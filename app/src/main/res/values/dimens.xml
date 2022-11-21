@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="notification_large_icon_size">72dp</dimen>
+    <dimen name="bigger_avatar_size">64dp</dimen>
+    <dimen name="play_outline_size">36dp</dimen>
+    <dimen name="attachment_preview_size">60dp</dimen>
+    <dimen name="remove_attachment_size">24dp</dimen>
+    <dimen name="pin_icon_size">18dp</dimen>
+    <dimen name="vcard_property_start_margin">64dp</dimen>
+
+    <!--message bubble-->
+    <dimen name="bubble_padding_top">8dp</dimen>
+    <dimen name="bubble_padding_bottom">12dp</dimen>
+    <dimen name="bubble_padding_left">12dp</dimen>
+    <dimen name="bubble_padding_right">16dp</dimen>
+    <dimen name="speech_bubble_corners">10dp</dimen>
+    <dimen name="speech_bubble_corners_plus_tail">15dp</dimen>
+    <dimen name="speech_bubble_spacing">5dp</dimen>
+    <dimen name="speech_bubble_tail">25dp</dimen>
+
+    <!--collapsing toolbar-->
+    <dimen name="contact_photo_size">88dp</dimen>
+    <dimen name="toolbar_height">102dp</dimen>
+    <dimen name="image_top_margin">24dp</dimen>
+    <dimen name="image_right_margin">20dp</dimen>
+    <dimen name="name_top_margin">1dp</dimen>
+    <dimen name="name_right_margin">6dp</dimen>
+    <dimen name="zero">0dp</dimen>
+
+
+    <dimen name="small_icon_size">38dp</dimen>
+</resources>

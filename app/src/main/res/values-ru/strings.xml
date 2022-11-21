@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Простой SMS-мессенджер</string>
+    <string name="app_launcher_name">Сообщения</string>
+    <string name="type_a_message">Введите сообщение…</string>
+    <string name="message_not_sent_short">Сообщение не отправлено</string>
+    <string name="message_not_sent_touch_retry">Не отправлено. Нажмите, чтобы повторить попытку.</string>
+    <string name="message_sending_error">Ваше сообщение для \"%s\" не было отправлено</string>
+    <string name="add_person">Добавить участника</string>
+    <string name="attachment">Вложение</string>
+    <string name="no_conversations_found">Нет сохранённых переписок</string>
+    <string name="start_conversation">Начать переписку</string>
+    <string name="reply">Ответ</string>
+    <string name="show_character_counter">Показывать счётчик символов при написании сообщений</string>
+    <string name="loading_messages">Загрузка сообщений…</string>
+    <string name="no_reply_support">Отправитель не поддерживает ответы</string>
+    <string name="draft">Черновик</string>
+    <string name="sending">Отправка…</string>
+    <string name="pin_conversation">Закрепить сверху</string>
+    <string name="unpin_conversation">Открепить</string>
+    <string name="forward_message">Переслать</string>
+    <string name="compress_error">Невозможно сжать изображение до выбранного размера</string>
+    <!-- vCard-->
+    <plurals name="and_other_contacts">
+        <item quantity="one">и ещё %d</item>
+        <item quantity="few">и ещё %d</item>
+        <item quantity="many">и ещё %d</item>
+        <item quantity="other">и ещё %d</item>
+    </plurals>
+    <!-- New conversation -->
+    <string name="new_conversation">Новая переписка</string>
+    <string name="add_contact_or_number">Добавить контакт или номер…</string>
+    <string name="suggestions">Предложения</string>
+    <!-- Notifications -->
+    <string name="channel_received_sms">Получено сообщение</string>
+    <string name="new_message">Новое сообщение</string>
+    <string name="mark_as_read">Прочитано</string>
+    <string name="mark_as_unread">Не прочитано</string>
+    <string name="me">Я</string>
+    <!-- Confirmation dialog -->
+    <string name="delete_whole_conversation_confirmation">Удалить все сообщения в этой переписке\?</string>
+    <!-- Are you sure you want to delete 5 conversations? -->
+    <plurals name="delete_conversations">
+        <item quantity="one">%d переписку</item>
+        <item quantity="few">%d переписки</item>
+        <item quantity="many">%d переписок</item>
+        <item quantity="other">%d переписок</item>
+    </plurals>
+    <!-- Are you sure you want to delete 5 messages? -->
+    <plurals name="delete_messages">
+        <item quantity="one">%d сообщение</item>
+        <item quantity="few">%d сообщения</item>
+        <item quantity="many">%d сообщений</item>
+        <item quantity="other">%d сообщений</item>
+    </plurals>
+    <!-- Settings -->
+    <string name="lock_screen_visibility">Отображение уведомлений на экране блокировки</string>
+    <string name="sender_and_message">Отправитель и сообщение</string>
+    <string name="sender_only">Только отправитель</string>
+    <string name="enable_delivery_reports">Использовать отчёты о доставке</string>
+    <string name="use_simple_characters">Удалять ударения и диакритические знаки при отправке сообщений</string>
+    <string name="mms_file_size_limit">Изменять размер отправляемых в MMS изображений</string>
+    <string name="mms_file_size_limit_none">Нет ограничения</string>
+    <string name="outgoing_messages">Исходящие сообщения</string>
+    <string name="group_message_mms">Отправлять групповые сообщения как MMS</string>
+    <string name="send_long_message_mms">Отправлять длинные сообщения как MMS</string>
+    <!-- Export / Import -->
+    <string name="messages">Сообщения</string>
+    <string name="export_messages">Экспорт сообщений</string>
+    <string name="export_sms">Экспорт SMS</string>
+    <string name="export_mms">Экспорт MMS</string>
+    <string name="import_messages">Импорт сообщений</string>
+    <string name="import_sms">Импорт SMS</string>
+    <string name="import_mms">Импорт MMS</string>
+    <string name="no_option_selected">Необходимо выбрать хотя бы один элемент</string>
+    <!-- FAQ -->
+    <string name="faq_1_title">Почему приложение требует доступ в интернет\?</string>
+    <string name="faq_1_text">К сожалению, это необходимо для отправки вложений MMS. Отсутствие возможности отправлять MMS-сообщения было бы огромным недостатком нашего приложения по сравнению с другими, поэтому мы решили пойти этим путём. Тем не менее, как и в других наших приложениях, это не содержит никакой рекламы, отслеживания или аналитики, интернет используется только для отправки MMS.</string>
+    <string name="faq_2_title">MMS не доходят до получателя, можно ли что-нибудь с этим сделать\?</string>
+    <string name="faq_2_text">Размер MMS ограничивается операторами связи, можно попробовать уменьшить лимит в настройках приложения.</string>
+    <!--
+        Haven't found some strings? There's more at
+        https://github.com/SimpleMobileTools/Simple-Commons/tree/master/commons/src/main/res
+    -->
+</resources>

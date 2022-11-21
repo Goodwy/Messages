@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/message_bubble_setting_scrollview"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/message_bubble_setting_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/activity_margin"
+        android:paddingTop="@dimen/activity_margin"
+        android:paddingEnd="@dimen/activity_margin">
+
+        <RelativeLayout
+            android:id="@+id/bubble_invert_color_holder"
+            style="@style/SettingsHolderSwitchStyle"
+            android:background="@drawable/rounded_rectangle_ripple">
+
+            <com.goodwy.commons.views.MySwitchCompat
+                android:id="@+id/bubble_invert_color"
+                style="@style/SettingsSwitchStyle"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:text="@string/invert_color"
+                android:textSize="@dimen/bigger_text_size"
+                app:switchPadding="@dimen/activity_margin" />
+
+        </RelativeLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/style_holder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/x50"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.50"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/style_original"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:background="@drawable/rounded_rectangle_outline"
+                android:foreground="@drawable/rounded_rectangle_ripple"
+                android:backgroundTint="@color/activated_item_foreground"
+                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="@+id/x50"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <ImageView
+                    android:id="@+id/style_original_check"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/radio_button"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <TextView
+                    android:id="@+id/style_original_bubble_one"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="52dp"
+                    android:autoLink="email|web"
+                    android:background="@drawable/item_received_background"
+                    android:paddingTop="@dimen/bubble_padding_top"
+                    android:paddingBottom="@dimen/bubble_padding_top"
+                    android:paddingStart="@dimen/bubble_padding_left"
+                    android:paddingEnd="@dimen/bubble_padding_left"
+                    android:textSize="@dimen/normal_text_size"
+                    android:text="Hey!"
+                    android:minHeight="36dp"
+                    android:gravity="start|center_vertical"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_max="384dp" />
+
+                <TextView
+                    android:id="@+id/style_original_bubble_two"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginEnd="36dp"
+                    android:autoLink="email|web"
+                    android:background="@drawable/item_received_background"
+                    android:paddingTop="@dimen/bubble_padding_top"
+                    android:paddingBottom="@dimen/bubble_padding_top"
+                    android:paddingStart="@dimen/bubble_padding_left"
+                    android:paddingEnd="@dimen/bubble_padding_left"
+                    android:textSize="@dimen/normal_text_size"
+                    android:text="How are you?"
+                    android:minHeight="36dp"
+                    android:gravity="start|center_vertical"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/style_original_bubble_one"
+                    app:layout_constraintWidth_max="384dp" />
+
+                <TextView
+                    android:id="@+id/style_original_bubble_three"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="60dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="12dp"
+                    android:autoLink="email|web"
+                    android:background="@drawable/item_sent_background"
+                    android:paddingTop="@dimen/bubble_padding_top"
+                    android:paddingBottom="@dimen/bubble_padding_top"
+                    android:paddingStart="@dimen/bubble_padding_left"
+                    android:paddingEnd="@dimen/bubble_padding_left"
+                    android:textSize="@dimen/normal_text_size"
+                    android:text="Hey!"
+                    android:minHeight="36dp"
+                    android:gravity="start|center_vertical"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/style_original_bubble_two"
+                    app:layout_constraintWidth_max="384dp" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/style_ios"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:background="@drawable/rounded_rectangle_outline"
+                android:foreground="@drawable/rounded_rectangle_ripple"
+                android:backgroundTint="@color/activated_item_foreground"
+                android:gravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/x50"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/style_ios_check"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/radio_button"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <TextView
+                    android:id="@+id/style_ios_bubble_one"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="52dp"
+                    android:autoLink="email|web"
+                    android:background="@drawable/item_received_ios_background"
+                    android:paddingTop="@dimen/bubble_padding_top"
+                    android:paddingBottom="@dimen/bubble_padding_bottom"
+                    android:paddingStart="@dimen/bubble_padding_right"
+                    android:paddingEnd="@dimen/bubble_padding_left"
+                    android:textSize="@dimen/normal_text_size"
+                    android:text="Hey!"
+                    android:minHeight="36dp"
+                    android:gravity="start|center_vertical"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_max="384dp" />
+
+                <TextView
+                    android:id="@+id/style_ios_bubble_two"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="36dp"
+                    android:autoLink="email|web"
+                    android:background="@drawable/item_received_ios_background"
+                    android:paddingTop="@dimen/bubble_padding_top"
+                    android:paddingBottom="@dimen/bubble_padding_bottom"
+                    android:paddingStart="@dimen/bubble_padding_right"
+                    android:paddingEnd="@dimen/bubble_padding_left"
+                    android:textSize="@dimen/normal_text_size"
+                    android:text="How are you?"
+                    android:minHeight="36dp"
+                    android:gravity="start|center_vertical"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/style_ios_bubble_one"
+                    app:layout_constraintWidth_max="384dp" />
+
+                <TextView
+                    android:id="@+id/style_ios_bubble_three"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="60dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginEnd="12dp"
+                    android:autoLink="email|web"
+                    android:background="@drawable/item_sent_ios_background"
+                    android:paddingTop="@dimen/bubble_padding_top"
+                    android:paddingBottom="@dimen/bubble_padding_bottom"
+                    android:paddingStart="@dimen/bubble_padding_left"
+                    android:paddingEnd="@dimen/bubble_padding_right"
+                    android:textSize="@dimen/normal_text_size"
+                    android:text="Hey!"
+                    android:minHeight="36dp"
+                    android:gravity="start|center_vertical"
+                    app:layout_constrainedWidth="true"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/style_ios_bubble_two"
+                    app:layout_constraintWidth_max="384dp" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+</ScrollView>

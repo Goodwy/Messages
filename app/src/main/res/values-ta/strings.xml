@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Simple SMS Messenger</string>
+    <string name="app_launcher_name">SMS Messenger</string>
+    <string name="type_a_message">செய்தியை உள்ளிடவும்…</string>
+    <string name="message_not_sent_short">செய்தி அனுப்பப்படவில்லை</string>
+    <string name="message_not_sent_touch_retry">அனுப்பப்படவில்லை. மீண்டும் முயற்சிக்க, தொடவும்.</string>
+    <string name="message_sending_error">\'%s\'க்கான உங்கள் செய்தி அனுப்பப்படவில்லை</string>
+    <string name="add_person">நபரைச் சேர்க்கவும்</string>
+    <string name="attachment">இணைப்பு</string>
+    <string name="no_conversations_found">சேமிக்கப்பட்ட உரையாடல்கள் எதுவும் கண்டறியப்படவில்லை</string>
+    <string name="start_conversation">உரையாடலைத் தொடங்குங்கள்</string>
+    <string name="reply">பதில்</string>
+    <string name="show_character_counter">செய்திகளை எழுதும் போது எழுத்து கவுண்டரைக் காட்டு</string>
+    <string name="loading_messages">செய்திகளை ஏற்றுகிறது…</string>
+    <string name="no_reply_support">அனுப்புநர் பதில்களை ஆதரிக்கவில்லை</string>
+    <string name="draft">வரைவு</string>
+    <string name="sending">அனுப்புகிறது…</string>
+    <string name="pin_conversation">மேலே பொருத்தவும்</string>
+    <string name="unpin_conversation">பின் நீக்கு</string>
+    <string name="forward_message">முன்னோக்கி</string>
+    <string name="compress_error">Unable to compress image to selected size</string>
+    <!-- vCard-->
+    <plurals name="and_other_contacts">
+        <item quantity="one">and %d other</item>
+        <item quantity="other">and %d others</item>
+    </plurals>
+    <!-- New conversation -->
+    <string name="new_conversation">புதிய உரையாடல்</string>
+    <string name="add_contact_or_number">தொடர்பு அல்லது எண்ணைச் சேர்க்கவும்…</string>
+    <string name="suggestions">பரிந்துரைகள்</string>
+    <!-- Notifications -->
+    <string name="channel_received_sms">SMS கிடைத்தது</string>
+    <string name="new_message">புதிய செய்தி</string>
+    <string name="mark_as_read">படித்ததாக குறியிடு</string>
+    <string name="mark_as_unread">படிக்காததாக குறியிடு</string>
+    <string name="me">Me</string>
+    <!-- Confirmation dialog -->
+    <string name="delete_whole_conversation_confirmation">இந்த உரையாடலின் அனைத்து செய்திகளையும் நிச்சயமாக நீக்க விரும்புகிறீர்களா\?</string>
+    <!-- Are you sure you want to delete 5 conversations? -->
+    <plurals name="delete_conversations">
+        <item quantity="one">%d உரையாடல்</item>
+        <item quantity="other">%d உரையாடல்கள்</item>
+    </plurals>
+    <!-- Are you sure you want to delete 5 messages? -->
+    <plurals name="delete_messages">
+        <item quantity="one">%d செய்தி</item>
+        <item quantity="other">%d செய்திகள்</item>
+    </plurals>
+    <!-- Settings -->
+    <string name="lock_screen_visibility">பூட்டுத் திரை அறிவிப்புத் தெரிவுநிலை</string>
+    <string name="sender_and_message">அனுப்புநர் மற்றும் செய்தி</string>
+    <string name="sender_only">அனுப்புநர் மட்டும்</string>
+    <string name="enable_delivery_reports">விநியோக அறிக்கைகளை இயக்கவும்</string>
+    <string name="use_simple_characters">செய்திகளை அனுப்பும் போது உச்சரிப்புகள் மற்றும் உச்சரிப்புகளை அகற்றவும்</string>
+    <string name="mms_file_size_limit">அனுப்பப்பட்ட MMS படங்களின் அளவை மாற்றவும்</string>
+    <string name="mms_file_size_limit_none">வரம்பு இல்லை</string>
+    <string name="outgoing_messages">வெளிச்செல்லும் செய்திகள்</string>
+    <string name="group_message_mms">Send group messages as MMS</string>
+    <string name="send_long_message_mms">Send long messages as MMS</string>
+    <!-- Export / Import -->
+    <string name="messages">செய்திகளை</string>
+    <string name="export_messages">செய்திகளை ஏற்றுமதி செய்யவும்</string>
+    <string name="export_sms">ஏற்றுமதி எஸ்எம்எஸ்</string>
+    <string name="export_mms">ஏற்றுமதி MMS</string>
+    <string name="import_messages">செய்திகளை இறக்குமதி செய்</string>
+    <string name="import_sms">SMS ஐ இறக்குமதி செய்யவும்</string>
+    <string name="import_mms">MMS ஐ இறக்குமதி செய்யவும்</string>
+    <string name="no_option_selected">நீங்கள் குறைந்தபட்சம் ஒரு உருப்படியைத் தேர்ந்தெடுக்க வேண்டும்</string>
+    <!-- FAQ -->
+    <string name="faq_1_title">பயன்பாட்டிற்கு இணைய அணுகல் ஏன் தேவைப்படுகிறது\?</string>
+    <string name="faq_1_text">MMS இணைப்புகளை அனுப்புவதற்கு இது தேவைப்படுகிறது. மற்ற பயன்பாடுகளுடன் ஒப்பிடும்போது MMS ஐ அனுப்ப முடியாமல் இருப்பது மிகவும் பெரிய குறையாக இருக்கும், எனவே நாங்கள் இந்த வழியில் செல்ல முடிவு செய்தோம். இருப்பினும், வழக்கமாக, விளம்பரங்கள், கண்காணிப்பு அல்லது பகுப்பாய்வு எதுவும் இல்லை, இணையம் MMS அனுப்ப மட்டுமே பயன்படுத்தப்படுகிறது.</string>
+    <string name="faq_2_title">The other end is not receiving my MMS, is there anything I can do about it\?</string>
+    <string name="faq_2_text">MMS size is limited by carriers, you can try setting a smaller limit in the app settings.</string>
+    <!--
+        Haven't found some strings? There's more at
+        https://github.com/SimpleMobileTools/Simple-Commons/tree/master/commons/src/main/res
+    -->
+</resources>

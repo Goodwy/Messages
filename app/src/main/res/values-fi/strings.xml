@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Simple SMS Messenger</string>
+    <string name="app_launcher_name">Viestit</string>
+    <string name="type_a_message">Lähetä viesti…</string>
+    <string name="message_not_sent_short">Viestiä ei lähetetty</string>
+    <string name="message_not_sent_touch_retry">Ei lähetetty. Yritä uudelleen koskemalla.</string>
+    <string name="message_sending_error">Viestiäsi henkilölle \'%s\' ei lähetetty</string>
+    <string name="add_person">Lisää henkilö</string>
+    <string name="attachment">Liite</string>
+    <string name="no_conversations_found">Tallennettuja keskusteluja ei löytyny</string>
+    <string name="start_conversation">Aloita keskustelu</string>
+    <string name="reply">Vastaa</string>
+    <string name="show_character_counter">Näytä merkkimäärä kirjoittaessasi viestejä</string>
+    <string name="loading_messages">Ladataan viestejä…</string>
+    <string name="no_reply_support">Lähettäjä ei tue vastauksia</string>
+    <string name="draft">Luonnos</string>
+    <string name="sending">Lähetetään…</string>
+    <string name="pin_conversation">Pin to the top</string>
+    <string name="unpin_conversation">Unpin</string>
+    <string name="forward_message">Forward</string>
+    <string name="compress_error">Unable to compress image to selected size</string>
+    <!-- vCard-->
+    <plurals name="and_other_contacts">
+        <item quantity="one">and %d other</item>
+        <item quantity="other">and %d others</item>
+    </plurals>
+    <!-- New conversation -->
+    <string name="new_conversation">Uusi keskustelu</string>
+    <string name="add_contact_or_number">Lisää yhteystieto tai numero…</string>
+    <string name="suggestions">Ehdotuksia</string>
+    <!-- Notifications -->
+    <string name="channel_received_sms">Vastaanotettu tekstiviesti</string>
+    <string name="new_message">Uusi viesti</string>
+    <string name="mark_as_read">Merkitse luetuksi</string>
+    <string name="mark_as_unread">Merkitse lukemattomaksi</string>
+    <string name="me">Me</string>
+    <!-- Confirmation dialog -->
+    <string name="delete_whole_conversation_confirmation">Haluatko varmasti poistaa kaikki tämän keskustelun viestit\?</string>
+    <!-- Are you sure you want to delete 5 conversations? -->
+    <plurals name="delete_conversations">
+        <item quantity="one">yhden keskustelun</item>
+        <item quantity="other">%d keskustelua</item>
+    </plurals>
+    <!-- Are you sure you want to delete 5 messages? -->
+    <plurals name="delete_messages">
+        <item quantity="one">yhden viestin</item>
+        <item quantity="other">%d viestiä</item>
+    </plurals>
+    <!-- Settings -->
+    <string name="lock_screen_visibility">Lock screen notification visibility</string>
+    <string name="sender_and_message">Sender and message</string>
+    <string name="sender_only">Sender only</string>
+    <string name="enable_delivery_reports">Ota käyttöön viestin toimitustiedot</string>
+    <string name="use_simple_characters">Remove accents and diacritics at sending messages</string>
+    <string name="mms_file_size_limit">Resize sent MMS images</string>
+    <string name="mms_file_size_limit_none">No limit</string>
+    <string name="outgoing_messages">Outgoing messages</string>
+    <string name="group_message_mms">Send group messages as MMS</string>
+    <string name="send_long_message_mms">Send long messages as MMS</string>
+    <!-- Export / Import -->
+    <string name="messages">Messages</string>
+    <string name="export_messages">Export messages</string>
+    <string name="export_sms">Export SMS</string>
+    <string name="export_mms">Export MMS</string>
+    <string name="import_messages">Import messages</string>
+    <string name="import_sms">Import SMS</string>
+    <string name="import_mms">Import MMS</string>
+    <string name="no_option_selected">You have to select at least one item</string>
+    <!-- FAQ -->
+    <string name="faq_1_title">Miksi sovellus vaatii Internet-yhteyden\?</string>
+    <string name="faq_1_text">Valitettavasti sitä tarvitaan multimediaviestin-liitteiden lähettämiseen. Multimediaviestien lähettämättä jättäminen olisi todella valtava haitta muihin sovelluksiin verrattuna, joten päätimme mennä tällä tavalla. Kuten yleensä, mainoksia, seurantaa tai analytiikkaa ei kuitenkaan ole, iternetiä käytetään vain multimediaviestien lähettämiseen.</string>
+    <string name="faq_2_title">The other end is not receiving my MMS, is there anything I can do about it\?</string>
+    <string name="faq_2_text">MMS size is limited by carriers, you can try setting a smaller limit in the app settings.</string>
+    <!--
+        Haven't found some strings? There's more at
+        https://github.com/SimpleMobileTools/Simple-Commons/tree/master/commons/src/main/res
+    -->
+</resources>

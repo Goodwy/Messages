@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Прості Повідомлення</string>
+    <string name="app_launcher_name">Повідомлення</string>
+    <string name="type_a_message">Введіть повідомлення…</string>
+    <string name="message_not_sent_short">Повідомлення не надіслано</string>
+    <string name="message_not_sent_touch_retry">Не надіслано. Торкніться, щоб повторити спробу.</string>
+    <string name="message_sending_error">Ваше повідомлення до \'%s\' не було надіслано</string>
+    <string name="add_person">Додати учасник а</string>
+    <string name="attachment">Вкладення</string>
+    <string name="no_conversations_found">Немає збережених листувань</string>
+    <string name="start_conversation">Почати листування</string>
+    <string name="reply">Відповідь</string>
+    <string name="show_character_counter">Показувати кількість символів</string>
+    <string name="loading_messages">Завантаження повідомлень…</string>
+    <string name="no_reply_support">Відправник не підтримує відповіді</string>
+    <string name="draft">Чернетка</string>
+    <string name="sending">Надсилання…</string>
+    <string name="pin_conversation">Pin to the top</string>
+    <string name="unpin_conversation">Відкріпити</string>
+    <string name="forward_message">Переслати</string>
+    <string name="compress_error">Не вдається стиснути зображення до вибраного розміру</string>
+    <!-- vCard-->
+    <plurals name="and_other_contacts">
+        <item quantity="one">and %d other</item>
+        <item quantity="few">and %d others</item>
+        <item quantity="many">and %d others</item>
+        <item quantity="other">and %d others</item>
+    </plurals>
+    <!-- New conversation -->
+    <string name="new_conversation">Нове листування</string>
+    <string name="add_contact_or_number">Додати контакт аба номер…</string>
+    <string name="suggestions">Пропозиція</string>
+    <!-- Notifications -->
+    <string name="channel_received_sms">Отримано повідомлення</string>
+    <string name="new_message">Нове повідомлення</string>
+    <string name="mark_as_read">Прочитано</string>
+    <string name="mark_as_unread">Не прочитано</string>
+    <string name="me">Me</string>
+    <!-- Confirmation dialog -->
+    <string name="delete_whole_conversation_confirmation">Справді видалити всі повідомлення у цьому листуванні\?</string>
+    <!-- Are you sure you want to delete 5 conversations? -->
+    <plurals name="delete_conversations">
+        <item quantity="one">%d листування</item>
+        <item quantity="few">%d листувань</item>
+        <item quantity="many">%d листувань</item>
+        <item quantity="other">%d листувань</item>
+    </plurals>
+    <!-- Are you sure you want to delete 5 messages? -->
+    <plurals name="delete_messages">
+        <item quantity="one">%d повідомлення</item>
+        <item quantity="few">%d повідомлень</item>
+        <item quantity="many">%d повідомлень</item>
+        <item quantity="other">%d повідомлень</item>
+    </plurals>
+    <!-- Settings -->
+    <string name="lock_screen_visibility">Видимість сповіщень на екрані блокування</string>
+    <string name="sender_and_message">Відправник і повідомлення</string>
+    <string name="sender_only">Лише відправник</string>
+    <string name="enable_delivery_reports">Увімкнути звіти про доставку</string>
+    <string name="use_simple_characters">Видаляти наголоси та діакритичні знаки під час надсилання повідомлень</string>
+    <string name="mms_file_size_limit">Змінювати розмір зображень, що надсилаються в MMS</string>
+    <string name="mms_file_size_limit_none">Без обмежень</string>
+    <string name="outgoing_messages">Вихідні повідомлення</string>
+    <string name="group_message_mms">Надсилати групові повідомлення як MMS</string>
+    <string name="send_long_message_mms">Надсилати довгі повідомлення як MMS</string>
+    <!-- Export / Import -->
+    <string name="messages">Messages</string>
+    <string name="export_messages">Export messages</string>
+    <string name="export_sms">Export SMS</string>
+    <string name="export_mms">Експорт MMS</string>
+    <string name="import_messages">Import messages</string>
+    <string name="import_sms">Import SMS</string>
+    <string name="import_mms">Імпорт MMS</string>
+    <string name="no_option_selected">Потрібно вибрати принаймні один елемент</string>
+    <!-- FAQ -->
+    <string name="faq_1_title">Чому додаток вимагає доступ до Інтернету\?</string>
+    <string name="faq_1_text">Нажаль, це необхідно для відправки вкладень MMS. Неспроможність надсилати MMS-повідомлення була б великим недоліком нашого додатку порівняно з іншими, тому ми так зробили. Тим не менше, як і в інших наших додатках, цей не містить реклами, відстеження та аналітики. Інтернет використовується лише для відправки MMS.</string>
+    <string name="faq_2_title">Інша сторона не отримує мого MMS, чи можу я щось з цим зробити\?</string>
+    <string name="faq_2_text">Розмір MMS обмежений операторами, ви можете спробувати зменшити ліміт у налаштуваннях програми.</string>
+    <!--
+        Haven't found some strings? There's more at
+        https://github.com/SimpleMobileTools/Simple-Commons/tree/master/commons/src/main/res
+    -->
+</resources>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="AppCompatResource">
+    <item
+        android:id="@+id/cab_delete"
+        android:icon="@drawable/ic_delete_vector"
+        android:title="@string/delete"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/cab_add_number_to_contact"
+        android:icon="@drawable/ic_add_person_vector"
+        android:title="@string/add_number_to_contact"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/cab_dial_number"
+        android:icon="@drawable/ic_phone_vector"
+        android:title="@string/dial_number"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/cab_block_number"
+        android:icon="@drawable/ic_minus_circle_vector"
+        android:title="@string/block_number"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/cab_copy_number"
+        android:showAsAction="never"
+        android:title="@string/copy_number_to_clipboard"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_mark_as_read"
+        android:showAsAction="never"
+        android:title="@string/mark_as_read"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_mark_as_unread"
+        android:showAsAction="never"
+        android:title="@string/mark_as_unread"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_pin_conversation"
+        android:icon="@drawable/ic_pin"
+        android:title="@string/pin_conversation"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/cab_unpin_conversation"
+        android:icon="@drawable/ic_unpin"
+        android:title="@string/unpin_conversation"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/cab_select_all"
+        android:icon="@drawable/ic_select_all_vector"
+        android:title="@string/select_all"
+        app:showAsAction="ifRoom" />
+</menu>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" >
+
+    <item
+        android:left="@dimen/speech_bubble_corners_plus_tail"
+        android:right="@dimen/speech_bubble_corners"
+        android:bottom="@dimen/speech_bubble_spacing"
+        tools:width="50dp"
+        tools:height="50dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white"/>
+        </shape>
+    </item>
+
+    <item
+        android:top="@dimen/speech_bubble_corners"
+        android:bottom="@dimen/speech_bubble_corners_plus_tail"
+        android:left="@dimen/speech_bubble_spacing"
+        android:gravity="left"
+        android:width="@dimen/speech_bubble_corners">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white"/>
+        </shape>
+    </item>
+
+    <item
+        android:top="@dimen/speech_bubble_corners"
+        android:bottom="@dimen/speech_bubble_corners_plus_tail"
+        android:gravity="right"
+        android:width="@dimen/speech_bubble_corners">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white"/>
+        </shape>
+    </item>
+
+    <item
+        android:width="@dimen/speech_bubble_corners"
+        android:height="@dimen/speech_bubble_corners"
+        android:bottom="@dimen/speech_bubble_spacing"
+        android:gravity="bottom|right">
+        <vector xmlns:android="http://schemas.android.com/apk/res/android"
+            android:width="@dimen/speech_bubble_corners"
+            android:height="@dimen/speech_bubble_corners"
+            android:viewportWidth="10.0"
+            android:viewportHeight="10.0">
+            <path
+                android:pathData="M0,10 A10,10 0 0,0 10,0 L0,0 Z"
+                android:fillColor="@color/white"/>
+        </vector>
+    </item>
+
+    <item
+        android:width="@dimen/speech_bubble_corners"
+        android:height="@dimen/speech_bubble_corners"
+        android:gravity="top|right">
+        <vector xmlns:android="http://schemas.android.com/apk/res/android"
+            android:width="@dimen/speech_bubble_corners"
+            android:height="@dimen/speech_bubble_corners"
+            android:viewportWidth="10.0"
+            android:viewportHeight="10.0">
+            <path
+                android:pathData="M10,10 A10,10 0 0,0 0,0 L0,10 Z"
+                android:fillColor="@color/white"/>
+        </vector>
+    </item>
+
+    <item
+        android:width="@dimen/speech_bubble_corners"
+        android:height="@dimen/speech_bubble_corners"
+        android:left="@dimen/speech_bubble_spacing"
+        android:gravity="top|left">
+        <vector xmlns:android="http://schemas.android.com/apk/res/android"
+            android:width="@dimen/speech_bubble_corners"
+            android:height="@dimen/speech_bubble_corners"
+            android:viewportWidth="10.0"
+            android:viewportHeight="10.0">
+            <path
+                android:pathData="M10,0 A10,10 0 0,0 0,10 L10,10 Z"
+                android:fillColor="@color/white"/>
+        </vector>
+    </item>
+
+    <item
+        android:width="@dimen/speech_bubble_corners_plus_tail"
+        android:height="@dimen/speech_bubble_corners_plus_tail"
+        android:gravity="bottom|left">
+        <vector xmlns:android="http://schemas.android.com/apk/res/android"
+            android:width="@dimen/speech_bubble_corners_plus_tail"
+            android:height="@dimen/speech_bubble_corners_plus_tail"
+            android:viewportWidth="150.0"
+            android:viewportHeight="150.0">
+            <path
+                android:pathData="M150,100 L150,0 L50,0 C50,11.9054549 52.5180742,22.2130322 55.2200144,32.2289993 C59.25,47.1679688 65.7054859,60.8615415 68.15625,65.5820312 C55.2200144,107.207031 41.7460938,127.800781 0,151 C61.5311854,147.539062 101.691406,129.675781 124.615295,97.6602593 C132.823321,99.8389881 141.106342,100 150,100 Z"
+                android:fillColor="@color/white"/>
+        </vector>
+    </item>
+
+</layer-list>
