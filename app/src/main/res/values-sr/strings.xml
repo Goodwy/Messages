@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Једноставан SMS Messenger</string>
+    <string name="app_launcher_name">SMS Messenger</string>
+    <string name="type_a_message">Унесите поруку…</string>
+    <string name="message_not_sent_short">Порука није послата</string>
+    <string name="message_not_sent_touch_retry">Није послато. Додирните за поновни покушај.</string>
+    <string name="message_sending_error">Ваша порука за \'%s\' није послата</string>
+    <string name="add_person">Додај особу</string>
+    <string name="attachment">Прилог</string>
+    <string name="no_conversations_found">Није пронађена ниједна сачувана преписка</string>
+    <string name="start_conversation">Започни преписку</string>
+    <string name="reply">Одговори</string>
+    <string name="show_character_counter">Прикажи бројач знакова при писању порука</string>
+    <string name="loading_messages">Учитавање порука…</string>
+    <string name="no_reply_support">Пошиљалац не подржава одговоре</string>
+    <string name="draft">Нацрт</string>
+    <string name="sending">Слање…</string>
+    <string name="pin_conversation">Закачи на врх</string>
+    <string name="unpin_conversation">Откачи</string>
+    <string name="forward_message">Проследи</string>
+    <string name="compress_error">Није могуће компримовати слику на изабрану величину</string>
+    <!-- vCard-->
+    <plurals name="and_other_contacts">
+        <item quantity="one">и %d остали</item>
+		<item quantity="few">и %d остала</item>
+        <item quantity="other">и %d осталих</item>
+    </plurals>
+    <!-- New conversation -->
+    <string name="new_conversation">Нова преписка</string>
+    <string name="add_contact_or_number">Додај контакт или број…</string>
+    <string name="suggestions">Предлози</string>
+    <!-- Notifications -->
+    <string name="channel_received_sms">Примљени SMS</string>
+    <string name="new_message">Нова порука</string>
+    <string name="mark_as_read">Означи као прочитано</string>
+    <string name="mark_as_unread">Означи као непрочитано</string>
+    <string name="me">Ја</string>
+    <!-- Confirmation dialog -->
+    <string name="delete_whole_conversation_confirmation">Да ли сте сигурни да желите да избришете све поруке ове преписке?</string>
+    <!-- Are you sure you want to delete 5 conversations? -->
+    <plurals name="delete_conversations">
+        <item quantity="one">%d преписку</item>
+		<item quantity="few">%d преписке</item>
+        <item quantity="other">%d преписака</item>
+    </plurals>
+    <!-- Are you sure you want to delete 5 messages? -->
+    <plurals name="delete_messages">
+        <item quantity="one">%d поруку</item>
+		<item quantity="few">%d поруке</item>
+        <item quantity="other">%d порука</item>
+    </plurals>
+    <!-- Settings -->
+    <string name="lock_screen_visibility">Видљивост обавештења на закључаном екрану</string>
+    <string name="sender_and_message">Пошиљалац и порука</string>
+    <string name="sender_only">Само пошиљалац</string>
+    <string name="enable_delivery_reports">Омогући извештаје о испоруци</string>
+    <string name="use_simple_characters">Уклони акценте и дијакритичке знакове при слању порука</string>
+    <string name="mms_file_size_limit">Промени величину послатих MMS слика</string>
+    <string name="mms_file_size_limit_none">Без ограничења</string>
+    <string name="outgoing_messages">Одлазне поруке</string>
+    <string name="group_message_mms">Шаљи групне поруке као MMS</string>
+    <string name="send_long_message_mms">Шаљи дугачке поруке као MMS</string>
+    <!-- Export / Import -->
+    <string name="messages">Поруке</string>
+    <string name="export_messages">Извези поруке</string>
+    <string name="export_sms">Извези SMS</string>
+    <string name="export_mms">Извези MMS</string>
+    <string name="import_messages">Увези поруке</string>
+    <string name="import_sms">Увези SMS</string>
+    <string name="import_mms">Увези MMS</string>
+    <string name="no_option_selected">Морате изабрати најмање једну ставку</string>
+    <!-- FAQ -->
+    <string name="faq_1_title">Зашто је апликацији потребан приступ интернету?</string>
+    <string name="faq_1_text">Нажалост, то је потребно за слање MMS прилога. Немогућност слања MMS-а би био заиста велики недостатак у поређењу са другим апликацијама, па смо одлучили да идемо овим путем.
+    Међутим, као и обично, нема реклама, праћења или аналитике, интернет се користи само за слање MMS-а.</string>
+    <string name="faq_2_title">Друга страна не прима мој MMS, могу ли нешто урадити поводом тога?</string>
+    <string name="faq_2_text">Величину MMS-а ограничавају оператери, можете покушати да подесите мање ограничење у подешавањима апликације.</string>
+    <!--
+        Haven't found some strings? There's more at
+        https://github.com/SimpleMobileTools/Simple-Commons/tree/master/commons/src/main/res
+    -->
+</resources>
