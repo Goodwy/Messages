@@ -8,8 +8,8 @@
     <string name="message_sending_error">Ваша порука за \'%s\' није послата</string>
     <string name="add_person">Додај особу</string>
     <string name="attachment">Прилог</string>
-    <string name="no_conversations_found">Није пронађена ниједна сачувана преписка</string>
-    <string name="start_conversation">Започни преписку</string>
+    <string name="no_conversations_found">Није пронађен ниједан сачувани разговор</string>
+    <string name="start_conversation">Започни разговор</string>
     <string name="reply">Одговори</string>
     <string name="show_character_counter">Прикажи бројач знакова при писању порука</string>
     <string name="loading_messages">Учитавање порука…</string>
@@ -23,11 +23,11 @@
     <!-- vCard-->
     <plurals name="and_other_contacts">
         <item quantity="one">и %d остали</item>
-		<item quantity="few">и %d остала</item>
+	<item quantity="few">и %d остала</item>
         <item quantity="other">и %d осталих</item>
     </plurals>
     <!-- New conversation -->
-    <string name="new_conversation">Нова преписка</string>
+    <string name="new_conversation">Нови разговор</string>
     <string name="add_contact_or_number">Додај контакт или број…</string>
     <string name="suggestions">Предлози</string>
     <!-- Notifications -->
@@ -37,17 +37,17 @@
     <string name="mark_as_unread">Означи као непрочитано</string>
     <string name="me">Ја</string>
     <!-- Confirmation dialog -->
-    <string name="delete_whole_conversation_confirmation">Да ли сте сигурни да желите да избришете све поруке ове преписке?</string>
+    <string name="delete_whole_conversation_confirmation">Да ли сте сигурни да желите да избришете све поруке овог разговора?</string>
     <!-- Are you sure you want to delete 5 conversations? -->
     <plurals name="delete_conversations">
-        <item quantity="one">%d преписку</item>
-		<item quantity="few">%d преписке</item>
-        <item quantity="other">%d преписака</item>
+        <item quantity="one">%d разговор</item>
+	<item quantity="few">%d разговора</item>
+        <item quantity="other">%d разговора</item>
     </plurals>
     <!-- Are you sure you want to delete 5 messages? -->
     <plurals name="delete_messages">
         <item quantity="one">%d поруку</item>
-		<item quantity="few">%d поруке</item>
+	<item quantity="few">%d поруке</item>
         <item quantity="other">%d порука</item>
     </plurals>
     <!-- Settings -->
@@ -63,10 +63,10 @@
     <string name="send_long_message_mms">Шаљи дугачке поруке као MMS</string>
     <!-- Export / Import -->
     <string name="messages">Поруке</string>
-    <string name="export_messages">Извези поруке</string>
+    <string name="export_messages">Извоз порука</string>
     <string name="export_sms">Извези SMS</string>
     <string name="export_mms">Извези MMS</string>
-    <string name="import_messages">Увези поруке</string>
+    <string name="import_messages">Увоз порука</string>
     <string name="import_sms">Увези SMS</string>
     <string name="import_mms">Увези MMS</string>
     <string name="no_option_selected">Морате изабрати најмање једну ставку</string>
