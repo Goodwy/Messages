@@ -2,9 +2,9 @@
 <resources>
     <string name="app_name">シンプル SMS</string>
     <string name="app_launcher_name">SMS</string>
-    <string name="type_a_message">メッセージを入力してください…</string>
+    <string name="type_a_message">メッセージを入力…</string>
     <string name="message_not_sent_short">メッセージは送信されませんでした</string>
-    <string name="message_not_sent_touch_retry">送信されませんでした。タップして再送します</string>
+    <string name="message_not_sent_touch_retry">送信失敗。タップして再送してください。</string>
     <string name="message_sending_error">「%s」さんへのメッセージは送信されませんでした</string>
     <string name="add_person">宛先を追加</string>
     <string name="attachment">添付</string>
@@ -12,44 +12,90 @@
     <string name="start_conversation">会話を始める</string>
     <string name="reply">返信</string>
     <string name="show_character_counter">メッセージ入力中に文字カウントを表示</string>
-    <string name="loading_messages">メッセージを読み込んでいます…</string>
+    <string name="loading_messages">メッセージを読み込み中…</string>
     <string name="no_reply_support">差出人は返信に対応していません</string>
     <string name="draft">下書き</string>
-    <string name="sending">送信しています…</string>
+    <string name="sending">送信中…</string>
     <string name="pin_conversation">最上部に固定</string>
     <string name="unpin_conversation">固定を外す</string>
     <string name="forward_message">転送</string>
     <string name="compress_error">選択したサイズに画像を圧縮できません</string>
-    <!-- vCard-->
+    <!-- Attachments -->
+    <string name="duplicate_item_warning">重複したアイテムは含まれていませんでした</string>
+    <!-- vCard -->
     <plurals name="and_other_contacts">
         <item quantity="other">and %d others</item>
     </plurals>
     <!-- New conversation -->
     <string name="new_conversation">新しい会話</string>
     <string name="add_contact_or_number">連絡先や電話番号を追加…</string>
-    <string name="suggestions">おすすめ</string>
+    <string name="suggestions">提案</string>
+    <!-- Group conversation -->
+    <string name="members">メンバー</string>
+    <string name="conversation_name">会話名</string>
+    <string name="conversation_details">会話の詳細</string>
+    <string name="rename_conversation">会話名を変更</string>
+    <string name="rename_conversation_warning">この会話名は相手には表示されません</string>
+    <!-- Schedule send -->
+    <string name="scheduled_message">予約されたメッセージ</string>
+    <string name="schedule_message">予約メッセージ</string>
+    <string name="schedule_send">予約送信</string>
+    <string name="cancel_schedule_send">予約送信の取り消し</string>
+    <string name="must_pick_time_in_the_future">今後の時間を選択する必要があります</string>
+    <string name="schedule_send_warning">端末の電源を入れたままにしつつ、アプリがバックグラウンドで強制終了されないようにしてください（バッテリー節約設定からこのアプリを除外してください）。</string>
+    <string name="update_message">メッセージを更新</string>
+    <string name="send_now">今すぐ送信</string>
+    <!-- Message details -->
+    <string name="message_details">Message details</string>
+    <string name="message_details_sender">Sender</string>
+    <string name="message_details_receiver">Receiver</string>
+    <string name="message_details_sent_at">Sent at</string>
+    <string name="message_details_received_at">Received at</string>
     <!-- Notifications -->
     <string name="channel_received_sms">受信した SMS</string>
     <string name="new_message">新しいメッセージ</string>
     <string name="mark_as_read">既読にする</string>
     <string name="mark_as_unread">未読にする</string>
-    <string name="me">Me</string>
+    <string name="me">自分</string>
+    <!-- Archive -->
+    <string name="unarchive">Unarchive</string>
+    <string name="empty_archive">Delete all archived conversations</string>
+    <string name="archived_conversations">Archive</string>
+    <string name="show_archived_conversations">Show archived conversations</string>
+    <string name="archive">Archive</string>
+    <string name="no_archived_conversations">No archived conversations have been found</string>
+    <string name="archive_emptied_successfully">The archive has been emptied successfully</string>
+    <string name="empty_archive_confirmation">Are you sure you want to empty the archive? All archived conversations will be permanently lost.</string>
+    <!-- Recycle bin -->
+    <string name="restore">Restore</string>
+    <string name="restore_all_messages">Restore all messages</string>
+    <string name="empty_recycle_bin_messages_confirmation">Are you sure you want to empty the Recycle Bin? The messages will be permanently lost.</string>
+    <string name="skip_the_recycle_bin_messages">Skip the Recycle Bin, delete messages directly</string>
     <!-- Confirmation dialog -->
     <string name="delete_whole_conversation_confirmation">本当にこの会話のすべてのメッセージを削除しますか？</string>
+    <string name="archive_confirmation">Are you sure you want to archive %s?</string>
+    <string name="restore_whole_conversation_confirmation">Are you sure you want to restore all messages of this conversation?</string>
+    <string name="restore_confirmation">Are you sure you want to restore %s?</string>
     <!-- Are you sure you want to delete 5 conversations? -->
     <plurals name="delete_conversations">
         <item quantity="other">%d 件の会話</item>
     </plurals>
     <!-- Are you sure you want to delete 5 messages? -->
     <plurals name="delete_messages">
-        <item quantity="other">% 件のメッセージ</item>
+        <item quantity="other">%d 件のメッセージ</item>
     </plurals>
     <!-- Settings -->
+    <string name="keyword">Keyword</string>
+    <string name="blocked_keywords">Blocked keywords</string>
+    <string name="manage_blocked_keywords">Manage blocked keywords</string>
+    <string name="not_blocking_keywords">You are not blocking any keywords. You may add keywords here to block all messages containing them.</string>
+    <string name="add_a_blocked_keyword">Add a blocked keyword</string>
     <string name="lock_screen_visibility">ロック画面の通知表示</string>
     <string name="sender_and_message">差出人とメッセージ</string>
     <string name="sender_only">差出人のみ</string>
     <string name="enable_delivery_reports">配信確認レポートを有効にする</string>
     <string name="use_simple_characters">送信するメッセージから発音記号を取り除く (英語)</string>
+    <string name="send_on_enter">Enter キーでメッセージを送信</string>
     <string name="mms_file_size_limit">送信する MMS の画像をリサイズ</string>
     <string name="mms_file_size_limit_none">制限しない</string>
     <string name="outgoing_messages">送信するメッセージ</string>
@@ -64,11 +110,25 @@
     <string name="import_sms">SMS をインポート</string>
     <string name="import_mms">MMS をインポート</string>
     <string name="no_option_selected">1 つ以上のアイテムを選択する必要があります</string>
+    <!-- Errors -->
+    <string name="empty_destination_address">番号を空にすることはできません</string>
+    <string name="unable_to_save_message">メッセージを電話データベースに保存できませんでした</string>
+    <string name="error_service_is_unavailable">メッセージを送信できませんでした (サービス利用不可)</string>
+    <string name="error_radio_turned_off">メッセージを送信できませんでした (無線オフにより)</string>
+    <string name="carrier_send_error">メッセージを送信できませんでした (通信キャリアエラー)</string>
+    <string name="unknown_error_occurred_sending_message">メッセージを送信できませんでした (エラーコード: %d)</string>
+    <string name="invalid_short_code">このようなショートコードには返信できません</string>
+    <string name="invalid_short_code_desc">「503501」のような数字のみのショートコードには返信できますが、「AB-CD0」のようなアルファベットと数字を含んだショートコードには返信できません。</string>
+    <string name="attachment_sized_exceeds_max_limit">Attachment size exceeds max MMS limit</string>
+    <string name="sim_card_not_available">SIM card not available</string>
+    <string name="couldnt_download_mms">Couldn\'t download MMS</string>
     <!-- FAQ -->
-    <string name="faq_1_title">なぜアプリ使用にインターネットへのアクセスが必要なのですか？</string>
-    <string name="faq_1_text">MMS (マルチメディアメッセージサービス) にはインターネットが必要となります。ほかのアプリでは使用できる MMS が使用できないことは大きな不利益となるため、このようになっています。 ただし、通常通り広告・追跡・分析は一切行わず、インターネットは MMS のみに使われます</string>
+    <string name="faq_1_title">なぜアプリの使用にインターネットへのアクセスが必要なのですか？</string>
+    <string name="faq_1_text">MMS (マルチメディアメッセージサービス) にはインターネットが必要となります。ほかのアプリでは使用できる MMS が使用できないことは大きな不利益となるため、このようになっています。 ただし、通常通り広告・追跡・分析は一切行わず、インターネットは MMS のみに使用されます。</string>
     <string name="faq_2_title">メッセージ相手が MMS を受信できません。何かできますか？</string>
-    <string name="faq_2_text">MMS のサイズは通信キャリアによって制限されています。アプリ設定からより小さく圧縮できます</string>
+    <string name="faq_2_text">MMS のサイズは通信キャリアによって制限されています。アプリの設定で制限を小さくしてみてください（「送信する MMS の画像をリサイズ」から制限を小さくできます）。</string>
+    <string name="faq_3_title">アプリは予約メッセージをサポートしていますか？</string>
+    <string name="faq_3_text">はい、送信ボタンを長押しして、希望の日付と時刻を選択することで、今後送信したいメッセージを予約できます。</string>
     <!--
         Haven't found some strings? There's more at
         https://github.com/SimpleMobileTools/Simple-Commons/tree/master/commons/src/main/res

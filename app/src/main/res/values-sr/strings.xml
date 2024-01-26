@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--TODO Change-->
     <string name="app_name">Једноставан SMS Messenger</string>
     <string name="app_launcher_name">SMS Messenger</string>
     <string name="type_a_message">Унесите поруку…</string>
@@ -23,34 +24,77 @@
     <!-- vCard-->
     <plurals name="and_other_contacts">
         <item quantity="one">и %d остали</item>
-	<item quantity="few">и %d остала</item>
+        <item quantity="few">и %d остала</item>
         <item quantity="other">и %d осталих</item>
     </plurals>
     <!-- New conversation -->
     <string name="new_conversation">Нови разговор</string>
     <string name="add_contact_or_number">Додај контакт или број…</string>
     <string name="suggestions">Предлози</string>
+    <!-- Group conversation -->
+    <string name="members">Members</string>
+    <string name="conversation_name">Conversation name</string>
+    <string name="conversation_details">Conversation details</string>
+    <string name="rename_conversation">Rename conversation</string>
+    <string name="rename_conversation_warning">Only you can see this conversation name</string>
+    <!-- Schedule send -->
+    <string name="scheduled_message">Заказана порука</string>
+    <string name="schedule_message">Закажите поруку</string>
+    <string name="schedule_send">Закажите слање</string>
+    <string name="cancel_schedule_send">Откажи слање распореда</string>
+    <string name="must_pick_time_in_the_future">Морате изабрати време у будућности</string>
+    <string name="schedule_send_warning">Држите телефон укључен и уверите се да ништа не убија апликацију док је у позадини.</string>
+    <string name="update_message">Ажурирајте поруку</string>
+    <string name="send_now">Пошаљи одмах</string>
+    <!-- Message details -->
+    <string name="message_details">Детаљи о поруци</string>
+    <string name="message_details_sender">Шалје</string>
+    <string name="message_details_receiver">Прима</string>
+    <string name="message_details_sent_at">Послано</string>
+    <string name="message_details_received_at">Примлјено</string>
     <!-- Notifications -->
     <string name="channel_received_sms">Примљени SMS</string>
     <string name="new_message">Нова порука</string>
     <string name="mark_as_read">Означи као прочитано</string>
     <string name="mark_as_unread">Означи као непрочитано</string>
     <string name="me">Ја</string>
+    <!-- Archive -->
+    <string name="unarchive">Врати из архиве</string>
+    <string name="empty_archive">Обриши све архивиране конверзације</string>
+    <string name="archived_conversations">Архива</string>
+    <string name="show_archived_conversations">Прикажи архивиране конверзације</string>
+    <string name="archive">Архивирај</string>
+    <string name="no_archived_conversations">Нема архивираних разговора</string>
+    <string name="archive_emptied_successfully">Архива је успјешно испражнјена</string>
+    <string name="empty_archive_confirmation">Да ли сте сигурни да желите да испразните архиву? Све архивиране поруке ће бити избрисане.</string>
+    <!-- Recycle bin -->
+    <string name="restore">Врати</string>
+    <string name="restore_all_messages">Врати све поруке</string>
+    <string name="empty_recycle_bin_messages_confirmation">Да ли сте сигурни да желите испразнити канту за отпазке? Поруке ће бити трајно обрисане.</string>
+    <string name="skip_the_recycle_bin_messages">Прескочи канту за отпатке, обриши поруке директно</string>
     <!-- Confirmation dialog -->
     <string name="delete_whole_conversation_confirmation">Да ли сте сигурни да желите да избришете све поруке овог разговора?</string>
+    <string name="archive_confirmation">Да ли сте сигурни да желите да архивирате %s?</string>
+    <string name="restore_whole_conversation_confirmation">Да ли сте сигурни да желите да вратите све поруке ове конверзације?</string>
+    <string name="restore_confirmation">Да ли сте сигурни да желите да вратите %s?</string>
     <!-- Are you sure you want to delete 5 conversations? -->
     <plurals name="delete_conversations">
         <item quantity="one">%d разговор</item>
-	<item quantity="few">%d разговора</item>
+        <item quantity="few">%d разговора</item>
         <item quantity="other">%d разговора</item>
     </plurals>
     <!-- Are you sure you want to delete 5 messages? -->
     <plurals name="delete_messages">
         <item quantity="one">%d поруку</item>
-	<item quantity="few">%d поруке</item>
+        <item quantity="few">%d поруке</item>
         <item quantity="other">%d порука</item>
     </plurals>
     <!-- Settings -->
+    <string name="keyword">Ријеч</string>
+    <string name="blocked_keywords">Блокиране ријечи</string>
+    <string name="manage_blocked_keywords">Управљање блокираним ријечима</string>
+    <string name="not_blocking_keywords">Не блокирате ни једну ријеч. Овдје можете додати ријечи како бисте блокирали све поруке које их садрже.</string>
+    <string name="add_a_blocked_keyword">Додај блокирану ријеч.</string>
     <string name="lock_screen_visibility">Видљивост обавештења на закључаном екрану</string>
     <string name="sender_and_message">Пошиљалац и порука</string>
     <string name="sender_only">Само пошиљалац</string>
@@ -70,14 +114,11 @@
     <string name="import_sms">Увези SMS</string>
     <string name="import_mms">Увези MMS</string>
     <string name="no_option_selected">Морате изабрати најмање једну ставку</string>
+    <string name="couldnt_download_mms">Couldn\'t download MMS</string>
     <!-- FAQ -->
     <string name="faq_1_title">Зашто је апликацији потребан приступ интернету?</string>
     <string name="faq_1_text">Нажалост, то је потребно за слање MMS прилога. Немогућност слања MMS-а би био заиста велики недостатак у поређењу са другим апликацијама, па смо одлучили да идемо овим путем.
     Међутим, као и обично, нема реклама, праћења или аналитике, интернет се користи само за слање MMS-а.</string>
     <string name="faq_2_title">Друга страна не прима мој MMS, могу ли нешто урадити поводом тога?</string>
     <string name="faq_2_text">Величину MMS-а ограничавају оператери, можете покушати да подесите мање ограничење у подешавањима апликације.</string>
-    <!--
-        Haven't found some strings? There's more at
-        https://github.com/SimpleMobileTools/Simple-Commons/tree/master/commons/src/main/res
-    -->
 </resources>

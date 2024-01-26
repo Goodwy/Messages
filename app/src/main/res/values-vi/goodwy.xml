@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name_g">Right Messages</string>
+    <string name="chat_title_style_g">Chat title style</string>
+    <string name="unread_at_top_g">Chưa đọc luôn ở trên cùng</string>
+</resources>

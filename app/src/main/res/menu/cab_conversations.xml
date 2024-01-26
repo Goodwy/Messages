@@ -2,22 +2,31 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="AppCompatResource">
+    tools:ignore="AppCompatResource,AlwaysShowAction">
     <item
         android:id="@+id/cab_delete"
-        android:icon="@drawable/ic_delete_vector"
+        android:icon="@drawable/ic_delete_outline"
+        android:showAsAction="always"
         android:title="@string/delete"
         app:showAsAction="always" />
     <item
-        android:id="@+id/cab_add_number_to_contact"
-        android:icon="@drawable/ic_add_person_vector"
-        android:title="@string/add_number_to_contact"
+        android:id="@+id/cab_archive"
+        android:icon="@drawable/ic_archive_vector"
+        android:showAsAction="always"
+        android:title="@string/archive"
         app:showAsAction="always" />
     <item
         android:id="@+id/cab_dial_number"
         android:icon="@drawable/ic_phone_vector"
+        android:showAsAction="always"
         android:title="@string/dial_number"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/cab_add_number_to_contact"
+        android:icon="@drawable/ic_add_person_vector"
+        android:showAsAction="ifRoom"
+        android:title="@string/add_number_to_contact"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/cab_block_number"
         android:icon="@drawable/ic_minus_circle_vector"
@@ -28,6 +37,11 @@
         android:showAsAction="never"
         android:title="@string/copy_number_to_clipboard"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_rename_conversation"
+        android:icon="@drawable/ic_edit_vector"
+        android:title="@string/rename_conversation"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/cab_mark_as_read"
         android:showAsAction="never"
@@ -40,12 +54,12 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/cab_pin_conversation"
-        android:icon="@drawable/ic_pin"
+        android:icon="@drawable/ic_pin_angle_filled"
         android:title="@string/pin_conversation"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/cab_unpin_conversation"
-        android:icon="@drawable/ic_unpin"
+        android:icon="@drawable/ic_pin_angle"
         android:title="@string/unpin_conversation"
         app:showAsAction="ifRoom" />
     <item

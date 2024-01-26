@@ -5,19 +5,31 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import com.bumptech.glide.Glide
+import com.klinker.android.send_message.MmsReceivedReceiver
 import com.goodwy.commons.extensions.isNumberBlocked
+import com.goodwy.commons.extensions.normalizePhoneNumber
+import com.goodwy.commons.extensions.showErrorToast
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.smsmessenger.R
-import com.goodwy.smsmessenger.extensions.*
+import com.goodwy.smsmessenger.extensions.conversationsDB
+import com.goodwy.smsmessenger.extensions.getConversations
+import com.goodwy.smsmessenger.extensions.getLatestMMS
+import com.goodwy.smsmessenger.extensions.insertOrUpdateConversation
+import com.goodwy.smsmessenger.extensions.showReceivedMessageNotification
+import com.goodwy.smsmessenger.extensions.updateUnreadCountBadge
+import com.goodwy.smsmessenger.helpers.refreshMessages
 
 // more info at https://github.com/klinker41/android-smsmms
-class MmsReceiver : com.klinker.android.send_message.MmsReceivedReceiver() {
+class MmsReceiver : MmsReceivedReceiver() {
+
+    override fun isAddressBlocked(context: Context, address: String): Boolean {
+        val normalizedAddress = address.normalizePhoneNumber()
+        return context.isNumberBlocked(normalizedAddress)
+    }
+
     override fun onMessageReceived(context: Context, messageUri: Uri) {
         val mms = context.getLatestMMS() ?: return
-        val address = mms.participants.firstOrNull()?.phoneNumbers?.first()?.normalizedNumber ?: ""
-        if (context.isNumberBlocked(address)) {
-            return
-        }
+        val address = mms.getSender()?.phoneNumbers?.first()?.normalizedNumber ?: ""
 
         val size = context.resources.getDimension(R.dimen.notification_large_icon_size).toInt()
         ensureBackgroundThread {
@@ -33,15 +45,16 @@ class MmsReceiver : com.klinker.android.send_message.MmsReceivedReceiver() {
             }
 
             Handler(Looper.getMainLooper()).post {
-                context.showReceivedMessageNotification(address, mms.body, mms.threadId, glideBitmap)
+                context.showReceivedMessageNotification(mms.id, address, mms.body, mms.threadId, glideBitmap)
                 val conversation = context.getConversations(mms.threadId).firstOrNull() ?: return@post
                 ensureBackgroundThread {
-                    context.conversationsDB.insertOrUpdate(conversation)
+                    context.insertOrUpdateConversation(conversation)
                     context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
+                    refreshMessages()
                 }
             }
         }
     }
 
-    override fun onError(context: Context, error: String) {}
+    override fun onError(context: Context, error: String) = context.showErrorToast(context.getString(R.string.couldnt_download_mms))
 }

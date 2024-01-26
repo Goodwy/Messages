@@ -10,10 +10,26 @@
     <string name="mms_file_size_limit_2mb">2MB</string>
     <string name="sms">SMS</string>
     <string name="mms">MMS</string>
+    <string name="message_details_sim">SIM</string>
 
-    <string name="release_48">
-        Disabled delivery reports by default\n
-        Avoid sending long messages as MMS
+    <string name="release_420">
+        !!! The format of backups has been changed. To restore backups made on previous versions install application version 4.1.0\n
+        Added blocking of messages by keywords\n
+        Added application password protection\n
+        Added the ability to hide the top ban when scrolling\n
+        Added support for RTL languages\n
+        Improved performance, bug fixes
+    </string>
+
+    <string name="release_421">
+        Added Unread Indicator Position setting\n
+        Changed grouping, group chats at the top\n
+        Added context menu when clicking on a message\n
+        Bug fixes
+    </string>
+
+    <string name="release_423">
+        Bug fixes
     </string>
 
 </resources>

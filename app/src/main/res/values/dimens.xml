@@ -3,30 +3,46 @@
     <dimen name="notification_large_icon_size">72dp</dimen>
     <dimen name="bigger_avatar_size">64dp</dimen>
     <dimen name="play_outline_size">36dp</dimen>
-    <dimen name="attachment_preview_size">60dp</dimen>
+    <dimen name="attachment_preview_size">64dp</dimen>
+    <dimen name="attachment_preview_min_height">@dimen/attachment_preview_size</dimen>
+    <dimen name="attachment_preview_max_width">156dp</dimen>
     <dimen name="remove_attachment_size">24dp</dimen>
     <dimen name="pin_icon_size">18dp</dimen>
     <dimen name="vcard_property_start_margin">64dp</dimen>
+    <dimen name="small_icon_size">20dp</dimen>
+    <dimen name="medium_icon_size">38dp</dimen>
+    <dimen name="attachment_button_height">96dp</dimen>
+    <dimen name="attachment_button_width">90dp</dimen>
+    <dimen name="attachment_button_width_small">48dp</dimen>
+    <dimen name="default_keyboard_height">250dp</dimen>
 
     <!--message bubble-->
-    <dimen name="bubble_padding_top">8dp</dimen>
-    <dimen name="bubble_padding_bottom">12dp</dimen>
+    <dimen name="bubble_padding_top">6dp</dimen>
+    <dimen name="bubble_padding_bottom">14dp</dimen>
     <dimen name="bubble_padding_left">12dp</dimen>
-    <dimen name="bubble_padding_right">16dp</dimen>
+    <dimen name="bubble_padding_right">17dp</dimen>
+    <dimen name="bubble_padding_right_ios">19dp</dimen>
     <dimen name="speech_bubble_corners">10dp</dimen>
     <dimen name="speech_bubble_corners_plus_tail">15dp</dimen>
     <dimen name="speech_bubble_spacing">5dp</dimen>
     <dimen name="speech_bubble_tail">25dp</dimen>
 
-    <!--collapsing toolbar-->
+    <!--thread collapsing toolbar-->
     <dimen name="contact_photo_size">88dp</dimen>
     <dimen name="toolbar_height">102dp</dimen>
     <dimen name="image_top_margin">24dp</dimen>
-    <dimen name="image_right_margin">20dp</dimen>
+    <dimen name="image_right_margin">23dp</dimen>
     <dimen name="name_top_margin">1dp</dimen>
     <dimen name="name_right_margin">6dp</dimen>
     <dimen name="zero">0dp</dimen>
 
+    <!--conversation details collapsing toolbar-->
+    <dimen name="details_name_top_margin">12dp</dimen>
+    <dimen name="details_name_right_margin">38dp</dimen>
 
-    <dimen name="small_icon_size">38dp</dimen>
+    <dimen name="contact_padding_top">8dp</dimen>
+    <dimen name="contact_padding_left">16dp</dimen>
+
+    <!--thread activity-->
+    <dimen name="attach_text_width">48dp</dimen>
 </resources>

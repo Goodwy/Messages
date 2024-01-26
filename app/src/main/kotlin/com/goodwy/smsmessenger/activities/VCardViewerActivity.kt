@@ -5,9 +5,11 @@ import android.net.Uri
 import android.os.Bundle
 import com.goodwy.commons.extensions.normalizePhoneNumber
 import com.goodwy.commons.extensions.sendEmailIntent
+import com.goodwy.commons.extensions.viewBinding
 import com.goodwy.commons.helpers.NavigationIcon
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.adapters.VCardViewerAdapter
+import com.goodwy.smsmessenger.databinding.ActivityVcardViewerBinding
 import com.goodwy.smsmessenger.extensions.dialNumber
 import com.goodwy.smsmessenger.helpers.EXTRA_VCARD_URI
 import com.goodwy.smsmessenger.helpers.parseVCardFromUri
@@ -16,13 +18,18 @@ import com.goodwy.smsmessenger.models.VCardWrapper
 import ezvcard.VCard
 import ezvcard.property.Email
 import ezvcard.property.Telephone
-import kotlinx.android.synthetic.main.activity_vcard_viewer.*
 
 class VCardViewerActivity : SimpleActivity() {
 
+    private val binding by viewBinding(ActivityVcardViewerBinding::inflate)
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        isMaterialActivity = true
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_vcard_viewer)
+        setContentView(binding.root)
+
+        updateMaterialActivityViews(binding.vcardViewerCoordinator, binding.contactsList, useTransparentNavigation = true, useTopSearchMenu = false)
+        setupMaterialScrollListener(binding.contactsList, binding.vcardToolbar)
 
         val vCardUri = intent.getParcelableExtra(EXTRA_VCARD_URI) as? Uri
         if (vCardUri != null) {
@@ -37,12 +44,11 @@ class VCardViewerActivity : SimpleActivity() {
 
     override fun onResume() {
         super.onResume()
-        setupToolbar(vcard_toolbar, NavigationIcon.Arrow, appBarLayout = main_app_bar_layout)
-        updateNavigationBarColor(isColorPreview = true)
+        setupToolbar(binding.vcardToolbar, NavigationIcon.Arrow)
     }
 
     private fun setupOptionsMenu(vCardUri: Uri) {
-        vcard_toolbar.setOnMenuItemClickListener { menuItem ->
+        binding.vcardToolbar.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.add_contact -> {
                     val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -52,6 +58,7 @@ class VCardViewerActivity : SimpleActivity() {
                     }
                     startActivity(intent)
                 }
+
                 else -> return@setOnMenuItemClickListener false
             }
             return@setOnMenuItemClickListener true
@@ -66,7 +73,7 @@ class VCardViewerActivity : SimpleActivity() {
                 handleClick(item)
             }
         }
-        contacts_list.adapter = adapter
+        binding.contactsList.adapter = adapter
     }
 
     private fun handleClick(property: VCardPropertyWrapper) {

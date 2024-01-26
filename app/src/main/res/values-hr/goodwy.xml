@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Stil naslova chata</string>
+    <string name="unread_at_top_g">Nepročitano uvijek na vrhu</string>
 </resources>

@@ -35,6 +35,7 @@
         android:gravity="center"
         android:textColor="@color/md_grey_black"
         android:textSize="@dimen/smaller_text_size"
+        android:textStyle="bold"
         tools:text="1" />
 
 </RelativeLayout>

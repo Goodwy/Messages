@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Stile del titolo della chat</string>
+    <string name="unread_at_top_g">Non letto sempre in primo piano</string>
 </resources>

@@ -4,58 +4,62 @@ import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.telephony.SubscriptionManager
+import android.os.Handler
+import android.os.Looper
 import androidx.core.app.RemoteInput
-import com.klinker.android.send_message.Transaction
-import com.goodwy.commons.extensions.notificationManager
 import com.goodwy.commons.extensions.showErrorToast
+import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.smsmessenger.extensions.*
 import com.goodwy.smsmessenger.helpers.REPLY
 import com.goodwy.smsmessenger.helpers.THREAD_ID
 import com.goodwy.smsmessenger.helpers.THREAD_NUMBER
+import com.goodwy.smsmessenger.messaging.sendMessageCompat
 
 class DirectReplyReceiver : BroadcastReceiver() {
     @SuppressLint("MissingPermission")
     override fun onReceive(context: Context, intent: Intent) {
         val address = intent.getStringExtra(THREAD_NUMBER)
         val threadId = intent.getLongExtra(THREAD_ID, 0L)
-        var msg = RemoteInput.getResultsFromIntent(intent)?.getCharSequence(REPLY)?.toString() ?: return
+        var body = RemoteInput.getResultsFromIntent(intent)?.getCharSequence(REPLY)?.toString() ?: return
 
-        msg = context.removeDiacriticsIfNeeded(msg)
+        body = context.removeDiacriticsIfNeeded(body)
 
-        val settings = context.getSendMessageSettings()
         if (address != null) {
-            val availableSIMs = SubscriptionManager.from(context).activeSubscriptionInfoList
+            var subscriptionId: Int? = null
+            val availableSIMs = context.subscriptionManagerCompat().activeSubscriptionInfoList
             if ((availableSIMs?.size ?: 0) > 1) {
                 val currentSIMCardIndex = context.config.getUseSIMIdAtNumber(address)
                 val wantedId = availableSIMs.getOrNull(currentSIMCardIndex)
                 if (wantedId != null) {
-                    settings.subscriptionId = wantedId.subscriptionId
+                    subscriptionId = wantedId.subscriptionId
                 }
             }
-        }
 
-        val transaction = Transaction(context, settings)
-        val message = com.klinker.android.send_message.Message(msg, address)
+            ensureBackgroundThread {
+                var messageId = 0L
+                try {
+                    context.sendMessageCompat(body, listOf(address), subscriptionId, emptyList())
+                    val message = context.getMessages(threadId, getImageResolutions = false, includeScheduledMessages = false, limit = 1).lastOrNull()
+                    if (message != null) {
+                        context.messagesDB.insertOrUpdate(message)
+                        messageId = message.id
 
-        try {
-            val smsSentIntent = Intent(context, SmsStatusSentReceiver::class.java)
-            val deliveredIntent = Intent(context, SmsStatusDeliveredReceiver::class.java)
+                        context.updateLastConversationMessage(threadId)
+                    }
+                } catch (e: Exception) {
+                    context.showErrorToast(e)
+                }
 
-            transaction.setExplicitBroadcastForSentSms(smsSentIntent)
-            transaction.setExplicitBroadcastForDeliveredSms(deliveredIntent)
+                val photoUri = SimpleContactsHelper(context).getPhotoUriFromPhoneNumber(address)
+                val bitmap = context.getNotificationBitmap(photoUri)
+                Handler(Looper.getMainLooper()).post {
+                    context.notificationHelper.showMessageNotification(messageId, address, body, threadId, bitmap, sender = null, alertOnlyOnce = true)
+                }
 
-            transaction.sendNewMessage(message)
-        } catch (e: Exception) {
-            context.showErrorToast(e)
-        }
-
-        context.notificationManager.cancel(threadId.hashCode())
-
-        ensureBackgroundThread {
-            context.markThreadMessagesRead(threadId)
-            context.conversationsDB.markRead(threadId)
+                context.markThreadMessagesRead(threadId)
+                context.conversationsDB.markRead(threadId)
+            }
         }
     }
 }

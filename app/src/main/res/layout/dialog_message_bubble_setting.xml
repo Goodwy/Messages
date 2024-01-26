@@ -138,9 +138,7 @@
                     android:gravity="start|center_vertical"
                     app:layout_constrainedWidth="true"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="1"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/style_original_bubble_two"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintWidth_max="384dp" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

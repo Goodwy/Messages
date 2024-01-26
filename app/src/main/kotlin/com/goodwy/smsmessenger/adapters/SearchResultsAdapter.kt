@@ -5,22 +5,19 @@ import android.util.TypedValue
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.goodwy.commons.adapters.MyRecyclerViewAdapter
-import com.goodwy.commons.extensions.applyColorFilter
-import com.goodwy.commons.extensions.beGoneIf
-import com.goodwy.commons.extensions.getTextSize
-import com.goodwy.commons.extensions.highlightTextPart
+import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.SimpleContactsHelper
-import com.goodwy.commons.helpers.letterBackgroundColors
 import com.goodwy.commons.views.MyRecyclerView
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
+import com.goodwy.smsmessenger.databinding.ItemSearchResultBinding
 import com.goodwy.smsmessenger.extensions.config
 import com.goodwy.smsmessenger.models.SearchResult
-import kotlinx.android.synthetic.main.item_search_result.view.*
 import java.util.*
+import kotlin.math.abs
 
 class SearchResultsAdapter(
     activity: SimpleActivity, var searchResults: ArrayList<SearchResult>, recyclerView: MyRecyclerView, highlightText: String, itemClick: (Any) -> Unit
@@ -47,11 +44,14 @@ class SearchResultsAdapter(
 
     override fun onActionModeDestroyed() {}
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = createViewHolder(R.layout.item_search_result, parent)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = ItemSearchResultBinding.inflate(layoutInflater, parent, false)
+        return createViewHolder(binding.root)
+    }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val searchResult = searchResults[position]
-        holder.bindView(searchResult, true, false) { itemView, layoutPosition ->
+        holder.bindView(searchResult, allowSingleClick = true, allowLongClick = false) { itemView, _ ->
             setupView(itemView, searchResult)
         }
         bindViewHolder(holder)
@@ -71,44 +71,51 @@ class SearchResultsAdapter(
     }
 
     private fun setupView(view: View, searchResult: SearchResult) {
-        view.apply {
-            search_result_title.apply {
+        ItemSearchResultBinding.bind(view).apply {
+
+            searchResultChevron.setColorFilter(textColor)
+            divider.setBackgroundColor(textColor)
+            if (searchResults.last() == searchResult || !activity.config.useDividers) divider.beInvisible() else divider.beVisible()
+
+            searchResultTitle.apply {
                 text = searchResult.title.highlightTextPart(textToHighlight, properPrimaryColor)
                 setTextColor(textColor)
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize * 1.2f)
             }
 
-            search_result_snippet.apply {
+            searchResultSnippet.apply {
                 text = searchResult.snippet.highlightTextPart(textToHighlight, properPrimaryColor)
                 setTextColor(textColor)
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize * 0.9f)
             }
 
-            search_result_date.apply {
+            searchResultDate.apply {
                 text = searchResult.date
                 setTextColor(textColor)
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize * 0.8f)
             }
 
-            findViewById<ImageView>(R.id.search_result_image).beGoneIf(!activity.config.showContactThumbnails)
-            //SimpleContactsHelper(context).loadContactImage(searchResult.photoUri, search_result_image, searchResult.title)
+            searchResultImage.beGoneIf(!activity.config.showContactThumbnails)
+            //SimpleContactsHelper(activity).loadContactImage(searchResult.photoUri, searchResultImage, searchResult.title)
             if (searchResult.title == searchResult.phoneNumber) {
-                val drawable = resources.getDrawable(R.drawable.placeholder_contact)
+                val drawable = ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, activity.theme)
                 if (baseConfig.useColoredContacts) {
-                    val color = letterBackgroundColors[Math.abs(searchResult.phoneNumber.hashCode()) % letterBackgroundColors.size].toInt()
+                    val letterBackgroundColors = activity.getLetterBackgroundColors()
+                    val color = letterBackgroundColors[abs(searchResult.run { phoneNumber.hashCode() }) % letterBackgroundColors.size].toInt()
                     (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
                 }
-                search_result_image.setImageDrawable(drawable)
+                searchResultImage.setImageDrawable(drawable)
             } else {
-                SimpleContactsHelper(context).loadContactImage(searchResult.photoUri, search_result_image, searchResult.title)
+                SimpleContactsHelper(activity).loadContactImage(searchResult.photoUri, searchResultImage, searchResult.title)
             }
         }
     }
 
     override fun onViewRecycled(holder: ViewHolder) {
         super.onViewRecycled(holder)
-        if (!activity.isDestroyed && !activity.isFinishing && holder.itemView.search_result_image != null) {
-            Glide.with(activity).clear(holder.itemView.search_result_image)
+        if (!activity.isDestroyed && !activity.isFinishing) {
+            val binding = ItemSearchResultBinding.bind(holder.itemView)
+            Glide.with(activity).clear(binding.searchResultImage)
         }
     }
 }

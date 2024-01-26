@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name_g">Right Messages</string>
-    <string name="chat_title_style_g">Csevegés címének stílusa</string>
+    <string name="chat_title_style_g">चैट शीर्षक शैली</string>
+    <string name="unread_at_top_g">अपठित हमेशा शीर्ष पर</string>
 </resources>

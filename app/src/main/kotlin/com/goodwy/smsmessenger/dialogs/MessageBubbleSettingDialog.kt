@@ -1,99 +1,89 @@
 package com.goodwy.smsmessenger.dialogs
 
 import android.content.res.ColorStateList
-import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import com.goodwy.commons.extensions.*
-import com.goodwy.commons.helpers.isTiramisuPlus
-import com.goodwy.commons.helpers.letterBackgroundColors
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
+import com.goodwy.smsmessenger.databinding.DialogMessageBubbleSettingBinding
 import com.goodwy.smsmessenger.extensions.config
-import kotlinx.android.synthetic.main.activity_settings.*
-import kotlinx.android.synthetic.main.dialog_message_bubble_setting.view.*
 import java.io.File
-import java.util.*
 
 class MessageBubbleSettingDialog(
     private val activity: SimpleActivity,
     private val callback: (file: File) -> Unit,
 ) {
+    private val binding = DialogMessageBubbleSettingBinding.inflate(activity.layoutInflater)
     private val config = activity.config
 
     init {
-        val view = (activity.layoutInflater.inflate(R.layout.dialog_message_bubble_setting, null) as ViewGroup).apply {
-            setupBubbleInvertColor(this)
-            setupColors(this)
-            setupToggleBubbleStyle(this)
+        setupBubbleInvertColor()
+        setupColors()
+        setupToggleBubbleStyle()
 
-            if (config.isUsingSystemTheme) {
-                val drawable = resources.getColoredDrawableWithColor(R.drawable.rounded_rectangle_color, context.getProperBackgroundColor())
-                style_original.background = drawable
-                style_ios.background = drawable
-            }
-            style_original.setOnClickListener {
-                config.bubbleStyle = 0
-                setupToggleBubbleStyle(this, 0)
-            }
-            style_ios.setOnClickListener {
-                config.bubbleStyle = 1
-                setupToggleBubbleStyle(this, 1)
-            }
+        if (config.isUsingSystemTheme || activity.isBlackTheme()) {
+            val drawable = binding.root.resources.getColoredDrawableWithColor(R.drawable.rounded_rectangle_color, binding.root.context.getProperBackgroundColor())
+            binding.styleOriginal.background = drawable
+            binding.styleIos.background = drawable
+        }
+        binding.styleOriginal.setOnClickListener {
+            config.bubbleStyle = 0
+            setupToggleBubbleStyle(0)
+        }
+        binding.styleIos.setOnClickListener {
+            config.bubbleStyle = 1
+            setupToggleBubbleStyle(1)
         }
 
         activity.getAlertDialogBuilder()
-            .setNegativeButton(R.string.ok, null)
+            .setNegativeButton(com.goodwy.commons.R.string.ok, null)
             .apply {
-                activity.setupDialogStuff(view, this, R.string.speech_bubble) { alertDialog ->
+                activity.setupDialogStuff(binding.root, this, com.goodwy.commons.R.string.speech_bubble) { alertDialog ->
                     alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                     }
                 }
             }
     }
 
-    private fun setupToggleBubbleStyle(view: ViewGroup, style: Int = config.bubbleStyle) {
-        view.apply {
-            style_original_check.isActivated = style == 0
-            style_ios_check.isActivated = style == 1
-            val states = arrayOf(
-                intArrayOf(android.R.attr.state_activated),
-                intArrayOf(-android.R.attr.state_activated))
-            arrayOf(style_original_check, style_ios_check).forEach {
-                it.imageTintList = ColorStateList(states, intArrayOf(context.getProperPrimaryColor(), context.getProperTextColor()))
-            }
+    private fun setupToggleBubbleStyle(style: Int = config.bubbleStyle) {
+        binding.styleOriginalCheck.isActivated = style == 0
+        binding.styleIosCheck.isActivated = style == 1
+        val states = arrayOf(
+            intArrayOf(android.R.attr.state_activated),
+            intArrayOf(-android.R.attr.state_activated))
+        arrayOf(binding.styleOriginalCheck, binding.styleIosCheck).forEach {
+            it.imageTintList = ColorStateList(states, intArrayOf(binding.root.context.getProperPrimaryColor(), binding.root.context.getProperTextColor()))
         }
     }
 
-    private fun setupBubbleInvertColor(view: ViewGroup) {
-        view.apply {
-            bubble_invert_color.isChecked = config.bubbleInvertColor
-            bubble_invert_color_holder.setOnClickListener {
-                bubble_invert_color.toggle()
-                config.bubbleInvertColor = bubble_invert_color.isChecked
-                setupColors(view)
-            }
+    private fun setupBubbleInvertColor() {
+        binding.bubbleInvertColor.isChecked = config.bubbleInvertColor
+        binding.bubbleInvertColorHolder.setOnClickListener {
+            binding.bubbleInvertColor.toggle()
+            config.bubbleInvertColor = binding.bubbleInvertColor.isChecked
+            setupColors()
         }
     }
 
-    private fun setupColors(view: ViewGroup) {
-        view.apply {
-            val backgroundReceived = if (context.config.bubbleInvertColor) context.getProperPrimaryColor() else context.getBottomNavigationBackgroundColor()
+    private fun setupColors() {
+        binding.apply {
+            val backgroundReceived = if (root.context.config.bubbleInvertColor) root.context.getProperPrimaryColor() else root.context.getBottomNavigationBackgroundColor()
             val contrastColorReceived = backgroundReceived.getContrastColor()
-            style_original_bubble_one.background.applyColorFilter(backgroundReceived)
-            style_original_bubble_two.background.applyColorFilter(backgroundReceived)
-            style_ios_bubble_one.background.applyColorFilter(backgroundReceived)
-            style_ios_bubble_two.background.applyColorFilter(backgroundReceived)
-            style_original_bubble_one.setTextColor(contrastColorReceived)
-            style_original_bubble_two.setTextColor(contrastColorReceived)
-            style_ios_bubble_one.setTextColor(contrastColorReceived)
-            style_ios_bubble_two.setTextColor(contrastColorReceived)
+            styleOriginalBubbleOne.background.applyColorFilter(backgroundReceived)
+            styleOriginalBubbleTwo.background.applyColorFilter(backgroundReceived)
+            styleIosBubbleOne.background.applyColorFilter(backgroundReceived)
+            styleIosBubbleTwo.background.applyColorFilter(backgroundReceived)
+            styleOriginalBubbleOne.setTextColor(contrastColorReceived)
+            styleOriginalBubbleTwo.setTextColor(contrastColorReceived)
+            styleIosBubbleOne.setTextColor(contrastColorReceived)
+            styleIosBubbleTwo.setTextColor(contrastColorReceived)
 
-            val backgroundSender = if (context.config.bubbleInvertColor) context.getBottomNavigationBackgroundColor() else context.getProperPrimaryColor()
+            val backgroundSender = if (root.context.config.bubbleInvertColor) root.context.getBottomNavigationBackgroundColor() else root.context.getProperPrimaryColor()
             val contrastColorSender = backgroundSender.getContrastColor()
-            style_original_bubble_three.background.applyColorFilter(backgroundSender)
-            style_ios_bubble_three.background.applyColorFilter(backgroundSender)
-            style_original_bubble_three.setTextColor(contrastColorSender)
-            style_ios_bubble_three.setTextColor(contrastColorSender)
+            styleOriginalBubbleThree.background.applyColorFilter(backgroundSender)
+            styleIosBubbleThree.background.applyColorFilter(backgroundSender)
+            styleOriginalBubbleThree.setTextColor(contrastColorSender)
+            styleIosBubbleThree.setTextColor(contrastColorSender)
         }
     }
 }

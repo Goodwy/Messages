@@ -2,34 +2,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="AppCompatResource">
+    tools:ignore="AppCompatResource,AlwaysShowAction">
     <item
-        android:id="@+id/search"
-        android:icon="@drawable/ic_search_vector"
-        android:title="@string/search"
-        android:visible="false"
-        app:showAsAction="always" />
+        android:id="@+id/show_recycle_bin"
+        android:showAsAction="never"
+        android:title="@string/show_the_recycle_bin"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/show_archived"
+        android:showAsAction="never"
+        android:title="@string/show_archived_conversations"
+        app:showAsAction="never" />
     <item
         android:id="@+id/settings"
         android:icon="@drawable/ic_more_horiz"
         android:title="@string/settings"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/import_messages"
-        android:showAsAction="never"
-        android:title="@string/import_messages"
-        android:visible="false"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/export_messages"
-        android:showAsAction="never"
-        android:title="@string/export_messages"
-        android:visible="false"
         app:showAsAction="never" />
     <item
         android:id="@+id/about"
         android:icon="@drawable/ic_info_vector"
         android:title="@string/about"
-        android:visible="false"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 </menu>

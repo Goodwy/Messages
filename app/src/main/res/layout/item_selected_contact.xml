@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="@dimen/normal_margin"
         android:paddingEnd="@dimen/normal_margin"
-        android:paddingTop="@dimen/medium_margin"
+        android:paddingTop="7dp"
         android:paddingBottom="@dimen/medium_margin"
         android:textColor="@color/md_grey_white"
         android:textSize="@dimen/bigger_text_size"

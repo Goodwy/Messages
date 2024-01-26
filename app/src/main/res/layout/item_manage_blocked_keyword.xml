@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/manage_blocked_keyword_holder"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/tiny_margin"
+    android:clickable="true"
+    android:focusable="true">
+
+    <com.goodwy.commons.views.MyTextView
+        android:id="@+id/manage_blocked_keyword_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="@dimen/bigger_margin"
+        android:layout_marginTop="@dimen/normal_margin"
+        android:layout_marginEnd="@dimen/activity_margin"
+        android:layout_marginBottom="@dimen/normal_margin"
+        android:layout_toStartOf="@+id/overflow_menu_icon" />
+
+    <ImageView
+        android:id="@+id/overflow_menu_icon"
+        style="@style/OverflowMenuIconStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/smaller_margin"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true" />
+
+    <View
+        android:id="@+id/overflow_menu_anchor"
+        style="@style/OverflowMenuAnchorStyle"
+        android:layout_marginEnd="@dimen/smaller_margin"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true" />
+
+</RelativeLayout>

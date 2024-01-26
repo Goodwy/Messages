@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/selected_contact_bg">
+        <shape android:shape="rectangle">
+            <corners android:radius="@dimen/material_button_corner_radius" />
+            <solid android:color="@color/white" />
+            <gradient android:endColor="#FFFFFFFF" android:startColor="#CCFFFFFF" android:angle="90.0" />
+        </shape>
+    </item>
+</layer-list>

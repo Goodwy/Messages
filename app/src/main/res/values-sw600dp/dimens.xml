@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--thread activity-->
+    <dimen name="attach_text_width">128dp</dimen>
+
+    <!--conversation details collapsing toolbar-->
+    <dimen name="details_name_right_margin">78dp</dimen>
+</resources>
