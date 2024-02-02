@@ -409,11 +409,10 @@ class ThreadAdapter(
         if (numbersList.isNotEmpty()) {
             numbersList.apply {
                 val size = numbersList.size
-                val range = if (size > 4) 0..4 else 0 until size
-                for (index in range) {
+                for (index in 0 until size) {
                     val item = this[index]
                     val menuName = activity.getString(com.goodwy.commons.R.string.copy) + " \"${item}\""
-                    popupMenu.menu.add(1, 4 + index, 4 + index, menuName).setIcon(com.goodwy.commons.R.drawable.ic_copy_vector)
+                    popupMenu.menu.add(1, index, index, menuName).setIcon(com.goodwy.commons.R.drawable.ic_copy_vector)
                 }
             }
         }

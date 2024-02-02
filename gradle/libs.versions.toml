@@ -17,7 +17,7 @@ room = "2.6.0-alpha03"
 android-smsmms = "c3e678befd"
 indicator-fast-scroll = "4524cd0b61"
 #Goodwy
-right-commons = "5123250668"
+right-commons = "a5fe0960e7"
 rustore = "3.1.0"
 behavioRule = "1.0.1"
 rxAnimation = "2.1.1"
@@ -34,8 +34,8 @@ ez-vcard = "0.11.3"
 shortcut-badger = "1.1.22"
 #versioning
 app-version-appId = "com.goodwy.smsmessenger"
-app-version-versionCode = "500"
-app-version-versionName = "5.0.0"
+app-version-versionCode = "501"
+app-version-versionName = "5.0.1"
 [libraries]
 #AndroidX
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
@@ -47,7 +47,8 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 #Simple Mobile Tools
 #simple-mobile-tools-commons = { module = "com.github.SimpleMobileTools:Simple-Commons", version.ref = "simple-commons" }
-indicator-fast-scroll = { module = "com.github.tibbi:IndicatorFastScroll", version.ref = "indicator-fast-scroll" }
+#indicator-fast-scroll = { module = "com.github.tibbi:IndicatorFastScroll", version.ref = "indicator-fast-scroll" }
+indicator-fast-scroll = { module = "com.github.goodwy:IndicatorFastScroll", version.ref = "indicator-fast-scroll" }
 android-smsmms = { module = "com.github.tibbi:android-smsmms", version.ref = "android-smsmms" }
 #EventBus
 eventbus = { module = "org.greenrobot:eventbus", version.ref = "eventbus" }

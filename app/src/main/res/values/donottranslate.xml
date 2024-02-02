@@ -32,4 +32,13 @@
         Bug fixes
     </string>
 
+    <string name="release_500">
+        Updated the interface\n
+        Bug fixes
+    </string>
+
+    <string name="release_501">
+        Bug fixes
+    </string>
+
 </resources>

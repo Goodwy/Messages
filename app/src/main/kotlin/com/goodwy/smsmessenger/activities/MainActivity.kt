@@ -634,6 +634,9 @@ class MainActivity : SimpleActivity() {
         val subscriptionIdX1 = BuildConfig.SUBSCRIPTION_ID_X1
         val subscriptionIdX2 = BuildConfig.SUBSCRIPTION_ID_X2
         val subscriptionIdX3 = BuildConfig.SUBSCRIPTION_ID_X3
+        val subscriptionYearIdX1 = BuildConfig.SUBSCRIPTION_YEAR_ID_X1
+        val subscriptionYearIdX2 = BuildConfig.SUBSCRIPTION_YEAR_ID_X2
+        val subscriptionYearIdX3 = BuildConfig.SUBSCRIPTION_YEAR_ID_X3
 
         startAboutActivity(
             appNameId = R.string.app_name_g,
@@ -646,6 +649,8 @@ class MainActivity : SimpleActivity() {
             productIdListRu = arrayListOf(productIdX1, productIdX2, productIdX3),
             subscriptionIdList = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
             subscriptionIdListRu = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
+            subscriptionYearIdList = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
+            subscriptionYearIdListRu = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
             playStoreInstalled = isPlayStoreInstalled(),
             ruStoreInstalled = isRuStoreInstalled()
         )
@@ -660,7 +665,9 @@ class MainActivity : SimpleActivity() {
         arrayListOf<Release>().apply {
             add(Release(420, R.string.release_420))
             add(Release(421, R.string.release_421))
-            add(Release(422, R.string.release_423))
+            add(Release(423, R.string.release_423))
+            add(Release(500, R.string.release_500))
+            add(Release(501, R.string.release_501))
             checkWhatsNew(this, BuildConfig.VERSION_CODE)
         }
     }

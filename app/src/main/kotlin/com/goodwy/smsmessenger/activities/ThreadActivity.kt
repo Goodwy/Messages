@@ -189,16 +189,19 @@ class ThreadActivity : SimpleActivity() {
         }
         //updateNavigationBarColor(isColorPreview = true)
 
-        val smsDraft = getSmsDraft(threadId)
-        if (smsDraft != null) {
-            binding.messageHolder.threadTypeMessage.setText(smsDraft)
-            binding.messageHolder.threadCharacterCounter.beVisibleIf(config.showCharacterCounter)
-        }
         isActivityVisible = true
 
         notificationManager.cancel(threadId.hashCode())
 
         ensureBackgroundThread {
+            val smsDraft = getSmsDraft(threadId)
+            if (smsDraft != null) {
+                runOnUiThread {
+                    binding.messageHolder.threadTypeMessage.setText(smsDraft)
+                    binding.messageHolder.threadCharacterCounter.beVisibleIf(config.showCharacterCounter)
+                }
+            }
+
             val newConv = conversationsDB.getConversationWithThreadId(threadId)
             if (newConv != null) {
                 conversation = newConv
@@ -920,8 +923,8 @@ class ThreadActivity : SimpleActivity() {
                         if (conversation != null) showConversationDetails()
                     }
                 }
-                senderName.setOnLongClickListener { copyToClipboard(senderNameLarge.value); true }
-                senderNumber.setOnLongClickListener { copyToClipboard(senderNumberLarge.value); true }
+                senderName.setOnLongClickListener { copyToClipboard(senderName.value); true }
+                senderNumber.setOnLongClickListener { copyToClipboard(senderNumber.value); true }
             }
             THREAD_TOP_LARGE -> topDetailsLarge.apply {
                 topDetailsCompact.root.beGone()

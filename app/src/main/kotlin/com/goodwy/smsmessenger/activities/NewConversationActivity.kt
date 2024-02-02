@@ -58,7 +58,7 @@ class NewConversationActivity : SimpleActivity() {
     override fun onResume() {
         super.onResume()
         val getProperPrimaryColor = getProperPrimaryColor()
-        setupToolbar(binding.newConversationToolbar, NavigationIcon.Arrow)
+        setupToolbar(binding.newConversationToolbar, NavigationIcon.Arrow, statusBarColor = getProperBackgroundColor())
         binding.noContactsPlaceholder2.setTextColor(getProperPrimaryColor)
         binding.noContactsPlaceholder2.underlineText()
         binding.suggestionsLabel.setTextColor(getProperPrimaryColor)
