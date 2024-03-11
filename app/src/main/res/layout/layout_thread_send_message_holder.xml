@@ -137,12 +137,12 @@
             android:paddingEnd="@dimen/normal_margin"
             android:paddingBottom="@dimen/smaller_margin"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/thread_select_sim_icon_holder"
+            app:layout_constraintRight_toLeftOf="@+id/threadSelectSimIconHolder"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
         <LinearLayout
-            android:id="@+id/thread_select_sim_icon_holder"
+            android:id="@+id/threadSelectSimIconHolder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -150,21 +150,21 @@
             android:layout_marginEnd="@dimen/small_margin"
             android:background="?selectableItemBackgroundBorderless"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" >
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="gone"
+            tools:visibility="visible" >
 
             <ImageView
-                android:id="@+id/thread_select_sim_icon"
+                android:id="@+id/threadSelectSimIcon"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:alpha="0.9"
                 android:background="@drawable/thread_background"
-                android:paddingStart="4dp"
-                android:paddingTop="7dp"
-                android:paddingEnd="4dp"
-                android:paddingBottom="7dp"
-                android:src="@drawable/ic_sim_vector"
-                android:visibility="gone"
-                tools:visibility="visible" />
+                android:paddingStart="3dp"
+                android:paddingTop="5dp"
+                android:paddingEnd="3dp"
+                android:paddingBottom="5dp"
+                android:src="@drawable/ic_sim_vector" />
         </LinearLayout>
 
         <TextView
@@ -175,10 +175,10 @@
             android:textSize="@dimen/normal_text_size"
             android:textStyle="bold"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/thread_select_sim_icon_holder"
-            app:layout_constraintLeft_toLeftOf="@+id/thread_select_sim_icon_holder"
-            app:layout_constraintRight_toRightOf="@+id/thread_select_sim_icon_holder"
-            app:layout_constraintTop_toTopOf="@+id/thread_select_sim_icon_holder"
+            app:layout_constraintBottom_toBottomOf="@+id/threadSelectSimIconHolder"
+            app:layout_constraintLeft_toLeftOf="@+id/threadSelectSimIconHolder"
+            app:layout_constraintRight_toRightOf="@+id/threadSelectSimIconHolder"
+            app:layout_constraintTop_toTopOf="@+id/threadSelectSimIconHolder"
             tools:text="1"
             tools:textColor="@color/bw_600"
             tools:visibility="visible" />

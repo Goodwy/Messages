@@ -3,4 +3,5 @@
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">ചാറ്റ് ശീർഷക ശൈലി</string>
     <string name="unread_at_top_g">വായിക്കാത്തത് എപ്പോഴും മുകളിലാണ്</string>
+    <string name="show_sim_selection_dialog">അയയ്ക്കുമ്പോൾ സിം കാർഡ് തിരഞ്ഞെടുക്കൽ ഡയലോഗ് കാണിക്കുക</string>
 </resources>

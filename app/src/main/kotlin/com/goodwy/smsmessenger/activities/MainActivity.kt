@@ -39,6 +39,7 @@ class MainActivity : SimpleActivity() {
 
     private var storedPrimaryColor = 0
     private var storedTextColor = 0
+    private var storedBackgroundColor = 0
     private var storedFontSize = 0
     private var lastSearchedText = ""
     private var bus: EventBus? = null
@@ -100,6 +101,10 @@ class MainActivity : SimpleActivity() {
                 updateTextColor(getProperTextColor())
             }
 
+            if (storedBackgroundColor != getProperBackgroundColor()) {
+                updateBackgroundColor(getProperBackgroundColor())
+            }
+
             if (storedFontSize != config.fontSize) {
                 updateFontSize()
             }
@@ -117,6 +122,7 @@ class MainActivity : SimpleActivity() {
         binding.conversationsProgressBar.setIndicatorColor(properPrimaryColor)
         binding.conversationsProgressBar.trackColor = properPrimaryColor.adjustAlpha(LOWER_ALPHA)
         checkShortcut()
+        binding.conversationsFastscroller.trackMarginEnd = navigationBarHeight
         (binding.conversationsFab.layoutParams as? CoordinatorLayout.LayoutParams)?.bottomMargin =
             navigationBarHeight + resources.getDimension(com.goodwy.commons.R.dimen.activity_margin).toInt()
 
@@ -231,6 +237,7 @@ class MainActivity : SimpleActivity() {
     private fun storeStateVariables() {
         storedPrimaryColor = getProperPrimaryColor()
         storedTextColor = getProperTextColor()
+        storedBackgroundColor = getProperBackgroundColor()
         storedFontSize = config.fontSize
         config.tabsChanged = false
     }
@@ -611,7 +618,11 @@ class MainActivity : SimpleActivity() {
 
     private fun launchSettings() {
         hideKeyboard()
-        startActivity(Intent(applicationContext, SettingsActivity::class.java))
+        //startActivity(Intent(applicationContext, SettingsActivity::class.java))
+        Intent(applicationContext, SettingsActivity::class.java).apply {
+            putExtra(WAS_PROTECTION_HANDLED, wasProtectionHandled)
+            startActivity(this)
+        }
     }
 
     private fun launchAbout() {
@@ -668,6 +679,9 @@ class MainActivity : SimpleActivity() {
             add(Release(423, R.string.release_423))
             add(Release(500, R.string.release_500))
             add(Release(501, R.string.release_501))
+            add(Release(510, R.string.release_510))
+            add(Release(511, R.string.release_511))
+            add(Release(512, R.string.release_512))
             checkWhatsNew(this, BuildConfig.VERSION_CODE)
         }
     }

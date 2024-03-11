@@ -858,13 +858,13 @@ fun Context.getThreadId(addresses: Set<String>): Long {
     }
 }
 
-fun Context.showReceivedMessageNotification(messageId: Long, address: String, body: String, threadId: Long, bitmap: Bitmap?) {
+fun Context.showReceivedMessageNotification(messageId: Long, address: String, body: String, threadId: Long, bitmap: Bitmap?, subscriptionId: Int?) {
     val privateCursor = getMyContactsCursor(favoritesOnly = false, withPhoneNumbersOnly = true)
     ensureBackgroundThread {
         val senderName = getNameFromAddress(address, privateCursor)
 
         Handler(Looper.getMainLooper()).post {
-            notificationHelper.showMessageNotification(messageId, address, body, threadId, bitmap, senderName)
+            notificationHelper.showMessageNotification(messageId, address, body, threadId, bitmap, senderName, subscriptionId = subscriptionId)
         }
     }
 }

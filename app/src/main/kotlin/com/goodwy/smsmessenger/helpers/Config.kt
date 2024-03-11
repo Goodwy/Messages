@@ -131,7 +131,7 @@ class Config(context: Context) : BaseConfig(context) {
 
     //Goodwy
     var bubbleStyle: Int
-        get() = prefs.getInt(BUBBLE_STYLE, 1)
+        get() = prefs.getInt(BUBBLE_STYLE, BUBBLE_STYLE_IOS_NEW)
         set(bubbleStyle) = prefs.edit().putInt(BUBBLE_STYLE, bubbleStyle).apply()
 
     var bubbleInvertColor: Boolean
@@ -157,4 +157,21 @@ class Config(context: Context) : BaseConfig(context) {
     var unreadIndicatorPosition: Int
         get() = prefs.getInt(UNREAD_INDICATOR_POSITION, UNREAD_INDICATOR_START)
         set(unreadIndicatorPosition) = prefs.edit().putInt(UNREAD_INDICATOR_POSITION, unreadIndicatorPosition).apply()
+
+    var showSimSelectionDialog: Boolean
+        get() = prefs.getBoolean(SHOW_SIM_SELECTION_DIALOG, false)
+        set(showSimSelectionDialog) = prefs.edit().putBoolean(SHOW_SIM_SELECTION_DIALOG, showSimSelectionDialog).apply()
+
+    //Swipe
+    var swipeRightAction: Int
+        get() = prefs.getInt(SWIPE_RIGHT_ACTION, SWIPE_ACTION_MARK_READ)
+        set(swipeRightAction) = prefs.edit().putInt(SWIPE_RIGHT_ACTION, swipeRightAction).apply()
+
+    var swipeLeftAction: Int
+        get() = prefs.getInt(SWIPE_LEFT_ACTION, SWIPE_ACTION_DELETE)
+        set(swipeLeftAction) = prefs.edit().putInt(SWIPE_LEFT_ACTION, swipeLeftAction).apply()
+
+    var swipeVibration: Boolean
+        get() = prefs.getBoolean(SWIPE_VIBRATION, true)
+        set(swipeVibration) = prefs.edit().putBoolean(SWIPE_VIBRATION, swipeVibration).apply()
 }

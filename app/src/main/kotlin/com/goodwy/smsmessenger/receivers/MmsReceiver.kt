@@ -45,7 +45,7 @@ class MmsReceiver : MmsReceivedReceiver() {
             }
 
             Handler(Looper.getMainLooper()).post {
-                context.showReceivedMessageNotification(mms.id, address, mms.body, mms.threadId, glideBitmap)
+                context.showReceivedMessageNotification(mms.id, address, mms.body, mms.threadId, glideBitmap, mms.subscriptionId)
                 val conversation = context.getConversations(mms.threadId).firstOrNull() ?: return@post
                 ensureBackgroundThread {
                     context.insertOrUpdateConversation(conversation)

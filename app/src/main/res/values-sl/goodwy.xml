@@ -3,4 +3,5 @@
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Slog naslova klepeta</string>
     <string name="unread_at_top_g">Neprebrano vedno na vrhu</string>
+    <string name="show_sim_selection_dialog">Pokaži pogovorno okno za izbiro kartice SIM pri pošiljanju</string>
 </resources>

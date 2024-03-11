@@ -364,8 +364,29 @@ class ConversationDetailsActivity : SimpleActivity() {
                             }
                         }
                     } else {
-                        threeButton.alpha = 0.5f
-                        threeButton.isClickable = false
+//                        threeButton.alpha = 0.5f
+//                        threeButton.isClickable = false
+                        val drawable = ResourcesCompat.getDrawable(resources, com.goodwy.commons.R.drawable.ic_add_person_vector, theme)?.apply {
+                            applyColorFilter(getProperPrimaryColor())
+                        }
+                        root.post {
+                            threeButton.setCompoundDrawablesWithIntrinsicBounds(null, drawable, null, null)
+                            threeButton.setText(com.goodwy.commons.R.string.add_contact)
+
+                            arrayOf(
+                                threeButton, topConversationDetails.conversationDetailsImage
+                            ).forEach {
+                                it.setOnClickListener {
+                                    Intent().apply {
+                                        action = Intent.ACTION_INSERT_OR_EDIT
+                                        type = "vnd.android.cursor.item/contact"
+                                        putExtra(KEY_PHONE, address)
+                                        launchActivityIntent(this)
+                                    }
+                                }
+                            }
+                            threeButton.setOnLongClickListener { toast(com.goodwy.commons.R.string.add_contact); true; }
+                        }
                     }
                 }
             } else {

@@ -3,4 +3,5 @@
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Chat titel stil</string>
     <string name="unread_at_top_g">Ulæst altid øverst</string>
+    <string name="show_sim_selection_dialog">Vis dialogboksen til valg af SIM-kort, når du sender</string>
 </resources>

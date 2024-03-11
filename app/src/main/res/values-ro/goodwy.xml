@@ -3,4 +3,5 @@
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Stilul de titlu al chat-ului</string>
     <string name="unread_at_top_g">Necitit întotdeauna în partea de sus</string>
+    <string name="show_sim_selection_dialog">Afișați dialogul de selectare a cartelei SIM la trimitere</string>
 </resources>

@@ -13,6 +13,9 @@ import com.goodwy.commons.helpers.IS_PRIVATE
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.models.SimpleContact
+import com.goodwy.smsmessenger.BuildConfig
+import com.goodwy.smsmessenger.R
+import com.goodwy.smsmessenger.activities.SimpleActivity
 import java.util.Locale
 
 fun Activity.dialNumber(phoneNumber: String, callback: (() -> Unit)? = null) {
@@ -81,4 +84,29 @@ fun Activity.startContactDetailsIntent(contact: SimpleContact) {
             }
         }
     }
+}
+
+fun SimpleActivity.launchPurchase() {
+    val productIdX1 = BuildConfig.PRODUCT_ID_X1
+    val productIdX2 = BuildConfig.PRODUCT_ID_X2
+    val productIdX3 = BuildConfig.PRODUCT_ID_X3
+    val subscriptionIdX1 = BuildConfig.SUBSCRIPTION_ID_X1
+    val subscriptionIdX2 = BuildConfig.SUBSCRIPTION_ID_X2
+    val subscriptionIdX3 = BuildConfig.SUBSCRIPTION_ID_X3
+    val subscriptionYearIdX1 = BuildConfig.SUBSCRIPTION_YEAR_ID_X1
+    val subscriptionYearIdX2 = BuildConfig.SUBSCRIPTION_YEAR_ID_X2
+    val subscriptionYearIdX3 = BuildConfig.SUBSCRIPTION_YEAR_ID_X3
+
+    startPurchaseActivity(
+        R.string.app_name_g,
+        BuildConfig.GOOGLE_PLAY_LICENSING_KEY,
+        productIdList = arrayListOf(productIdX1, productIdX2, productIdX3),
+        productIdListRu = arrayListOf(productIdX1, productIdX2, productIdX3),
+        subscriptionIdList = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
+        subscriptionIdListRu = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
+        subscriptionYearIdList = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
+        subscriptionYearIdListRu = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
+        playStoreInstalled = isPlayStoreInstalled(),
+        ruStoreInstalled = isRuStoreInstalled()
+    )
 }

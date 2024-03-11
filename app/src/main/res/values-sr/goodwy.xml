@@ -3,4 +3,5 @@
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Стил наслова ћаскања</string>
     <string name="unread_at_top_g">Непрочитано увек на врху</string>
+    <string name="show_sim_selection_dialog">Прикажи дијалог за избор СИМ картице приликом слања</string>
 </resources>

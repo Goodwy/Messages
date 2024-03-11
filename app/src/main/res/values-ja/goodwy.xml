@@ -3,4 +3,5 @@
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">チャットのタイトルスタイル</string>
     <string name="unread_at_top_g">未読は常に一番上に表示されます</string>
+    <string name="show_sim_selection_dialog">送信時にSIMカード選択ダイアログを表示する</string>
 </resources>

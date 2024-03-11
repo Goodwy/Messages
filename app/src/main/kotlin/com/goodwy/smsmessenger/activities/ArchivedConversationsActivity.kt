@@ -127,10 +127,19 @@ class ArchivedConversationsActivity : SimpleActivity() {
     }
 
     private fun setupConversations(conversations: ArrayList<Conversation>) {
-        val sortedConversations = conversations.sortedWith(
-            compareByDescending<Conversation> { config.pinnedConversations.contains(it.threadId.toString()) }
-                .thenByDescending { it.date }
-        ).toMutableList() as ArrayList<Conversation>
+        val sortedConversations = if (config.unreadAtTop) {
+            conversations.sortedWith(
+                compareByDescending<Conversation> { config.pinnedConversations.contains(it.threadId.toString()) }
+                    .thenBy { it.read }
+                    .thenByDescending { it.date }
+            ).toMutableList() as ArrayList<Conversation>
+        } else {
+            conversations.sortedWith(
+                compareByDescending<Conversation> { config.pinnedConversations.contains(it.threadId.toString()) }
+                    .thenByDescending { it.date }
+                    .thenByDescending { it.isGroupConversation } // Group chats at the top
+            ).toMutableList() as ArrayList<Conversation>
+        }
 
         showOrHidePlaceholder(conversations.isEmpty())
         updateOptionsMenu(conversations)

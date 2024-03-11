@@ -3,4 +3,5 @@
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Στυλ τίτλου συνομιλίας</string>
     <string name="unread_at_top_g">Μη αναγνωσμένο πάντα στην κορυφή</string>
+    <string name="show_sim_selection_dialog">Εμφάνιση διαλόγου επιλογής κάρτας SIM κατά την αποστολή</string>
 </resources>

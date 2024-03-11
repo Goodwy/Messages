@@ -2,14 +2,12 @@ package com.goodwy.smsmessenger.activities
 
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
-import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
-import android.widget.Toast
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.goodwy.commons.activities.ManageBlockedNumbersActivity
@@ -24,22 +22,15 @@ import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.databinding.ActivitySettingsBinding
 import com.goodwy.smsmessenger.dialogs.ExportMessagesDialog
-import com.goodwy.smsmessenger.dialogs.ImportMessagesDialog
 import com.goodwy.smsmessenger.dialogs.MessageBubbleSettingDialog
-import com.goodwy.smsmessenger.extensions.areMultipleSIMsAvailable
-import com.goodwy.smsmessenger.extensions.config
-import com.goodwy.smsmessenger.extensions.emptyMessagesRecycleBin
-import com.goodwy.smsmessenger.extensions.messagesDB
+import com.goodwy.smsmessenger.extensions.*
 import com.goodwy.smsmessenger.helpers.*
 import com.goodwy.smsmessenger.models.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ru.rustore.sdk.core.feature.model.FeatureAvailabilityResult
-import java.io.FileOutputStream
-import java.io.OutputStream
 import java.util.*
-import kotlin.system.exitProcess
 import kotlin.system.exitProcess
 
 class SettingsActivity : SimpleActivity() {
@@ -47,6 +38,7 @@ class SettingsActivity : SimpleActivity() {
     private var recycleBinMessages = 0
     private val messagesFileType = "application/json"
     private val messageImportFileTypes = listOf("application/json", "application/xml", "text/xml")
+    private var wasProtectionHandled = false
 
     private val binding by viewBinding(ActivitySettingsBinding::inflate)
 
@@ -144,6 +136,16 @@ class SettingsActivity : SimpleActivity() {
                     }
             }
         }
+
+        wasProtectionHandled = intent.getBooleanExtra(WAS_PROTECTION_HANDLED, false)
+        if (savedInstanceState == null) {
+            if (!wasProtectionHandled) {
+                handleAppPasswordProtection {
+                    wasProtectionHandled = it
+                    if (!it) finish()
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -174,6 +176,7 @@ class SettingsActivity : SimpleActivity() {
 
         setupActionOnMessageClick()
         setupSendOnEnter()
+        setupShowSimSelectionDialog()
         setupEnableDeliveryReports()
         setupShowCharacterCounter()
         setupUseSimpleCharacters()
@@ -189,8 +192,16 @@ class SettingsActivity : SimpleActivity() {
         setupUnreadIndicatorPosition()
         setupHideTopBarWhenScroll()
 
+        setupUseSwipeToAction()
+        setupSwipeVibration()
+        setupSwipeRightAction()
+        setupSwipeLeftAction()
+        setupArchiveConfirmation()
+        setupDeleteConfirmation()
+
         setupUseRecycleBin()
         setupEmptyRecycleBin()
+
         setupAppPasswordProtection()
 
         setupMessagesExport()
@@ -211,9 +222,10 @@ class SettingsActivity : SimpleActivity() {
                 settingsNotificationsLabel,
                 settingsOutgoingMessagesLabel,
                 settingsListViewLabel,
-                settingsBackupsLabel,
+                settingsSwipeGesturesLabel,
                 settingsRecycleBinLabel,
                 settingsSecurityLabel,
+                settingsBackupsLabel,
                 settingsOtherLabel
             ).forEach {
                 it.setTextColor(getProperPrimaryColor())
@@ -225,9 +237,10 @@ class SettingsActivity : SimpleActivity() {
                 settingsNotificationsHolder,
                 settingsOutgoingMessagesHolder,
                 settingsListViewHolder,
-                settingsBackupsHolder,
+                settingsSwipeGesturesHolder,
                 settingsRecycleBinHolder,
                 settingsSecurityHolder,
+                settingsBackupsHolder,
                 settingsOtherHolder
             ).forEach {
                 it.background.applyColorFilter(getBottomNavigationBackgroundColor())
@@ -235,7 +248,6 @@ class SettingsActivity : SimpleActivity() {
 
             arrayOf(
                 settingsCustomizeColorsChevron,
-                settingsMessageBubbleChevron,
                 settingsManageBlockedNumbersChevron,
                 settingsManageBlockedKeywordsChevron,
                 settingsChangeDateTimeFormatChevron,
@@ -246,6 +258,23 @@ class SettingsActivity : SimpleActivity() {
                 settingsAboutChevron
             ).forEach {
                 it.applyColorFilter(getProperTextColor())
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(WAS_PROTECTION_HANDLED, wasProtectionHandled)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        wasProtectionHandled = savedInstanceState.getBoolean(WAS_PROTECTION_HANDLED, false)
+
+        if (!wasProtectionHandled) {
+            handleAppPasswordProtection {
+                wasProtectionHandled = it
+                if (!it) finish()
             }
         }
     }
@@ -382,7 +411,7 @@ class SettingsActivity : SimpleActivity() {
                 RadioItem(THREAD_TOP_LARGE, getString(com.goodwy.commons.R.string.large))
             )
 
-            RadioGroupDialog(this@SettingsActivity, items, config.threadTopStyle) {
+            RadioGroupDialog(this@SettingsActivity, items, config.threadTopStyle, R.string.chat_title_style_g) {
                 config.threadTopStyle = it as Int
                 settingsThreadTopStyle.text = getThreadTopStyleText()
             }
@@ -398,9 +427,22 @@ class SettingsActivity : SimpleActivity() {
     )
 
     private fun setupMessageBubble() = binding.apply {
+        settingsMessageBubbleIcon.background = resources.getColoredDrawableWithColor(getMessageBubbleResource(config.bubbleStyle), getProperPrimaryColor())
+        settingsMessageBubbleIcon.setPaddingBubble(this@SettingsActivity, config.bubbleStyle)
         settingsMessageBubbleHolder.setOnClickListener {
-            MessageBubbleSettingDialog(this@SettingsActivity) {
+            MessageBubbleSettingDialog(this@SettingsActivity, isPro()) {
+                settingsMessageBubbleIcon.background = resources.getColoredDrawableWithColor(getMessageBubbleResource(it), getProperPrimaryColor())
+                settingsMessageBubbleIcon.setPaddingBubble(this@SettingsActivity, it)
             }
+        }
+    }
+
+    private fun getMessageBubbleResource(bubbleStyle: Int): Int {
+        return when (bubbleStyle) {
+            BUBBLE_STYLE_ROUNDED -> R.drawable.item_received_rounded_background
+            BUBBLE_STYLE_IOS_NEW -> R.drawable.item_received_ios_new_background
+            BUBBLE_STYLE_IOS -> R.drawable.item_received_ios_background
+            else -> R.drawable.item_received_background
         }
     }
 
@@ -478,7 +520,7 @@ class SettingsActivity : SimpleActivity() {
                 RadioItem(FONT_SIZE_EXTRA_LARGE, getString(com.goodwy.commons.R.string.extra_large))
             )
 
-            RadioGroupDialog(this@SettingsActivity, items, config.fontSize) {
+            RadioGroupDialog(this@SettingsActivity, items, config.fontSize, com.goodwy.commons.R.string.font_size) {
                 config.fontSize = it as Int
                 settingsFontSize.text = getFontSizeText()
             }
@@ -497,13 +539,13 @@ class SettingsActivity : SimpleActivity() {
         settingsActionOnMessageClick.text = getActionOnMessageClickText()
         settingsActionOnMessageClickHolder.setOnClickListener {
             val items = arrayListOf(
-                RadioItem(ACTION_COPY_CODE, getString(com.goodwy.commons.R.string.copy_code)),
-                RadioItem(ACTION_COPY_MESSAGE, getString(com.goodwy.commons.R.string.copy_to_clipboard)),
-                RadioItem(ACTION_SELECT_TEXT, getString(com.goodwy.commons.R.string.select_text)),
-                RadioItem(ACTION_NOTHING, getString(com.goodwy.commons.R.string.nothing)),
+                RadioItem(ACTION_COPY_CODE, getString(com.goodwy.commons.R.string.copy_code), icon = com.goodwy.commons.R.drawable.ic_copy_vector),
+                RadioItem(ACTION_COPY_MESSAGE, getString(com.goodwy.commons.R.string.copy_to_clipboard), icon = com.goodwy.commons.R.drawable.ic_copy_vector),
+                RadioItem(ACTION_SELECT_TEXT, getString(com.goodwy.commons.R.string.select_text), icon = R.drawable.ic_text_select),
+                RadioItem(ACTION_NOTHING, getString(com.google.android.material.R.string.exposed_dropdown_menu_content_description), icon = R.drawable.ic_menu_open),
             )
 
-            RadioGroupDialog(this@SettingsActivity, items, config.actionOnMessageClickSetting) {
+            RadioGroupIconDialog(this@SettingsActivity, items, config.actionOnMessageClickSetting, com.goodwy.commons.R.string.action_on_message_click) {
                 config.actionOnMessageClickSetting = it as Int
                 settingsActionOnMessageClick.text = getActionOnMessageClickText()
             }
@@ -515,7 +557,7 @@ class SettingsActivity : SimpleActivity() {
             ACTION_COPY_CODE -> com.goodwy.commons.R.string.copy_code
             ACTION_COPY_MESSAGE -> com.goodwy.commons.R.string.copy_to_clipboard
             ACTION_SELECT_TEXT -> com.goodwy.commons.R.string.select_text
-            else -> com.goodwy.commons.R.string.nothing
+            else -> com.google.android.material.R.string.exposed_dropdown_menu_content_description
         }
     )
 
@@ -532,6 +574,15 @@ class SettingsActivity : SimpleActivity() {
         settingsSendOnEnterHolder.setOnClickListener {
             settingsSendOnEnter.toggle()
             config.sendOnEnter = settingsSendOnEnter.isChecked
+        }
+    }
+
+    private fun setupShowSimSelectionDialog() = binding.apply {
+        settingsShowSimSelectionDialogHolder.beVisibleIf(areMultipleSIMsAvailable())
+        settingsShowSimSelectionDialog.isChecked = config.showSimSelectionDialog
+        settingsShowSimSelectionDialogHolder.setOnClickListener {
+            settingsShowSimSelectionDialog.toggle()
+            config.showSimSelectionDialog = settingsShowSimSelectionDialog.isChecked
         }
     }
 
@@ -568,7 +619,7 @@ class SettingsActivity : SimpleActivity() {
                 RadioItem(LOCK_SCREEN_NOTHING, getString(com.goodwy.commons.R.string.nothing)),
             )
 
-            RadioGroupDialog(this@SettingsActivity, items, config.lockScreenVisibilitySetting) {
+            RadioGroupDialog(this@SettingsActivity, items, config.lockScreenVisibilitySetting, R.string.lock_screen_visibility) {
                 config.lockScreenVisibilitySetting = it as Int
                 settingsLockScreenVisibility.text = getLockScreenVisibilityText()
             }
@@ -597,9 +648,142 @@ class SettingsActivity : SimpleActivity() {
             )
 
             val checkedItemId = items.find { it.value == config.mmsFileSizeLimit }?.id ?: 7
-            RadioGroupDialog(this@SettingsActivity, items, checkedItemId) {
+            RadioGroupDialog(this@SettingsActivity, items, checkedItemId, R.string.mms_file_size_limit) {
                 config.mmsFileSizeLimit = it as Long
                 settingsMmsFileSizeLimit.text = getMMSFileLimitText()
+            }
+        }
+    }
+
+    private fun setupUseSwipeToAction() {
+        updateSwipeToActionVisible()
+        binding.apply {
+            settingsUseSwipeToAction.isChecked = config.useSwipeToAction
+            settingsUseSwipeToActionHolder.setOnClickListener {
+                settingsUseSwipeToAction.toggle()
+                config.useSwipeToAction = settingsUseSwipeToAction.isChecked
+                //config.tabsChanged = true
+                updateSwipeToActionVisible()
+            }
+        }
+    }
+
+    private fun updateSwipeToActionVisible() {
+        binding.apply {
+            settingsSwipeVibrationHolder.beVisibleIf(config.useSwipeToAction)
+            settingsSwipeRightActionHolder.beVisibleIf(config.useSwipeToAction)
+            settingsSwipeLeftActionHolder.beVisibleIf(config.useSwipeToAction)
+            settingsSkipArchiveConfirmationHolder.beVisibleIf(config.useSwipeToAction && (config.swipeLeftAction == SWIPE_ACTION_ARCHIVE || config.swipeRightAction == SWIPE_ACTION_ARCHIVE))
+            settingsSkipDeleteConfirmationHolder.beVisibleIf(config.useSwipeToAction &&(config.swipeLeftAction == SWIPE_ACTION_DELETE || config.swipeRightAction == SWIPE_ACTION_DELETE))
+        }
+    }
+
+    private fun setupSwipeVibration() {
+        binding.apply {
+            settingsSwipeVibration.isChecked = config.swipeVibration
+            settingsSwipeVibrationHolder.setOnClickListener {
+                settingsSwipeVibration.toggle()
+                config.swipeVibration = settingsSwipeVibration.isChecked
+            }
+        }
+    }
+
+    private fun setupSwipeRightAction() = binding.apply {
+        if (isRTLLayout) settingsSwipeRightActionLabel.text = getString(com.goodwy.commons.R.string.swipe_left_action)
+        settingsSwipeRightAction.text = getSwipeActionText(false)
+        settingsSwipeRightActionHolder.setOnClickListener {
+            val items = if (isNougatPlus()) arrayListOf(
+                RadioItem(SWIPE_ACTION_MARK_READ, getString(R.string.mark_as_read), icon = R.drawable.ic_mark_read),
+                RadioItem(SWIPE_ACTION_DELETE, getString(com.goodwy.commons.R.string.delete), icon = com.goodwy.commons.R.drawable.ic_delete_outline),
+                RadioItem(SWIPE_ACTION_ARCHIVE, getString(R.string.archive), icon = R.drawable.ic_archive_vector),
+                RadioItem(SWIPE_ACTION_BLOCK, getString(com.goodwy.commons.R.string.block_number), icon = com.goodwy.commons.R.drawable.ic_block_vector),
+                RadioItem(SWIPE_ACTION_CALL, getString(com.goodwy.commons.R.string.call), icon = com.goodwy.commons.R.drawable.ic_phone_vector),
+                RadioItem(SWIPE_ACTION_MESSAGE, getString(com.goodwy.commons.R.string.send_sms), icon = com.goodwy.commons.R.drawable.ic_messages),
+            ) else arrayListOf(
+                RadioItem(SWIPE_ACTION_MARK_READ, getString(R.string.mark_as_read), icon = R.drawable.ic_mark_read),
+                RadioItem(SWIPE_ACTION_DELETE, getString(com.goodwy.commons.R.string.delete), icon = com.goodwy.commons.R.drawable.ic_delete_outline),
+                RadioItem(SWIPE_ACTION_ARCHIVE, getString(R.string.archive), icon = R.drawable.ic_archive_vector),
+                RadioItem(SWIPE_ACTION_CALL, getString(com.goodwy.commons.R.string.call), icon = com.goodwy.commons.R.drawable.ic_phone_vector),
+                RadioItem(SWIPE_ACTION_MESSAGE, getString(com.goodwy.commons.R.string.send_sms), icon = com.goodwy.commons.R.drawable.ic_messages),
+            )
+
+            val title =
+                if (isRTLLayout) com.goodwy.commons.R.string.swipe_left_action else com.goodwy.commons.R.string.swipe_right_action
+            RadioGroupIconDialog(this@SettingsActivity, items, config.swipeRightAction, title) {
+                config.swipeRightAction = it as Int
+                config.tabsChanged = true
+                settingsSwipeRightAction.text = getSwipeActionText(false)
+                settingsSkipArchiveConfirmationHolder.beVisibleIf(config.swipeLeftAction == SWIPE_ACTION_ARCHIVE || config.swipeRightAction == SWIPE_ACTION_ARCHIVE)
+                settingsSkipDeleteConfirmationHolder.beVisibleIf(config.swipeLeftAction == SWIPE_ACTION_DELETE || config.swipeRightAction == SWIPE_ACTION_DELETE)
+            }
+        }
+    }
+
+    private fun setupSwipeLeftAction() = binding.apply {
+        val stringId = if (isRTLLayout) com.goodwy.commons.R.string.swipe_right_action else com.goodwy.commons.R.string.swipe_left_action
+        settingsSwipeLeftActionLabel.text = addLockedLabelIfNeeded(stringId, isPro())
+        settingsSwipeLeftAction.text = getSwipeActionText(true)
+        settingsSwipeLeftActionHolder.setOnClickListener {
+            if (isPro()) {
+                val items = if (isNougatPlus()) arrayListOf(
+                    RadioItem(SWIPE_ACTION_MARK_READ, getString(R.string.mark_as_read), icon = R.drawable.ic_mark_read),
+                    RadioItem(SWIPE_ACTION_DELETE, getString(com.goodwy.commons.R.string.delete), icon = com.goodwy.commons.R.drawable.ic_delete_outline),
+                    RadioItem(SWIPE_ACTION_ARCHIVE, getString(R.string.archive), icon = R.drawable.ic_archive_vector),
+                    RadioItem(SWIPE_ACTION_BLOCK, getString(com.goodwy.commons.R.string.block_number), icon = com.goodwy.commons.R.drawable.ic_block_vector),
+                    RadioItem(SWIPE_ACTION_CALL, getString(com.goodwy.commons.R.string.call), icon = com.goodwy.commons.R.drawable.ic_phone_vector),
+                    RadioItem(SWIPE_ACTION_MESSAGE, getString(com.goodwy.commons.R.string.send_sms), icon = com.goodwy.commons.R.drawable.ic_messages),
+                ) else arrayListOf(
+                    RadioItem(SWIPE_ACTION_MARK_READ, getString(R.string.mark_as_read), icon = R.drawable.ic_mark_read),
+                    RadioItem(SWIPE_ACTION_DELETE, getString(com.goodwy.commons.R.string.delete), icon = com.goodwy.commons.R.drawable.ic_delete_outline),
+                    RadioItem(SWIPE_ACTION_ARCHIVE, getString(R.string.archive), icon = R.drawable.ic_archive_vector),
+                    RadioItem(SWIPE_ACTION_CALL, getString(com.goodwy.commons.R.string.call), icon = com.goodwy.commons.R.drawable.ic_phone_vector),
+                    RadioItem(SWIPE_ACTION_MESSAGE, getString(com.goodwy.commons.R.string.send_sms), icon = com.goodwy.commons.R.drawable.ic_messages),
+                )
+
+                val title =
+                    if (isRTLLayout) com.goodwy.commons.R.string.swipe_right_action else com.goodwy.commons.R.string.swipe_left_action
+                RadioGroupIconDialog(this@SettingsActivity, items, config.swipeLeftAction, title) {
+                    config.swipeLeftAction = it as Int
+                    config.tabsChanged = true
+                    settingsSwipeLeftAction.text = getSwipeActionText(true)
+                    settingsSkipArchiveConfirmationHolder.beVisibleIf(config.swipeLeftAction == SWIPE_ACTION_ARCHIVE || config.swipeRightAction == SWIPE_ACTION_ARCHIVE)
+                    settingsSkipDeleteConfirmationHolder.beVisibleIf(config.swipeLeftAction == SWIPE_ACTION_DELETE || config.swipeRightAction == SWIPE_ACTION_DELETE)
+                }
+            } else {
+                launchPurchase()
+            }
+        }
+    }
+
+    private fun getSwipeActionText(left: Boolean) = getString(
+        when (if (left) config.swipeLeftAction else config.swipeRightAction) {
+            SWIPE_ACTION_DELETE -> com.goodwy.commons.R.string.delete
+            SWIPE_ACTION_ARCHIVE -> R.string.archive
+            SWIPE_ACTION_BLOCK -> com.goodwy.commons.R.string.block_number
+            SWIPE_ACTION_CALL -> com.goodwy.commons.R.string.call
+            SWIPE_ACTION_MESSAGE -> com.goodwy.commons.R.string.send_sms
+            else -> R.string.mark_as_read
+        }
+    )
+
+    private fun setupArchiveConfirmation() {
+        binding.apply {
+            //settingsSkipArchiveConfirmationHolder.beVisibleIf(config.swipeLeftAction == SWIPE_ACTION_ARCHIVE || config.swipeRightAction == SWIPE_ACTION_ARCHIVE)
+            settingsSkipArchiveConfirmation.isChecked = config.skipArchiveConfirmation
+            settingsSkipArchiveConfirmationHolder.setOnClickListener {
+                settingsSkipArchiveConfirmation.toggle()
+                config.skipArchiveConfirmation = settingsSkipArchiveConfirmation.isChecked
+            }
+        }
+    }
+
+    private fun setupDeleteConfirmation() {
+        binding.apply {
+            //settingsSkipDeleteConfirmationHolder.beVisibleIf(config.swipeLeftAction == SWIPE_ACTION_DELETE || config.swipeRightAction == SWIPE_ACTION_DELETE)
+            settingsSkipDeleteConfirmation.isChecked = config.skipDeleteConfirmation
+            settingsSkipDeleteConfirmationHolder.setOnClickListener {
+                settingsSkipDeleteConfirmation.toggle()
+                config.skipDeleteConfirmation = settingsSkipDeleteConfirmation.isChecked
             }
         }
     }
@@ -727,13 +911,13 @@ class SettingsActivity : SimpleActivity() {
         settingsLinesCount.text = config.linesCount.toString()
         settingsLinesCountHolder.setOnClickListener {
             val items = arrayListOf(
-                RadioItem(1, "1"),
-                RadioItem(2, "2"),
-                RadioItem(3, "3"),
-                RadioItem(4, "4")
+                RadioItem(1, "1", icon = R.drawable.ic_lines_count_1),
+                RadioItem(2, "2", icon = R.drawable.ic_lines_count_2),
+                RadioItem(3, "3", icon = R.drawable.ic_lines_count_3),
+                RadioItem(4, "4", icon = R.drawable.ic_lines_count_4)
             )
 
-            RadioGroupDialog(this@SettingsActivity, items, config.linesCount) {
+            RadioGroupIconDialog(this@SettingsActivity, items, config.linesCount, com.goodwy.commons.R.string.lines_count) {
                 config.linesCount = it as Int
                 settingsLinesCount.text = it.toString()
                 config.tabsChanged = true
@@ -745,11 +929,11 @@ class SettingsActivity : SimpleActivity() {
         settingsUnreadIndicatorPosition.text = getUnreadIndicatorPositionText()
         settingsUnreadIndicatorPositionHolder.setOnClickListener {
             val items = arrayListOf(
-                RadioItem(UNREAD_INDICATOR_START, getString(com.goodwy.commons.R.string.start)),
-                RadioItem(UNREAD_INDICATOR_END, getString(com.goodwy.commons.R.string.end))
+                RadioItem(UNREAD_INDICATOR_START, getString(com.goodwy.commons.R.string.start), icon = R.drawable.ic_unread_start),
+                RadioItem(UNREAD_INDICATOR_END, getString(com.goodwy.commons.R.string.end), icon = R.drawable.ic_unread_end)
             )
 
-            RadioGroupDialog(this@SettingsActivity, items, config.unreadIndicatorPosition) {
+            RadioGroupIconDialog(this@SettingsActivity, items, config.unreadIndicatorPosition, com.goodwy.commons.R.string.unread_indicator_position) {
                 config.unreadIndicatorPosition = it as Int
                 settingsUnreadIndicatorPosition.text = getUnreadIndicatorPositionText()
                 config.tabsChanged = true
@@ -771,21 +955,6 @@ class SettingsActivity : SimpleActivity() {
             config.hideTopBarWhenScroll = settingsHideBarWhenScroll.isChecked
             config.tabsChanged = true
         }
-    }
-
-    private fun launchPurchase() {
-        startPurchaseActivity(
-            R.string.app_name_g,
-            BuildConfig.GOOGLE_PLAY_LICENSING_KEY,
-            productIdList = arrayListOf(productIdX1, productIdX2, productIdX3),
-            productIdListRu = arrayListOf(productIdX1, productIdX2, productIdX3),
-            subscriptionIdList = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
-            subscriptionIdListRu = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
-            subscriptionYearIdList = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
-            subscriptionYearIdListRu = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
-            playStoreInstalled = isPlayStoreInstalled(),
-            ruStoreInstalled = isRuStoreInstalled()
-        )
     }
 
     private fun setupUseColoredContacts() = binding.apply {
@@ -835,7 +1004,7 @@ class SettingsActivity : SimpleActivity() {
         settingsSimCardColorListIcon2.setColorFilter(config.simIconsColors[2])
         if (isPro()) {
             settingsSimCardColorListIcon1.setOnClickListener {
-                ColorPickerDialog(this@SettingsActivity, config.simIconsColors[1], addDefaultColorButton = true, colorDefault = resources.getColor(com.goodwy.commons.R.color.md_blue_500), title = resources.getString(com.goodwy.commons.R.string.color_sim_card_icons)) { wasPositivePressed, color ->
+                ColorPickerDialog(this@SettingsActivity, config.simIconsColors[1], addDefaultColorButton = true, colorDefault = resources.getColor(com.goodwy.commons.R.color.ic_dialer), title = resources.getString(com.goodwy.commons.R.string.color_sim_card_icons)) { wasPositivePressed, color ->
                     if (wasPositivePressed) {
                         if (hasColorChanged(config.simIconsColors[1], color)) {
                             addSimCardColor(1, color)
@@ -845,7 +1014,7 @@ class SettingsActivity : SimpleActivity() {
                 }
             }
             settingsSimCardColorListIcon2.setOnClickListener {
-                ColorPickerDialog(this@SettingsActivity, config.simIconsColors[2], addDefaultColorButton = true, colorDefault = resources.getColor(com.goodwy.commons.R.color.md_green_500), title = resources.getString(com.goodwy.commons.R.string.color_sim_card_icons)) { wasPositivePressed, color ->
+                ColorPickerDialog(this@SettingsActivity, config.simIconsColors[2], addDefaultColorButton = true, colorDefault = resources.getColor(com.goodwy.commons.R.color.color_primary), title = resources.getString(com.goodwy.commons.R.string.color_sim_card_icons)) { wasPositivePressed, color ->
                     if (wasPositivePressed) {
                         if (hasColorChanged(config.simIconsColors[2], color)) {
                             addSimCardColor(2, color)
@@ -936,11 +1105,14 @@ class SettingsActivity : SimpleActivity() {
 //                getString(com.goodwy.commons.R.string.customize_colors_locked)
 //            }
             settingsTipJarHolder.beVisibleIf(isPro)
+
+            val stringId = if (isRTLLayout) com.goodwy.commons.R.string.swipe_right_action else com.goodwy.commons.R.string.swipe_left_action
+            settingsSwipeLeftActionLabel.text = addLockedLabelIfNeeded(stringId, isPro)
         }
     }
 
     private fun updateProducts() {
-        val productList: ArrayList<String> = arrayListOf(productIdX1, productIdX2, productIdX3, subscriptionIdX1, subscriptionIdX2, subscriptionIdX3)
+        val productList: ArrayList<String> = arrayListOf(productIdX1, productIdX2, productIdX3, subscriptionIdX1, subscriptionIdX2, subscriptionIdX3, subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3)
         ruStoreHelper.getProducts(productList)
     }
 

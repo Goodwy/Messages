@@ -127,5 +127,7 @@ dependencies {
     implementation(libs.rustore.client)
     implementation(libs.behavio.rule)
     implementation(libs.rx.animation)
+    implementation(libs.rx.java)
     implementation(libs.bundles.lifecycle)
+    implementation(libs.swipe.action)
 }

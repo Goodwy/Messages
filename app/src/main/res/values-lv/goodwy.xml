@@ -3,4 +3,5 @@
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Tērzēšanas virsraksta stils</string>
     <string name="unread_at_top_g">Nelasītie vienmēr augšpusē</string>
+    <string name="show_sim_selection_dialog">Sūtīšanas laikā rādīt SIM kartes izvēles dialoglodziņu</string>
 </resources>

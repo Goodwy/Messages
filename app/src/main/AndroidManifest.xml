@@ -59,26 +59,26 @@
 
         <activity
             android:name=".activities.MainActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|uiMode"
             android:exported="true" />
 
         <activity
             android:name=".activities.RecycleBinConversationsActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|uiMode"
             android:exported="true"
             android:label="@string/recycle_bin"
             android:parentActivityName=".activities.MainActivity" />
 
         <activity
             android:name=".activities.ArchivedConversationsActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|uiMode"
             android:exported="true"
             android:label="@string/archived_conversations"
             android:parentActivityName=".activities.MainActivity" />
 
         <activity
             android:name=".activities.ThreadActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|uiMode"
             android:exported="false"
             android:launchMode="singleTop"
             android:parentActivityName=".activities.MainActivity"
@@ -86,7 +86,7 @@
 
         <activity
             android:name=".activities.NewConversationActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|uiMode"
             android:exported="true"
             android:parentActivityName=".activities.MainActivity">
 
@@ -122,7 +122,7 @@
 
         <activity
             android:name=".activities.SettingsActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|uiMode"
             android:exported="true"
             android:label="@string/settings"
             android:parentActivityName=".activities.MainActivity">
@@ -135,21 +135,21 @@
 
         <activity
             android:name="com.goodwy.commons.activities.AboutActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|uiMode"
             android:exported="false"
             android:label="@string/about"
             android:parentActivityName=".activities.MainActivity" />
 
         <activity
             android:name="com.goodwy.commons.activities.CustomizationActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|uiMode"
             android:exported="false"
             android:label="@string/customize_colors"
             android:parentActivityName=".activities.SettingsActivity" />
 
         <activity
             android:name="com.goodwy.commons.activities.ManageBlockedNumbersActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|uiMode"
             android:exported="false"
             android:label="@string/blocked_numbers"
             android:parentActivityName=".activities.SettingsActivity"
@@ -157,21 +157,21 @@
 
         <activity
             android:name=".activities.ManageBlockedKeywordsActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|uiMode"
             android:exported="false"
             android:label="@string/blocked_keywords"
             android:parentActivityName=".activities.SettingsActivity" />
 
         <activity
             android:name=".activities.VCardViewerActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|uiMode"
             android:exported="false"
             android:label="@string/contact_details"
             android:parentActivityName=".activities.ThreadActivity" />
 
         <activity
             android:name=".activities.ConversationDetailsActivity"
-            android:configChanges="orientation"
+            android:configChanges="orientation|uiMode"
             android:exported="false"
             android:label="@string/conversation_details"
             android:parentActivityName=".activities.ThreadActivity" />

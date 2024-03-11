@@ -168,7 +168,7 @@
         </RelativeLayout>
 
         <com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
-            android:id="@+id/thread_messages_fastscroller"
+            android:id="@+id/threadMessagesFastscroller"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@id/short_code_holder"
@@ -199,8 +199,8 @@
             android:src="@drawable/ic_arrow_down_vector"
             android:visibility="invisible"
             app:fabSize="mini"
-            app:layout_constraintBottom_toBottomOf="@id/thread_messages_fastscroller"
-            app:layout_constraintEnd_toEndOf="@id/thread_messages_fastscroller"
+            app:layout_constraintBottom_toBottomOf="@id/threadMessagesFastscroller"
+            app:layout_constraintEnd_toEndOf="@id/threadMessagesFastscroller"
             tools:ignore="ContentDescription"
             tools:visibility="visible" />
 
@@ -213,7 +213,7 @@
             app:layout_constraintBottom_toTopOf="@id/message_holder"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/thread_messages_fastscroller"
+            app:layout_constraintTop_toBottomOf="@id/threadMessagesFastscroller"
             tools:visibility="visible" />
 
         <include

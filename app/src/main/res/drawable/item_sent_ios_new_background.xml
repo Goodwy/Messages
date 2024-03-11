@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" >
+
+    <item
+        android:right="@dimen/speech_bubble_spacing"
+        tools:width="50dp"
+        tools:height="50dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp" />
+            <solid android:color="@color/color_primary" />
+        </shape>
+    </item>
+
+    <item
+        android:right="0.24dp"
+        android:bottom="0.5dp"
+        android:width="@dimen/speech_bubble_corners_plus_tail"
+        android:height="@dimen/speech_bubble_corners_plus_tail"
+        android:gravity="bottom|right">
+        <vector xmlns:android="http://schemas.android.com/apk/res/android"
+            android:width="@dimen/speech_bubble_corners_plus_tail"
+            android:height="@dimen/speech_bubble_corners_plus_tail"
+            android:viewportWidth="150.0"
+            android:viewportHeight="150.0">
+            <path
+                android:pathData="M0,100 C7.67309143,100 14.1935201,100.346373 20.500756,99.0996492 C43.6628959,129.872031 94.1698247,146.306561 150.320843,150.792562 C113.168693,130.799632 87.2808993,98.5054948 81.0808824,68.6524321 C94.1277117,51.7595331 100,23.9957121 100,0 L0,0 L0,100 Z"
+                android:fillColor="@color/color_primary"/>
+        </vector>
+    </item>
+
+</layer-list>

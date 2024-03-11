@@ -105,4 +105,8 @@ class RecycleBinConversationsAdapter(
             }
         }
     }
+
+    override fun swipedLeft(conversation: Conversation) {}
+
+    override fun swipedRight(conversation: Conversation) {}
 }

@@ -12,6 +12,7 @@ import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.smsmessenger.extensions.*
 import com.goodwy.smsmessenger.helpers.REPLY
+import com.goodwy.smsmessenger.helpers.SIM_TO_REPLY
 import com.goodwy.smsmessenger.helpers.THREAD_ID
 import com.goodwy.smsmessenger.helpers.THREAD_NUMBER
 import com.goodwy.smsmessenger.messaging.sendMessageCompat
@@ -21,6 +22,7 @@ class DirectReplyReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val address = intent.getStringExtra(THREAD_NUMBER)
         val threadId = intent.getLongExtra(THREAD_ID, 0L)
+        val simToReply: Int = intent.getIntExtra(SIM_TO_REPLY, -1)
         var body = RemoteInput.getResultsFromIntent(intent)?.getCharSequence(REPLY)?.toString() ?: return
 
         body = context.removeDiacriticsIfNeeded(body)
@@ -36,10 +38,12 @@ class DirectReplyReceiver : BroadcastReceiver() {
                 }
             }
 
+            val simToReplyFinal = if (simToReply == -1) subscriptionId else simToReply
+
             ensureBackgroundThread {
                 var messageId = 0L
                 try {
-                    context.sendMessageCompat(body, listOf(address), subscriptionId, emptyList())
+                    context.sendMessageCompat(body, listOf(address), simToReplyFinal, emptyList())
                     val message = context.getMessages(threadId, getImageResolutions = false, includeScheduledMessages = false, limit = 1).lastOrNull()
                     if (message != null) {
                         context.messagesDB.insertOrUpdate(message)
@@ -54,7 +58,7 @@ class DirectReplyReceiver : BroadcastReceiver() {
                 val photoUri = SimpleContactsHelper(context).getPhotoUriFromPhoneNumber(address)
                 val bitmap = context.getNotificationBitmap(photoUri)
                 Handler(Looper.getMainLooper()).post {
-                    context.notificationHelper.showMessageNotification(messageId, address, body, threadId, bitmap, sender = null, alertOnlyOnce = true)
+                    context.notificationHelper.showMessageNotification(messageId, address, body, threadId, bitmap, sender = null, alertOnlyOnce = true, subscriptionId = simToReplyFinal)
                 }
 
                 context.markThreadMessagesRead(threadId)

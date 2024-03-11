@@ -3,4 +3,5 @@
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Sohbet başlığı stili</string>
     <string name="unread_at_top_g">Okunmamış, her zaman en üstte</string>
+    <string name="show_sim_selection_dialog">Gönderirken SIM kart seçimi iletişim kutusunu göster</string>
 </resources>

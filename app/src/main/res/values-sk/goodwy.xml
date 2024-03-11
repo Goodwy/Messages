@@ -3,4 +3,5 @@
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Štýl názvu chatu</string>
     <string name="unread_at_top_g">Neprečítané vždy hore</string>
+    <string name="show_sim_selection_dialog">Zobraziť dialógové okno výberu SIM karty pri odosielaní</string>
 </resources>

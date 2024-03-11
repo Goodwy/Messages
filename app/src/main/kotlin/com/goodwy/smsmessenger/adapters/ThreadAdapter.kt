@@ -463,29 +463,20 @@ class ThreadAdapter(
 //                setTextColor(textColor)
 //                setLinkTextColor(activity.getProperPrimaryColor())
 
-                val isRtl = TextUtils.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL
-                val bubbleReceived = when (activity.config.bubbleStyle) {
-                    1 -> if (isRtl) R.drawable.item_sent_ios_background else R.drawable.item_received_ios_background
+                val isRtl = activity.isRTLLayout
+                val bubbleStyle = activity.config.bubbleStyle
+
+                val bubbleReceived = when (bubbleStyle) {
+                    BUBBLE_STYLE_IOS_NEW -> if (isRtl) R.drawable.item_sent_ios_new_background else R.drawable.item_received_ios_new_background
+                    BUBBLE_STYLE_IOS -> if (isRtl) R.drawable.item_sent_ios_background else R.drawable.item_received_ios_background
+                    BUBBLE_STYLE_ROUNDED -> if (isRtl) R.drawable.item_sent_rounded_background else R.drawable.item_received_rounded_background
                     else -> if (isRtl) R.drawable.item_sent_background else R.drawable.item_received_background
                 }
                 background = ResourcesCompat.getDrawable(resources, bubbleReceived, activity.theme)
-                if (activity.config.bubbleStyle == 1) {
-                    val paddingTop = activity.resources.getDimensionPixelOffset(com.goodwy.commons.R.dimen.medium_margin)
-                    val paddingLeft = if (isRtl) activity.resources.getDimensionPixelOffset(R.dimen.bubble_padding_right_ios)
-                                            else activity.resources.getDimensionPixelOffset(R.dimen.bubble_padding_bottom)
-                    val paddingRight = if (isRtl) activity.resources.getDimensionPixelOffset(R.dimen.bubble_padding_bottom)
-                                             else activity.resources.getDimensionPixelOffset(R.dimen.bubble_padding_right_ios)
-                    val paddingBottom = activity.resources.getDimensionPixelOffset(R.dimen.bubble_padding_bottom)
-                    setPadding(paddingRight, paddingTop, paddingLeft, paddingBottom)
-                } else {
-                    val paddingTop = activity.resources.getDimensionPixelOffset(com.goodwy.commons.R.dimen.medium_margin)
-                    val paddingBottom = activity.resources.getDimensionPixelOffset(com.goodwy.commons.R.dimen.ten_dpi)
-                    val paddingHorizontal = activity.resources.getDimensionPixelOffset(R.dimen.bubble_padding_bottom)
-                    setPadding(paddingHorizontal, paddingTop, paddingHorizontal, paddingBottom)
-                }
+                setPaddingBubble(activity, bubbleStyle)
 
                 val letterBackgroundColors = activity.getLetterBackgroundColors()
-                val primaryOrSenderColor = if (activity.config.bubbleInContactColor) letterBackgroundColors[abs(message.senderName.hashCode().hashCode()) % letterBackgroundColors.size].toInt()
+                val primaryOrSenderColor = if (activity.config.bubbleInContactColor) letterBackgroundColors[abs(message.senderName.hashCode()) % letterBackgroundColors.size].toInt()
                                                 else activity.getProperPrimaryColor()
                 val backgroundReceived = if (activity.config.bubbleInvertColor) primaryOrSenderColor else activity.getBottomNavigationBackgroundColor()
                 background.applyColorFilter(backgroundReceived)
@@ -538,27 +529,16 @@ class ThreadAdapter(
                 }
 
                 val isRtl = TextUtils.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL
-                val bubbleReceived = when (activity.config.bubbleStyle) {
-                    1 -> if (isRtl) R.drawable.item_received_ios_background else R.drawable.item_sent_ios_background
+                val bubbleStyle = activity.config.bubbleStyle
+
+                val bubbleReceived = when (bubbleStyle) {
+                    BUBBLE_STYLE_IOS_NEW -> if (isRtl) R.drawable.item_received_ios_new_background else R.drawable.item_sent_ios_new_background
+                    BUBBLE_STYLE_IOS -> if (isRtl) R.drawable.item_received_ios_background else R.drawable.item_sent_ios_background
+                    BUBBLE_STYLE_ROUNDED -> if (isRtl) R.drawable.item_received_rounded_background else R.drawable.item_sent_rounded_background
                     else -> if (isRtl) R.drawable.item_received_background else R.drawable.item_sent_background
                 }
                 background = AppCompatResources.getDrawable(activity, bubbleReceived)
-
-                if (context.config.bubbleStyle == 1) {
-                    val paddingTop = activity.resources.getDimensionPixelOffset(com.goodwy.commons.R.dimen.medium_margin)
-                    val paddingLeft = if (isRtl) activity.resources.getDimensionPixelOffset(R.dimen.bubble_padding_right_ios)
-                                            else activity.resources.getDimensionPixelOffset(R.dimen.bubble_padding_bottom)
-                    val paddingRight = if (isRtl) activity.resources.getDimensionPixelOffset(R.dimen.bubble_padding_bottom)
-                                            else activity.resources.getDimensionPixelOffset(R.dimen.bubble_padding_right_ios)
-                    val paddingBottom = activity.resources.getDimensionPixelOffset(R.dimen.bubble_padding_bottom)
-                    setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
-                }
-                else {
-                    val paddingTop = activity.resources.getDimensionPixelOffset(com.goodwy.commons.R.dimen.medium_margin)
-                    val paddingBottom = activity.resources.getDimensionPixelOffset(com.goodwy.commons.R.dimen.ten_dpi)
-                    val paddingHorizontal = activity.resources.getDimensionPixelOffset(R.dimen.bubble_padding_bottom)
-                    setPadding(paddingHorizontal, paddingTop, paddingHorizontal, paddingBottom)
-                }
+                setPaddingBubble(activity, bubbleStyle, false)
 
                 val letterBackgroundColors = activity.getLetterBackgroundColors()
                 val primaryOrSenderColor = if (activity.config.bubbleInContactColor) letterBackgroundColors[abs(message.senderName.hashCode().hashCode()) % letterBackgroundColors.size].toInt()

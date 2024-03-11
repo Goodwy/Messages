@@ -3,4 +3,5 @@
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Gaya judul obrolan</string>
     <string name="unread_at_top_g">Belum dibaca selalu di atas</string>
+    <string name="show_sim_selection_dialog">Tampilkan dialog pemilihan kartu SIM saat mengirim</string>
 </resources>

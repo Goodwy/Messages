@@ -45,6 +45,8 @@ const val LAST_RECYCLE_BIN_CHECK = "last_recycle_bin_check"
 const val IS_RECYCLE_BIN = "is_recycle_bin"
 const val IS_ARCHIVE_AVAILABLE = "is_archive_available"
 const val CUSTOM_NOTIFICATIONS = "custom_notifications"
+const val SIM_TO_REPLY = "sim_to_reply"
+const val SHOW_SIM_SELECTION_DIALOG = "show_sim_selection_dialog"
 
 private const val PATH = "com.goodwy.smsmessenger.action."
 const val MARK_AS_READ = PATH + "mark_as_read"
@@ -102,6 +104,10 @@ fun generateRandomId(length: Int = 9): Long {
 
 //Goodwy
 const val BUBBLE_STYLE = "bubble_style"
+const val BUBBLE_STYLE_ORIGINAL = 0
+const val BUBBLE_STYLE_IOS_NEW = 1
+const val BUBBLE_STYLE_IOS = 2
+const val BUBBLE_STYLE_ROUNDED = 3
 const val BUBBLE_INVERT_COLOR = "bubble_invert_color"
 const val BUBBLE_IN_CONTACT_COLOR = "bubble_in_contact_color"
 const val UNREAD_AT_TOP = "unread_at_top"
@@ -125,8 +131,13 @@ const val UNREAD_INDICATOR_POSITION = "unread_indicator_position"
 const val UNREAD_INDICATOR_START = 1
 const val UNREAD_INDICATOR_END = 2
 
-const val WHATSAPP = "whatsapp"
-const val SIGNAL = "signal"
-const val VIBER = "viber"
-const val TELEGRAM = "telegram"
-const val THREEMA = "threema"
+// swiped left action
+const val SWIPE_RIGHT_ACTION = "swipe_right_action"
+const val SWIPE_LEFT_ACTION = "swipe_left_action"
+const val SWIPE_ACTION_MARK_READ = 1
+const val SWIPE_ACTION_DELETE = 2
+const val SWIPE_ACTION_ARCHIVE = 3
+const val SWIPE_ACTION_BLOCK = 4 //!! isNougatPlus()
+const val SWIPE_ACTION_CALL = 5
+const val SWIPE_ACTION_MESSAGE = 6
+const val SWIPE_VIBRATION = "swipe_vibration"

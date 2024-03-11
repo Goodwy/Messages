@@ -45,7 +45,8 @@ class NotificationHelper(private val context: Context) {
         threadId: Long,
         bitmap: Bitmap?,
         sender: String?,
-        alertOnlyOnce: Boolean = false
+        alertOnlyOnce: Boolean = false,
+        subscriptionId: Int? = null
     ) {
         //maybeCreateChannel(name = context.getString(R.string.channel_received_sms))
 
@@ -88,6 +89,7 @@ class NotificationHelper(private val context: Context) {
             val replyIntent = Intent(context, DirectReplyReceiver::class.java).apply {
                 putExtra(THREAD_ID, threadId)
                 putExtra(THREAD_NUMBER, address)
+                putExtra(SIM_TO_REPLY, subscriptionId)
             }
 
             val replyPendingIntent =

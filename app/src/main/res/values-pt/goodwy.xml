@@ -3,4 +3,5 @@
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Estilo de título do bate-papo</string>
     <string name="unread_at_top_g">Não lidos sempre no topo</string>
+    <string name="show_sim_selection_dialog">Mostrar a caixa de diálogo de seleção do cartão SIM durante o envio</string>
 </resources>

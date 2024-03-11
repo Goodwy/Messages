@@ -123,7 +123,6 @@
                         style="@style/SettingsChevronStyle"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginEnd="@dimen/smaller_margin"
                         android:contentDescription="@string/customization_theme_summary" />
 
                 </RelativeLayout>
@@ -158,6 +157,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
                         android:layout_marginEnd="@dimen/settings_margin"
                         android:clickable="false"
                         android:contentDescription="@string/settings_icon"
@@ -202,6 +202,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
                             android:layout_marginEnd="@dimen/settings_margin"
                             android:clickable="false"
                             android:contentDescription="@string/contact_color_list"
@@ -230,14 +231,15 @@
                         style="@style/SettingsTextLabelStyle"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
-                        android:layout_toStartOf="@+id/settings_sim_card_color_list_icon1"
+                        android:layout_toStartOf="@+id/settingsSimCardColorListIcon1"
                         android:text="@string/change_color" />
 
                     <ImageView
-                        android:id="@+id/settings_sim_card_color_list_icon1"
+                        android:id="@+id/settingsSimCardColorListIcon1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_toStartOf="@+id/settings_sim_card_color_list_icon2"
+                        android:layout_toStartOf="@+id/settingsSimCardColorListIcon2"
+                        android:layout_centerVertical="true"
                         android:layout_marginEnd="@dimen/bigger_margin"
                         android:background="?selectableItemBackgroundBorderless"
                         android:contentDescription="@string/color_sim_card_icons"
@@ -245,13 +247,14 @@
                         app:tint="@color/md_blue_500" />
 
                     <TextView
-                        android:id="@+id/settings_sim_card_color_list_number1"
-                        android:layout_width="match_parent"
+                        android:id="@+id/settingsSimCardColorListNumber1"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_alignStart="@+id/settings_sim_card_color_list_icon1"
-                        android:layout_alignTop="@+id/settings_sim_card_color_list_icon1"
-                        android:layout_alignEnd="@+id/settings_sim_card_color_list_icon1"
-                        android:layout_alignBottom="@+id/settings_sim_card_color_list_icon1"
+                        android:layout_centerVertical="true"
+                        android:layout_alignStart="@+id/settingsSimCardColorListIcon1"
+                        android:layout_alignTop="@+id/settingsSimCardColorListIcon1"
+                        android:layout_alignEnd="@+id/settingsSimCardColorListIcon1"
+                        android:layout_alignBottom="@+id/settingsSimCardColorListIcon1"
                         android:gravity="center"
                         android:textColor="@color/md_grey_black"
                         android:textSize="@dimen/normal_text_size"
@@ -259,10 +262,11 @@
                         android:text="1" />
 
                     <ImageView
-                        android:id="@+id/settings_sim_card_color_list_icon2"
+                        android:id="@+id/settingsSimCardColorListIcon2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
                         android:layout_marginEnd="@dimen/settings_margin"
                         android:background="?selectableItemBackgroundBorderless"
                         android:contentDescription="@string/color_sim_card_icons"
@@ -270,19 +274,19 @@
                         app:tint="@color/md_green_500" />
 
                     <TextView
-                        android:id="@+id/settings_sim_card_color_list_number2"
+                        android:id="@+id/settingsSimCardColorListNumber2"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_alignStart="@+id/settings_sim_card_color_list_icon2"
-                        android:layout_alignTop="@+id/settings_sim_card_color_list_icon2"
-                        android:layout_alignEnd="@+id/settings_sim_card_color_list_icon2"
-                        android:layout_alignBottom="@+id/settings_sim_card_color_list_icon2"
+                        android:layout_alignStart="@+id/settingsSimCardColorListIcon2"
+                        android:layout_alignTop="@+id/settingsSimCardColorListIcon2"
+                        android:layout_alignEnd="@+id/settingsSimCardColorListIcon2"
+                        android:layout_alignBottom="@+id/settingsSimCardColorListIcon2"
+                        android:layout_centerVertical="true"
                         android:gravity="center"
                         android:textColor="@color/md_grey_black"
                         android:textSize="@dimen/normal_text_size"
                         android:textStyle="bold"
                         android:text="2" />
-
                 </RelativeLayout>
             </LinearLayout>
 
@@ -348,7 +352,6 @@
                         style="@style/SettingsChevronStyle"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginEnd="@dimen/smaller_margin"
                         android:contentDescription="@string/manage_blocked_numbers"/>
                 </RelativeLayout>
 
@@ -378,7 +381,6 @@
                         style="@style/SettingsChevronStyle"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginEnd="@dimen/smaller_margin"
                         android:contentDescription="@string/manage_blocked_keywords"/>
                 </RelativeLayout>
 
@@ -418,7 +420,6 @@
                         style="@style/SettingsChevronStyle"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginEnd="@dimen/settings_margin"
                         android:contentDescription="@string/change_date_and_time_format"/>
 
                 </RelativeLayout>
@@ -458,6 +459,106 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/settingsSwipeGesturesHolder"
+                style="@style/SettingsSectionHolder"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/settingsSwipeGesturesLabel"
+                    style="@style/SettingsTextLabelStyle"
+                    android:layout_marginTop="@dimen/normal_margin"
+                    android:layout_marginStart="@dimen/smaller_margin"
+                    android:layout_marginBottom="@dimen/small_margin"
+                    android:text="@string/swipe_gestures"
+                    android:textStyle="bold"
+                    tools:textColor="@color/primary" />
+
+                <RelativeLayout
+                    android:id="@+id/settingsUseSwipeToActionHolder"
+                    style="@style/SettingsHolderSwitchStyle">
+
+                    <com.goodwy.commons.views.MySwitchCompat
+                        android:id="@+id/settingsUseSwipeToAction"
+                        style="@style/SettingsSwitchStyle"
+                        android:text="@string/use_swipe_gestures"
+                        app:switchPadding="@dimen/bigger_margin" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/settingsSwipeVibrationHolder"
+                    style="@style/SettingsHolderSwitchStyle">
+
+                    <com.goodwy.commons.views.MySwitchCompat
+                        android:id="@+id/settingsSwipeVibration"
+                        style="@style/SettingsSwitchStyle"
+                        android:text="@string/vibrate_g"
+                        app:switchPadding="@dimen/bigger_margin" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/settingsSwipeRightActionHolder"
+                    style="@style/SettingsHolderSwitchStyle">
+
+                    <com.goodwy.commons.views.MyTextView
+                        android:id="@+id/settingsSwipeRightActionLabel"
+                        style="@style/SettingsTextLabelStyle"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@+id/settingsSwipeRightAction"
+                        android:text="@string/swipe_right_action" />
+
+                    <com.goodwy.commons.views.MyTextView
+                        android:id="@+id/settingsSwipeRightAction"
+                        style="@style/SettingsTextValueStyle"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="@dimen/settings_margin"
+                        tools:text="@string/mark_as_read" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/settingsSwipeLeftActionHolder"
+                    style="@style/SettingsHolderSwitchStyle">
+
+                    <com.goodwy.commons.views.MyTextView
+                        android:id="@+id/settingsSwipeLeftActionLabel"
+                        style="@style/SettingsTextLabelStyle"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@+id/settingsSwipeLeftAction"
+                        android:text="@string/swipe_left_action" />
+
+                    <com.goodwy.commons.views.MyTextView
+                        android:id="@+id/settingsSwipeLeftAction"
+                        style="@style/SettingsTextValueStyle"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="@dimen/settings_margin"
+                        tools:text="@string/delete" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/settingsSkipArchiveConfirmationHolder"
+                    style="@style/SettingsHolderSwitchStyle">
+
+                    <com.goodwy.commons.views.MySwitchCompat
+                        android:id="@+id/settingsSkipArchiveConfirmation"
+                        style="@style/SettingsSwitchStyle"
+                        android:text="@string/skip_archive_confirmation"
+                        app:switchPadding="@dimen/bigger_margin" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/settingsSkipDeleteConfirmationHolder"
+                    style="@style/SettingsHolderSwitchStyle">
+
+                    <com.goodwy.commons.views.MySwitchCompat
+                        android:id="@+id/settingsSkipDeleteConfirmation"
+                        style="@style/SettingsSwitchStyle"
+                        android:text="@string/skip_delete_confirmation"
+                        app:switchPadding="@dimen/bigger_margin" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/settings_notifications_holder"
                 style="@style/SettingsSectionHolder"
                 android:orientation="vertical">
@@ -479,7 +580,9 @@
                     <com.goodwy.commons.views.MyTextView
                         android:id="@+id/settings_customize_notifications_label"
                         style="@style/SettingsTextLabelStyle"
+                        android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
+                        android:layout_toStartOf="@+id/settings_customize_notifications_chevron"
                         android:text="@string/customize_notifications" />
 
                     <ImageView
@@ -487,7 +590,6 @@
                         style="@style/SettingsChevronStyle"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginEnd="@dimen/settings_margin"
                         android:contentDescription="@string/customize_notifications"/>
 
                 </RelativeLayout>
@@ -552,22 +654,37 @@
 
                 <RelativeLayout
                     android:id="@+id/settings_message_bubble_holder"
-                    style="@style/SettingsHolderSwitchStyle">
+                    style="@style/SettingsHolderStyle"
+                    android:paddingEnd="@dimen/medium_margin">
 
                     <com.goodwy.commons.views.MyTextView
                         android:id="@+id/settings_message_bubble_label"
                         style="@style/SettingsTextLabelStyle"
+                        android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
-                        android:text="@string/speech_bubble" />
+                        android:layout_marginEnd="@dimen/medium_margin"
+                        android:layout_toStartOf="@+id/settingsMessageBubbleIcon"
+                        android:text="@string/speech_bubble"/>
 
-                    <ImageView
-                        android:id="@+id/settings_message_bubble_chevron"
-                        style="@style/SettingsChevronStyle"
+                    <TextView
+                        android:id="@+id/settingsMessageBubbleIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="@dimen/tiny_margin"
+                        android:layout_marginEnd="@dimen/tiny_margin"
+                        android:background="@drawable/item_received_ios_new_background"
+                        android:paddingTop="@dimen/bubble_padding_top"
+                        android:paddingBottom="@dimen/bubble_padding_top"
+                        android:paddingStart="@dimen/bubble_padding_right"
+                        android:paddingEnd="@dimen/bubble_padding_left"
+                        android:textSize="@dimen/normal_text_size"
+                        android:text="@string/message"
+                        android:minHeight="36dp"
+                        android:gravity="start|center_vertical"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginEnd="@dimen/settings_margin"
-                        android:contentDescription="@string/speech_bubble"/>
-
+                        android:clickable="false" />
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -599,6 +716,18 @@
                         android:id="@+id/settings_send_on_enter"
                         style="@style/SettingsSwitchStyle"
                         android:text="@string/send_on_enter"
+                        app:switchPadding="@dimen/bigger_margin" />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/settingsShowSimSelectionDialogHolder"
+                    style="@style/SettingsHolderSwitchStyle">
+
+                    <com.goodwy.commons.views.MySwitchCompat
+                        android:id="@+id/settingsShowSimSelectionDialog"
+                        style="@style/SettingsSwitchStyle"
+                        android:text="@string/show_sim_selection_dialog"
                         app:switchPadding="@dimen/bigger_margin" />
 
                 </RelativeLayout>
@@ -802,6 +931,83 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/settingsRecycleBinHolder"
+                style="@style/SettingsSectionHolder"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/settingsRecycleBinLabel"
+                    style="@style/SettingsTextLabelStyle"
+                    android:layout_marginTop="@dimen/normal_margin"
+                    android:layout_marginStart="@dimen/smaller_margin"
+                    android:layout_marginBottom="@dimen/small_margin"
+                    android:text="@string/recycle_bin"
+                    android:textStyle="bold"
+                    tools:textColor="@color/primary" />
+
+                <RelativeLayout
+                    android:id="@+id/settings_use_recycle_bin_holder"
+                    style="@style/SettingsHolderSwitchStyle">
+
+                    <com.goodwy.commons.views.MySwitchCompat
+                        android:id="@+id/settings_use_recycle_bin"
+                        style="@style/SettingsSwitchStyle"
+                        android:text="@string/move_items_into_recycle_bin"
+                        app:switchPadding="@dimen/bigger_margin" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/settings_empty_recycle_bin_holder"
+                    style="@style/SettingsHolderSwitchStyle">
+
+                    <com.goodwy.commons.views.MyTextView
+                        android:id="@+id/settings_empty_recycle_bin_label"
+                        style="@style/SettingsTextLabelStyle"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@+id/settings_empty_recycle_bin_size"
+                        android:text="@string/empty_recycle_bin" />
+
+                    <com.goodwy.commons.views.MyTextView
+                        android:id="@+id/settings_empty_recycle_bin_size"
+                        style="@style/SettingsTextValueStyle"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="@dimen/settings_margin"
+                        tools:text="0 B" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/settingsSecurityHolder"
+                style="@style/SettingsSectionHolder"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/settingsSecurityLabel"
+                    style="@style/SettingsTextLabelStyle"
+                    android:layout_marginTop="@dimen/normal_margin"
+                    android:layout_marginStart="@dimen/smaller_margin"
+                    android:layout_marginBottom="@dimen/small_margin"
+                    android:text="@string/security"
+                    android:textStyle="bold"
+                    tools:textColor="@color/primary" />
+
+                <RelativeLayout
+                    android:id="@+id/settings_app_password_protection_holder"
+                    style="@style/SettingsHolderSwitchStyle">
+
+                    <com.goodwy.commons.views.MySwitchCompat
+                        android:id="@+id/settings_app_password_protection"
+                        style="@style/SettingsSwitchStyle"
+                        android:text="@string/password_protect_whole_app"
+                        app:switchPadding="@dimen/bigger_margin" />
+
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/settingsBackupsHolder"
                 style="@style/SettingsSectionHolder"
                 android:orientation="vertical">
@@ -831,7 +1037,6 @@
                         style="@style/SettingsChevronStyle"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginEnd="@dimen/settings_margin"
                         android:contentDescription="@string/export_messages"/>
 
                 </RelativeLayout>
@@ -851,92 +1056,7 @@
                         style="@style/SettingsChevronStyle"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginEnd="@dimen/settings_margin"
                         android:contentDescription="@string/import_messages"/>
-
-                </RelativeLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settingsRecycleBinHolder"
-                style="@style/SettingsSectionHolder"
-                android:orientation="vertical"
-                android:visibility="gone"
-                tools:visibility="visible">
-
-                <TextView
-                    android:id="@+id/settingsRecycleBinLabel"
-                    style="@style/SettingsTextLabelStyle"
-                    android:layout_marginStart="@dimen/smaller_margin"
-                    android:layout_marginTop="@dimen/normal_margin"
-                    android:layout_marginBottom="@dimen/small_margin"
-                    android:text="@string/recycle_bin"
-                    android:textStyle="bold"
-                    tools:textColor="@color/primary" />
-
-                <RelativeLayout
-                    android:id="@+id/settings_use_recycle_bin_holder"
-                    style="@style/SettingsHolderCheckboxStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <com.goodwy.commons.views.MyAppCompatCheckbox
-                        android:id="@+id/settings_use_recycle_bin"
-                        style="@style/SettingsCheckboxStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/move_items_into_recycle_bin" />
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:id="@+id/settings_empty_recycle_bin_holder"
-                    style="@style/SettingsHolderTextViewStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <com.goodwy.commons.views.MyTextView
-                        android:id="@+id/settings_empty_recycle_bin_label"
-                        style="@style/SettingsTextLabelStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/empty_recycle_bin" />
-
-                    <com.goodwy.commons.views.MyTextView
-                        android:id="@+id/settings_empty_recycle_bin_size"
-                        style="@style/SettingsTextValueStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/settings_empty_recycle_bin_label"
-                        tools:text="0 B" />
-
-                </RelativeLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/settingsSecurityHolder"
-                style="@style/SettingsSectionHolder"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/settingsSecurityLabel"
-                    style="@style/SettingsTextLabelStyle"
-                    android:layout_marginTop="@dimen/normal_margin"
-                    android:layout_marginStart="@dimen/smaller_margin"
-                    android:layout_marginBottom="@dimen/small_margin"
-                    android:text="@string/security"
-                    android:textStyle="bold"
-                    tools:textColor="@color/primary" />
-
-                <RelativeLayout
-                    android:id="@+id/settings_app_password_protection_holder"
-                    style="@style/SettingsHolderSwitchStyle">
-
-                    <com.goodwy.commons.views.MySwitchCompat
-                        android:id="@+id/settings_app_password_protection"
-                        style="@style/SettingsSwitchStyle"
-                        android:text="@string/password_protect_whole_app"
-                        app:switchPadding="@dimen/bigger_margin" />
 
                 </RelativeLayout>
             </LinearLayout>
@@ -987,7 +1107,6 @@
                             style="@style/SettingsChevronStyle"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:layout_marginEnd="@dimen/smaller_margin"
                             android:contentDescription="@string/tip_jar"/>
                     </RelativeLayout>
                 </RelativeLayout>
@@ -1017,7 +1136,6 @@
                         style="@style/SettingsChevronStyle"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:layout_marginEnd="@dimen/smaller_margin"
                         android:contentDescription="@string/about"/>
 
                 </RelativeLayout>

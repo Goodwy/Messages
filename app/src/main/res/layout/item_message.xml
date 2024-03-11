@@ -5,8 +5,8 @@
     android:id="@+id/thread_message_holder"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/medium_margin"
-    android:layout_marginBottom="@dimen/medium_margin"
+    android:layout_marginTop="@dimen/small_margin"
+    android:layout_marginBottom="@dimen/tiny_margin"
     android:foreground="@drawable/selector"
     android:paddingStart="@dimen/activity_margin"
     android:paddingEnd="@dimen/activity_margin">
@@ -45,8 +45,7 @@
             android:layout_height="@dimen/play_outline_size"
             android:layout_alignEnd="@+id/thread_message_attachments_holder"
             android:layout_alignBottom="@+id/thread_message_attachments_holder"
-            android:layout_marginStart="@dimen/medium_margin"
-            android:layout_marginBottom="@dimen/activity_margin"
+            android:layout_margin="@dimen/medium_margin"
             android:src="@drawable/ic_play_outline_vector"
             android:visibility="gone" />
 
@@ -56,6 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/thread_message_attachments_holder"
             android:layout_toEndOf="@+id/thread_message_sender_photo"
+            android:layout_marginTop="@dimen/tiny_margin"
             android:autoLink="email|web"
             android:background="@drawable/item_received_background"
             android:paddingHorizontal="@dimen/normal_margin"

@@ -12,6 +12,40 @@
     <string name="mms">MMS</string>
     <string name="message_details_sim">SIM</string>
 
+    <!-- Release notes -->
+    <string name="release_512">
+        Bug fixes
+    </string>
+    <string name="release_511">
+        Added swipe gestures (call, message, block)\n
+        Now, when app password protection is enabled, you cannot access app settings without unlocking the app\n
+        New speech bubble styles have been added\n
+        Added "Show SIM card selection dialog when sending a message" setting\n
+        Added setting "Use contact colors" for message bubble\n
+        Fixed SIM card detection when replying in a notification\n
+        Bug fixes
+    </string>
+    <string name="release_510">
+        Added swipe gestures (mark as read, archive, delete)\n
+        Long-pressing the send button now launches voice dialing\n
+        Bug fixes
+    </string>
+    <string name="release_501">
+        Bug fixes
+    </string>
+    <string name="release_500">
+        Updated the interface\n
+        Bug fixes
+    </string>
+    <string name="release_423">
+        Bug fixes
+    </string>
+    <string name="release_421">
+        Added Unread Indicator Position setting\n
+        Changed grouping, group chats at the top\n
+        Added context menu when clicking on a message\n
+        Bug fixes
+    </string>
     <string name="release_420">
         !!! The format of backups has been changed. To restore backups made on previous versions install application version 4.1.0\n
         Added blocking of messages by keywords\n
@@ -19,26 +53,6 @@
         Added the ability to hide the top ban when scrolling\n
         Added support for RTL languages\n
         Improved performance, bug fixes
-    </string>
-
-    <string name="release_421">
-        Added Unread Indicator Position setting\n
-        Changed grouping, group chats at the top\n
-        Added context menu when clicking on a message\n
-        Bug fixes
-    </string>
-
-    <string name="release_423">
-        Bug fixes
-    </string>
-
-    <string name="release_500">
-        Updated the interface\n
-        Bug fixes
-    </string>
-
-    <string name="release_501">
-        Bug fixes
     </string>
 
 </resources>

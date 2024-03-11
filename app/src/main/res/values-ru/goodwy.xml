@@ -3,4 +3,5 @@
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Стиль заголовка чата</string>
     <string name="unread_at_top_g">Непрочитанное всегда вверху</string>
+    <string name="show_sim_selection_dialog">Показывать диалог выбора SIM-карты при отправке</string>
 </resources>

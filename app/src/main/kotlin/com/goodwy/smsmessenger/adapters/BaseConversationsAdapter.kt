@@ -21,15 +21,20 @@ import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
 import com.goodwy.smsmessenger.databinding.ItemConversationBinding
 import com.goodwy.smsmessenger.extensions.*
-import com.goodwy.smsmessenger.helpers.UNREAD_INDICATOR_START
+import com.goodwy.smsmessenger.helpers.*
 import com.goodwy.smsmessenger.models.Conversation
+import me.thanel.swipeactionview.SwipeActionView
+import me.thanel.swipeactionview.SwipeDirection
+import me.thanel.swipeactionview.SwipeGestureListener
+import org.jetbrains.annotations.NotNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
 @Suppress("LeakingThis")
 abstract class BaseConversationsAdapter(
-    activity: SimpleActivity, recyclerView: MyRecyclerView, onRefresh: () -> Unit, itemClick: (Any) -> Unit
+    activity: SimpleActivity, recyclerView: MyRecyclerView, onRefresh: () -> Unit, itemClick: (Any) -> Unit,
+    var isArchived: Boolean = false
 ) : MyRecyclerViewListAdapter<Conversation>(activity, recyclerView, ConversationDiffCallback(), itemClick, onRefresh),
     RecyclerViewFastScroller.OnPopupTextUpdate {
     private var fontSize = activity.getTextSize()
@@ -95,6 +100,17 @@ abstract class BaseConversationsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        if (position == currentList.lastIndex){
+            val params = holder.itemView.layoutParams as RecyclerView.LayoutParams
+            val margin = activity.resources.getDimension(com.goodwy.commons.R.dimen.shortcut_size).toInt()
+            params.bottomMargin = margin
+            holder.itemView.layoutParams = params
+        } else {
+            val params = holder.itemView.layoutParams as RecyclerView.LayoutParams
+            params.bottomMargin = 0
+            holder.itemView.layoutParams = params
+        }
+
         val conversation = getItem(position)
         holder.bindView(conversation, allowSingleClick = true, allowLongClick = true) { itemView, _ ->
             setupView(itemView, conversation)
@@ -121,10 +137,11 @@ abstract class BaseConversationsAdapter(
 
     private fun setupView(view: View, conversation: Conversation) {
         ItemConversationBinding.bind(view).apply {
-            root.setupViewBackground(activity)
+            conversationFrameSelect.setupViewBackground(activity)
             val smsDraft = drafts[conversation.threadId]
             draftIndicator.beVisibleIf(smsDraft != null)
             draftIndicator.setTextColor(properPrimaryColor)
+            conversationFrame.setBackgroundColor(backgroundColor)
 
             if (activity.config.unreadIndicatorPosition == UNREAD_INDICATOR_START) {
                 unreadIndicatorEnd.beGone()
@@ -145,7 +162,7 @@ abstract class BaseConversationsAdapter(
             divider.setBackgroundColor(textColor)
             if (currentList.last() == conversation || !activity.config.useDividers) divider.beInvisible() else divider.beVisible()
 
-            conversationFrame.isSelected = selectedKeys.contains(conversation.hashCode())
+            swipeView.isSelected = selectedKeys.contains(conversation.hashCode())
 
             val title = conversation.title
             conversationAddress.apply {
@@ -209,6 +226,44 @@ abstract class BaseConversationsAdapter(
             } else {
                 SimpleContactsHelper(activity).loadContactImage(conversation.photoUri, conversationImage, title, placeholder)
             }
+
+            //swipe
+            val isRTL = activity.isRTLLayout
+            val swipeLeftAction = if (isRTL) activity.config.swipeRightAction else activity.config.swipeLeftAction
+            swipeLeftIcon.setImageResource(swipeActionImageResource(swipeLeftAction))
+            swipeLeftIconHolder.setBackgroundColor(swipeActionColor(swipeLeftAction))
+
+            val swipeRightAction = if (isRTL) activity.config.swipeLeftAction else activity.config.swipeRightAction
+            swipeRightIcon.setImageResource(swipeActionImageResource(swipeRightAction))
+            swipeRightIconHolder.setBackgroundColor(swipeActionColor(swipeRightAction))
+
+            swipeView.setRippleColor(SwipeDirection.Left, swipeActionColor(swipeLeftAction))
+            swipeView.setRippleColor(SwipeDirection.Right, swipeActionColor(swipeRightAction))
+
+            if (isArchived) {
+                if (swipeLeftAction == SWIPE_ACTION_BLOCK) swipeView.setDirectionEnabled(SwipeDirection.Left, false)
+                if (swipeRightAction == SWIPE_ACTION_BLOCK) swipeView.setDirectionEnabled(SwipeDirection.Right, false)
+            }
+
+            arrayOf(
+                swipeRightIcon, swipeRightIcon
+            ).forEach {
+                it.setColorFilter(properPrimaryColor.getContrastColor())
+            }
+
+            swipeView.swipeGestureListener = object : SwipeGestureListener {
+                override fun onSwipedLeft(swipeActionView: SwipeActionView): Boolean {
+                    swipedLeft(conversation)
+                    if (activity.config.swipeVibration) swipeView.performHapticFeedback()
+                    return true
+                }
+
+                override fun onSwipedRight(swipeActionView: SwipeActionView): Boolean {
+                    swipedRight(conversation)
+                    if (activity.config.swipeVibration) swipeView.performHapticFeedback()
+                    return true
+                }
+            }
         }
     }
 
@@ -229,6 +284,32 @@ abstract class BaseConversationsAdapter(
 
         override fun areContentsTheSame(oldItem: Conversation, newItem: Conversation): Boolean {
             return Conversation.areContentsTheSame(oldItem, newItem)
+        }
+    }
+
+    abstract fun swipedLeft(conversation: Conversation)
+
+    abstract fun swipedRight(conversation: Conversation)
+
+    private fun swipeActionImageResource(swipeAction: Int): Int {
+        return when (swipeAction) {
+            SWIPE_ACTION_DELETE -> com.goodwy.commons.R.drawable.ic_delete_outline
+            SWIPE_ACTION_ARCHIVE -> if (isArchived) R.drawable.ic_unarchive_vector else R.drawable.ic_archive_vector
+            SWIPE_ACTION_BLOCK -> com.goodwy.commons.R.drawable.ic_block_vector
+            SWIPE_ACTION_CALL -> com.goodwy.commons.R.drawable.ic_phone_vector
+            SWIPE_ACTION_MESSAGE -> com.goodwy.commons.R.drawable.ic_messages
+            else -> R.drawable.ic_mark_read
+        }
+    }
+
+    private fun swipeActionColor(swipeAction: Int): Int {
+        return when (swipeAction) {
+            SWIPE_ACTION_DELETE -> resources.getColor(R.color.red_call, activity.theme)
+            SWIPE_ACTION_ARCHIVE -> resources.getColor(R.color.swipe_purple, activity.theme)
+            SWIPE_ACTION_BLOCK -> resources.getColor(com.goodwy.commons.R.color.red_700, activity.theme)
+            SWIPE_ACTION_CALL -> resources.getColor(R.color.green_call, activity.theme)
+            SWIPE_ACTION_MESSAGE -> resources.getColor(com.goodwy.commons.R.color.ic_messages, activity.theme)
+            else -> properPrimaryColor
         }
     }
 }

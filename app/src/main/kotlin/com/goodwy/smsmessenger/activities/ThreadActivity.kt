@@ -46,6 +46,7 @@ import com.google.gson.reflect.TypeToken
 import com.goodwy.commons.dialogs.ConfirmationDialog
 import com.goodwy.commons.dialogs.PermissionRequiredDialog
 import com.goodwy.commons.dialogs.RadioGroupDialog
+import com.goodwy.commons.dialogs.RadioGroupIconDialog
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.*
 import com.goodwy.commons.models.PhoneNumber
@@ -341,9 +342,17 @@ class ThreadActivity : SimpleActivity() {
                 val res: ArrayList<String> =
                     resultData.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
 
-                binding.messageHolder.threadTypeMessage.setText(
-                    Objects.requireNonNull(res)[0]
-                )
+                val speechToText =  Objects.requireNonNull(res)[0]
+                val draft = binding.messageHolder.threadTypeMessage.value
+                val draftPlusSpeech =
+                    if (draft.isNotEmpty()) {
+                        if (draft.last().toString() != " ") "$draft $speechToText" else draft + speechToText
+                    } else speechToText
+                if (draftPlusSpeech != "") {
+                    saveSmsDraft(draftPlusSpeech, threadId)
+                    //binding.messageHolder.threadTypeMessage.setText(draftPlusSpeech)
+                    //binding.messageHolder.threadTypeMessage.requestFocusFromTouch()
+                }
             }
         }
     }
@@ -488,7 +497,7 @@ class ThreadActivity : SimpleActivity() {
                 override fun updateBottom() {}
 
                 override fun updateTop() {
-                    fetchNextMessages()
+                    if (!isRecycleBin) fetchNextMessages()
                 }
             }
         }
@@ -714,9 +723,10 @@ class ThreadActivity : SimpleActivity() {
 //            }
 
             threadSendMessageWrapper.setOnLongClickListener {
-                if (!isScheduledMessage) {
-                    launchScheduleSendDialog()
-                }
+//                if (!isScheduledMessage) {
+//                    launchScheduleSendDialog()
+//                }
+                speechToText()
                 true
             }
 
@@ -955,6 +965,7 @@ class ThreadActivity : SimpleActivity() {
         val textColor = getProperTextColor()
         val availableSIMs = subscriptionManagerCompat().activeSubscriptionInfoList ?: return
         if (availableSIMs.size > 1) {
+            availableSIMCards.clear()
             availableSIMs.forEachIndexed { index, subscriptionInfo ->
                 var label = subscriptionInfo.displayName?.toString() ?: ""
                 if (subscriptionInfo.number?.isNotEmpty() == true) {
@@ -978,11 +989,11 @@ class ThreadActivity : SimpleActivity() {
             currentSIMCardIndex = getProperSimIndex(availableSIMs, numbers)
             binding.messageHolder.threadSelectSimIcon.background.applyColorFilter(resources.getColor(com.goodwy.commons.R.color.activated_item_foreground))
             binding.messageHolder.threadSelectSimIcon.applyColorFilter(getProperTextColor())
-            binding.messageHolder.threadSelectSimIcon.beVisible()
+            binding.messageHolder.threadSelectSimIconHolder.beVisibleIf(!config.showSimSelectionDialog)
             binding.messageHolder.threadSelectSimNumber.beVisible()
 
             if (availableSIMCards.isNotEmpty()) {
-                binding.messageHolder.threadSelectSimIcon.setOnClickListener {
+                binding.messageHolder.threadSelectSimIconHolder.setOnClickListener {
                     currentSIMCardIndex = (currentSIMCardIndex + 1) % availableSIMCards.size
                     val currentSIMCard = availableSIMCards[currentSIMCardIndex]
                     binding.messageHolder.threadSelectSimNumber.text = currentSIMCard.id.toString()
@@ -1001,6 +1012,7 @@ class ThreadActivity : SimpleActivity() {
                     numbers.forEach {
                         config.saveUseSIMIdAtNumber(it, currentSubscriptionId)
                     }
+                    it.performHapticFeedback()
                     toast(currentSIMCard.label)
                 }
             }
@@ -1008,16 +1020,19 @@ class ThreadActivity : SimpleActivity() {
             binding.messageHolder.threadSelectSimNumber.setTextColor(textColor.getContrastColor())
             try {
                 binding.messageHolder.threadSelectSimNumber.text = (availableSIMCards[currentSIMCardIndex].id).toString()
-                val simColor = if (!config.colorSimIcons) textColor
-                else {
-                    when (availableSIMCards[currentSIMCardIndex].id) {
-                        1 -> config.simIconsColors[1]
-                        2 -> config.simIconsColors[2]
-                        3 -> config.simIconsColors[3]
-                        4 -> config.simIconsColors[4]
-                        else -> config.simIconsColors[0]
+                val simColor =
+                    if (!config.colorSimIcons) textColor
+                    else {
+                        val simId = availableSIMCards[currentSIMCardIndex].id
+                        if (simId in 1..4) config.simIconsColors[simId] else config.simIconsColors[0]
+//                        when (availableSIMCards[currentSIMCardIndex].id) {
+//                            1 -> config.simIconsColors[1]
+//                            2 -> config.simIconsColors[2]
+//                            3 -> config.simIconsColors[3]
+//                            4 -> config.simIconsColors[4]
+//                            else -> config.simIconsColors[0]
+//                        }
                     }
-                }
                 binding.messageHolder.threadSelectSimIcon.applyColorFilter(simColor)
             } catch (e: Exception) {
                 showErrorToast(e)
@@ -1486,10 +1501,35 @@ class ThreadActivity : SimpleActivity() {
 
         val subscriptionId = availableSIMCards.getOrNull(currentSIMCardIndex)?.subscriptionId ?: SmsManager.getDefaultSmsSubscriptionId()
 
-        if (isScheduledMessage) {
-            sendScheduledMessage(text, subscriptionId)
+        if (config.showSimSelectionDialog && availableSIMCards.size > 1) {
+            val items: ArrayList<RadioItem> = arrayListOf()
+            items.clear()
+            availableSIMCards.forEach {
+                val simColor = if (it.id in 1..4) config.simIconsColors[it.id] else config.simIconsColors[0]
+                val res = when (it.id) {
+                    1 -> R.drawable.ic_sim_one
+                    2 -> R.drawable.ic_sim_two
+                    else -> com.goodwy.commons.R.drawable.ic_sim_vector
+                }
+                val drawable = ResourcesCompat.getDrawable(resources, res, theme)?.apply {
+                    applyColorFilter(simColor)
+                }
+                items.add(RadioItem(it.id, it.label, it, drawable = drawable))
+            }
+            RadioGroupIconDialog(this@ThreadActivity, items) {
+                val simId = (it as SIMCard).subscriptionId
+                if (isScheduledMessage) {
+                    sendScheduledMessage(text, simId)
+                } else {
+                    sendNormalMessage(text, simId)
+                }
+            }
         } else {
-            sendNormalMessage(text, subscriptionId)
+            if (isScheduledMessage) {
+                sendScheduledMessage(text, subscriptionId)
+            } else {
+                sendNormalMessage(text, subscriptionId)
+            }
         }
     }
 

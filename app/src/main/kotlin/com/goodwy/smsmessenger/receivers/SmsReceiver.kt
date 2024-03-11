@@ -117,7 +117,7 @@ class SmsReceiver : BroadcastReceiver() {
                         context.updateConversationArchivedStatus(threadId, false)
                     }
                     refreshMessages()
-                    context.showReceivedMessageNotification(newMessageId, address, body, threadId, bitmap)
+                    context.showReceivedMessageNotification(newMessageId, address, body, threadId, bitmap, subscriptionId)
                 }
             }
         }

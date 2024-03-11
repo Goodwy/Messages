@@ -21,6 +21,8 @@
     <string name="unpin_conversation">Откачи</string>
     <string name="forward_message">Проследи</string>
     <string name="compress_error">Није могуће компримовати слику на изабрану величину</string>
+    <!-- Attachments -->
+    <string name="duplicate_item_warning">Дупликат ставке није укључен</string>
     <!-- vCard-->
     <plurals name="and_other_contacts">
         <item quantity="one">и %d остали</item>
@@ -100,6 +102,7 @@
     <string name="sender_only">Само пошиљалац</string>
     <string name="enable_delivery_reports">Омогући извештаје о испоруци</string>
     <string name="use_simple_characters">Уклони акценте и дијакритичке знакове при слању порука</string>
+    <string name="send_on_enter">Пошаљите поруку притиском на Ентер</string>
     <string name="mms_file_size_limit">Промени величину послатих MMS слика</string>
     <string name="mms_file_size_limit_none">Без ограничења</string>
     <string name="outgoing_messages">Одлазне поруке</string>
@@ -114,11 +117,24 @@
     <string name="import_sms">Увези SMS</string>
     <string name="import_mms">Увези MMS</string>
     <string name="no_option_selected">Морате изабрати најмање једну ставку</string>
-    <string name="couldnt_download_mms">Couldn\'t download MMS</string>
+    <!-- Errors -->
+    <string name="empty_destination_address">Не могу послати поруку на празан број</string>
+    <string name="unable_to_save_message">Није могуће сачувати поруку у телефонској бази података</string>
+    <string name="error_service_is_unavailable">Није могуће послати поруку, услуга није доступна</string>
+    <string name="error_radio_turned_off">Није могуће послати поруку, радио је искључен</string>
+    <string name="carrier_send_error">Није могуће послати поруку, грешка оператера</string>
+    <string name="unknown_error_occurred_sending_message">Није могуће послати поруку, код грешке: %d</string>
+    <string name="invalid_short_code">Не могу да одговорим на овакве кратке кодове</string>
+    <string name="invalid_short_code_desc">Можете одговорити само на кратке кодове са бројевима као што је \"803801\" али не и на кодове који садрже слова и бројеве попут \"AB-CD8\".</string>
+    <string name="attachment_sized_exceeds_max_limit">Величина прилога премашује максимално ограничење MMS</string>
+    <string name="sim_card_not_available">SIM картица није доступна</string>
+    <string name="couldnt_download_mms">Није могуће преузети MMS</string>
     <!-- FAQ -->
     <string name="faq_1_title">Зашто је апликацији потребан приступ интернету?</string>
     <string name="faq_1_text">Нажалост, то је потребно за слање MMS прилога. Немогућност слања MMS-а би био заиста велики недостатак у поређењу са другим апликацијама, па смо одлучили да идемо овим путем.
     Међутим, као и обично, нема реклама, праћења или аналитике, интернет се користи само за слање MMS-а.</string>
     <string name="faq_2_title">Друга страна не прима мој MMS, могу ли нешто урадити поводом тога?</string>
     <string name="faq_2_text">Величину MMS-а ограничавају оператери, можете покушати да подесите мање ограничење у подешавањима апликације.</string>
+    <string name="faq_3_title">Да ли апликација подржава заказане поруке?</string>
+    <string name="faq_3_text">Да, можете заказати слање порука у будућности дугим притиском на дугме Пошаљи и одабиром жељеног датума и времена.</string>
 </resources>

@@ -3,4 +3,5 @@
     <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Stil des Chattitels</string>
     <string name="unread_at_top_g">Ungelesen immer ganz oben</string>
+    <string name="show_sim_selection_dialog">SIM-Karten-Auswahldialog beim Senden anzeigen</string>
 </resources>
