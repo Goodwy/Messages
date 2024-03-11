@@ -999,13 +999,15 @@ class ThreadActivity : SimpleActivity() {
                     binding.messageHolder.threadSelectSimNumber.text = currentSIMCard.id.toString()
                     val simColor = if (!config.colorSimIcons) textColor
                     else {
-                        when (currentSIMCard.id) {
-                            1 -> config.simIconsColors[1]
-                            2 -> config.simIconsColors[2]
-                            3 -> config.simIconsColors[3]
-                            4 -> config.simIconsColors[4]
-                            else -> config.simIconsColors[0]
-                        }
+                        val simId = currentSIMCard.id
+                        if (simId in 1..4) config.simIconsColors[simId] else config.simIconsColors[0]
+//                        when (currentSIMCard.id) {
+//                            1 -> config.simIconsColors[1]
+//                            2 -> config.simIconsColors[2]
+//                            3 -> config.simIconsColors[3]
+//                            4 -> config.simIconsColors[4]
+//                            else -> config.simIconsColors[0]
+//                        }
                     }
                     binding.messageHolder.threadSelectSimIcon.applyColorFilter(simColor)
                     val currentSubscriptionId = currentSIMCard.subscriptionId
