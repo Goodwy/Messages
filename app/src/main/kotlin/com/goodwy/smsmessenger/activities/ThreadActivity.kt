@@ -280,7 +280,7 @@ class ThreadActivity : SimpleActivity() {
             findItem(R.id.archive).isVisible = threadItems.isNotEmpty() && conversation?.isArchived == false && !isRecycleBin && archiveAvailable
             findItem(R.id.unarchive).isVisible = threadItems.isNotEmpty() && conversation?.isArchived == true && !isRecycleBin && archiveAvailable
             findItem(R.id.rename_conversation).isVisible = participants.size > 1 && conversation != null && !isRecycleBin
-            //findItem(R.id.conversation_details).isVisible = conversation != null && !isRecycleBin
+            findItem(R.id.conversation_details).isVisible = conversation != null && !isRecycleBin
             //findItem(R.id.block_number).title = addLockedLabelIfNeeded(com.goodwy.commons.R.string.block_number)
             findItem(R.id.block_number).isVisible = isNougatPlus() && !isRecycleBin
             findItem(R.id.dial_number).isVisible = participants.size == 1 && !isSpecialNumber() && !isRecycleBin
@@ -291,7 +291,7 @@ class ThreadActivity : SimpleActivity() {
             findItem(R.id.add_number_to_contact).isVisible = participants.size == 1 && participants.first().name == firstPhoneNumber && firstPhoneNumber.any {
                 it.isDigit()
             } && !isRecycleBin
-            val unblockText = if (participants.size == 1) com.goodwy.commons.R.string.unblock_number else com.goodwy.commons.R.string.unblock_numbers
+            val unblockText = if (participants.size == 1) com.goodwy.strings.R.string.unblock_number else com.goodwy.strings.R.string.unblock_numbers
             val blockText = if (participants.size == 1) com.goodwy.commons.R.string.block_number else com.goodwy.commons.R.string.block_numbers
             findItem(R.id.block_number).title = if (isBlockNumbers()) getString(unblockText) else getString(blockText)
         }
@@ -310,7 +310,7 @@ class ThreadActivity : SimpleActivity() {
                 R.id.archive -> archiveConversation()
                 R.id.unarchive -> unarchiveConversation()
                 R.id.rename_conversation -> renameConversation()
-                //R.id.conversation_details -> showConversationDetails()
+                R.id.conversation_details -> showConversationDetails()
                 R.id.add_number_to_contact -> addNumberToContact()
                 R.id.dial_number -> dialNumber()
                 R.id.manage_people -> managePeople()
@@ -489,6 +489,7 @@ class ThreadActivity : SimpleActivity() {
                 recyclerView = binding.threadMessagesList,
                 itemClick = { handleItemClick(it) },
                 isRecycleBin = isRecycleBin,
+                isGroupChat = participants.size > 1,
                 deleteMessages = { messages, toRecycleBin, fromRecycleBin -> deleteMessages(messages, toRecycleBin, fromRecycleBin) }
             )
 
@@ -717,7 +718,7 @@ class ThreadActivity : SimpleActivity() {
             threadCharacterCounter.backgroundTintList = getProperBackgroundColor().getColorStateList()
 //            threadCharacterCounter.setTextSize(TypedValue.COMPLEX_UNIT_PX, getTextSize())
 
-            threadTypeMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, getTextSize())
+            threadTypeMessage.setTextSize(TypedValue.COMPLEX_UNIT_PX, getTextSizeMessage())
 //            threadSendMessageWrapper.setOnClickListener {
 //                sendMessage()
 //            }
@@ -917,6 +918,7 @@ class ThreadActivity : SimpleActivity() {
         val threadSubtitle = participants.getThreadSubtitle()
         when (config.threadTopStyle) {
             THREAD_TOP_COMPACT -> topDetailsCompact.apply {
+                senderPhoto.beVisibleIf(config.showContactThumbnails)
                 if (threadTitle.isNotEmpty()) {
                     senderName.text = threadTitle
                     senderName.setTextColor(textColor)
@@ -938,6 +940,7 @@ class ThreadActivity : SimpleActivity() {
             }
             THREAD_TOP_LARGE -> topDetailsLarge.apply {
                 topDetailsCompact.root.beGone()
+                senderPhotoLarge.beVisibleIf(config.showContactThumbnails)
                 if (threadTitle.isNotEmpty()) {
                     senderNameLarge.text = threadTitle
                     senderNameLarge.setTextColor(textColor)
@@ -991,6 +994,8 @@ class ThreadActivity : SimpleActivity() {
             binding.messageHolder.threadSelectSimIcon.applyColorFilter(getProperTextColor())
             binding.messageHolder.threadSelectSimIconHolder.beVisibleIf(!config.showSimSelectionDialog)
             binding.messageHolder.threadSelectSimNumber.beVisible()
+            val simLabel = if (availableSIMCards.size > currentSIMCardIndex) availableSIMCards[currentSIMCardIndex].label else "SIM Card"
+            binding.messageHolder.threadSelectSimIconHolder.contentDescription = simLabel
 
             if (availableSIMCards.isNotEmpty()) {
                 binding.messageHolder.threadSelectSimIconHolder.setOnClickListener {
@@ -1015,6 +1020,7 @@ class ThreadActivity : SimpleActivity() {
                         config.saveUseSIMIdAtNumber(it, currentSubscriptionId)
                     }
                     it.performHapticFeedback()
+                    binding.messageHolder.threadSelectSimIconHolder.contentDescription = currentSIMCard.label
                     toast(currentSIMCard.label)
                 }
             }
@@ -1081,7 +1087,7 @@ class ThreadActivity : SimpleActivity() {
         val numbersString = TextUtils.join(", ", numbers)
         val isBlockNumbers = isBlockNumbers()
         val baseString = if (isBlockNumbers) {
-            com.goodwy.commons.R.string.unblock_confirmation
+            com.goodwy.strings.R.string.unblock_confirmation
         } else { com.goodwy.commons.R.string.block_confirmation }
         val question = String.format(resources.getString(baseString), numbersString)
 
@@ -1363,30 +1369,49 @@ class ThreadActivity : SimpleActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun addContactAttachment(contactUri: Uri) {
-        ensureBackgroundThread {
-            val contact = ContactsHelper(this).getContactFromUri(contactUri)
-            if (contact != null) {
-                val outputFile = File(getAttachmentsDir(), "${contact.contactId}.vcf")
-                val outputStream = outputFile.outputStream()
+        val items = arrayListOf(
+            RadioItem(1, getString(com.goodwy.commons.R.string.file)),
+            RadioItem(2, getString(com.goodwy.commons.R.string.text))
+        )
 
-                VcfExporter().exportContacts(
-                    activity = this,
-                    outputStream = outputStream,
-                    contacts = arrayListOf(contact),
-                    showExportingToast = false,
-                ) {
-                    if (it == ExportResult.EXPORT_OK) {
-                        val vCardUri = getMyFileUri(outputFile)
-                        runOnUiThread {
-                            addAttachment(vCardUri)
+        RadioGroupDialog(this@ThreadActivity, items) {
+            if (it == 1) {
+                ensureBackgroundThread {
+                    val contact = ContactsHelper(this).getContactFromUri(contactUri)
+                    if (contact != null) {
+                        val outputFile = File(getAttachmentsDir(), "${contact.contactId}.vcf")
+                        val outputStream = outputFile.outputStream()
+
+                        VcfExporter().exportContacts(
+                            activity = this,
+                            outputStream = outputStream,
+                            contacts = arrayListOf(contact),
+                            showExportingToast = false,
+                        ) {
+                            if (it == ExportResult.EXPORT_OK) {
+                                val vCardUri = getMyFileUri(outputFile)
+                                runOnUiThread {
+                                    addAttachment(vCardUri)
+                                }
+                            } else {
+                                toast(com.goodwy.commons.R.string.unknown_error_occurred)
+                            }
                         }
                     } else {
                         toast(com.goodwy.commons.R.string.unknown_error_occurred)
                     }
                 }
             } else {
-                toast(com.goodwy.commons.R.string.unknown_error_occurred)
+                ensureBackgroundThread {
+                    val contact = ContactsHelper(this).getContactFromUri(contactUri)
+                    if (contact != null) {
+                        runOnUiThread {
+                            binding.messageHolder.threadTypeMessage.setText(binding.messageHolder.threadTypeMessage.value + contact.getContactToText(this))
+                        }
+                    }
+                }
             }
         }
     }
@@ -1472,16 +1497,12 @@ class ThreadActivity : SimpleActivity() {
         updateSendButtonDrawable()
         binding.messageHolder.apply {
             if (threadTypeMessage.text!!.isNotEmpty() || (getAttachmentSelections().isNotEmpty() && !getAttachmentSelections().any { it.isPending })) {
-//                threadSendMessage.isEnabled = true
-//                threadSendMessage.isClickable = true
-//                threadSendMessage.alpha = 0.9f
+                threadSendMessageWrapper.contentDescription = getString(R.string.sending)
                 threadSendMessageWrapper.setOnClickListener {
                     sendMessage()
                 }
             } else {
-//                threadSendMessage.isEnabled = false
-//                threadSendMessage.isClickable = false
-//                threadSendMessage.alpha = 0.4f
+                threadSendMessageWrapper.contentDescription = getString(R.string.voice_input)
                 threadSendMessageWrapper.setOnClickListener {
                     speechToText()
                 }

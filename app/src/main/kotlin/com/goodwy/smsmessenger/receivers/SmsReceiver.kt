@@ -14,6 +14,7 @@ import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.models.PhoneNumber
 import com.goodwy.commons.models.SimpleContact
 import com.goodwy.smsmessenger.extensions.*
+import com.goodwy.smsmessenger.helpers.ReceiverUtils.isMessageFilteredOut
 import com.goodwy.smsmessenger.helpers.refreshMessages
 import com.goodwy.smsmessenger.models.Message
 
@@ -121,15 +122,5 @@ class SmsReceiver : BroadcastReceiver() {
                 }
             }
         }
-    }
-
-    private fun isMessageFilteredOut(context: Context, body: String): Boolean {
-        for (blockedKeyword in context.config.blockedKeywords) {
-            if (body.contains(blockedKeyword, ignoreCase = true)) {
-                return true
-            }
-        }
-
-        return false
     }
 }

@@ -55,16 +55,19 @@ data class VCardPropertyWrapper(val value: String, val type: String, val propert
                         type = context.getString(com.goodwy.commons.R.string.work),
                         property = property
                     )
+
                     is Birthday -> VCardPropertyWrapper(
                         value = date.format(context.config.dateFormat),
                         type = context.getString(com.goodwy.commons.R.string.birthday),
                         property = property
                     )
+
                     is Anniversary -> VCardPropertyWrapper(
                         value = date.format(context.config.dateFormat),
                         type = context.getString(com.goodwy.commons.R.string.anniversary),
                         property = property
                     )
+
                     is Note -> VCardPropertyWrapper(value, context.getString(com.goodwy.commons.R.string.notes), property)
                     else -> VCardPropertyWrapper("", "", property)
                 }

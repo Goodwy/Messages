@@ -1,6 +1,7 @@
 <resources>
 
     <string name="package_name">com.goodwy.smsmessenger</string>
+    <string name="app_name">Right Messages</string>
 
     <string name="mms_file_size_limit_100kb">100KB</string>
     <string name="mms_file_size_limit_200kb">200KB</string>
@@ -13,6 +14,22 @@
     <string name="message_details_sim">SIM</string>
 
     <!-- Release notes -->
+    <string name="release_520">
+        Improved interaction with TalkBack\n
+        Added ‘Delete message after copying number from notification’ option\n
+        Added ‘Font size’ option for messages\n
+        Added ability to customize avatars size\n
+        Added the ability to delete drafts\n
+        Added the ability to send a contact as text\n
+        Changed the depth of swipes and haptic feedback behavior\n
+        Fixed bugs, improved stability
+    </string>
+    <string name="release_515">
+        Fix privacy policy
+    </string>
+    <string name="release_514">
+        Bug fixes
+    </string>
     <string name="release_513">
         Corrected the text of deletion confirmation dialog
     </string>

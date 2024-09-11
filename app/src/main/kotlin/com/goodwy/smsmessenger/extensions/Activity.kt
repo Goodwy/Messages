@@ -3,33 +3,51 @@ package com.goodwy.smsmessenger.extensions
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.provider.ContactsContract
+import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.content.res.ResourcesCompat
 import com.goodwy.commons.dialogs.NewAppDialog
 import com.goodwy.commons.extensions.*
-import com.goodwy.commons.helpers.CONTACT_ID
-import com.goodwy.commons.helpers.IS_PRIVATE
-import com.goodwy.commons.helpers.SimpleContactsHelper
-import com.goodwy.commons.helpers.ensureBackgroundThread
+import com.goodwy.commons.helpers.*
 import com.goodwy.commons.models.SimpleContact
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
+import com.google.android.material.snackbar.Snackbar
 import java.util.Locale
 
-fun Activity.dialNumber(phoneNumber: String, callback: (() -> Unit)? = null) {
+fun SimpleActivity.dialNumber(phoneNumber: String, callback: (() -> Unit)? = null) {
     hideKeyboard()
-    Intent(Intent.ACTION_DIAL).apply {
-        data = Uri.fromParts("tel", phoneNumber, null)
+//    Intent(Intent.ACTION_DIAL).apply {
+//        data = Uri.fromParts("tel", phoneNumber, null)
+//
+//        try {
+//            startActivity(this)
+//            callback?.invoke()
+//        } catch (e: ActivityNotFoundException) {
+//            toast(com.goodwy.commons.R.string.no_app_found)
+//        } catch (e: Exception) {
+//            showErrorToast(e)
+//        }
+//    }
 
-        try {
-            startActivity(this)
-            callback?.invoke()
-        } catch (e: ActivityNotFoundException) {
-            toast(com.goodwy.commons.R.string.no_app_found)
-        } catch (e: Exception) {
-            showErrorToast(e)
+    handlePermission(PERMISSION_CALL_PHONE) {
+        val action = if (it) Intent.ACTION_CALL else Intent.ACTION_DIAL
+        Intent(action).apply {
+            data = Uri.fromParts("tel", phoneNumber, null)
+            putExtra(IS_RIGHT_APP, BuildConfig.RIGHT_APP_KEY)
+
+            try {
+                launchActivityIntent(this)
+                callback?.invoke()
+            } catch (e: ActivityNotFoundException) {
+                toast(com.goodwy.commons.R.string.no_app_found)
+            } catch (e: Exception) {
+                showErrorToast(e)
+            }
         }
     }
 }
@@ -60,7 +78,7 @@ fun Activity.startContactDetailsIntent(contact: SimpleContact) {
     val simpleContacts = "com.goodwy.contacts"
     val simpleContactsDebug = "com.goodwy.contacts.debug"
     if ((0..config.appRecommendationDialogCount).random() == 2 && (!isPackageInstalled(simpleContacts) && !isPackageInstalled(simpleContactsDebug))) {
-        NewAppDialog(this, simpleContacts, getString(com.goodwy.commons.R.string.recommendation_dialog_contacts_g), getString(com.goodwy.commons.R.string.right_contacts),
+        NewAppDialog(this, simpleContacts, getString(com.goodwy.strings.R.string.recommendation_dialog_contacts_g), getString(com.goodwy.commons.R.string.right_contacts),
             AppCompatResources.getDrawable(this, com.goodwy.commons.R.drawable.ic_contacts)) {}
     } else {
         if (contact.rawId > 1000000 && contact.contactId > 1000000 && contact.rawId == contact.contactId &&
@@ -99,7 +117,6 @@ fun SimpleActivity.launchPurchase() {
 
     startPurchaseActivity(
         R.string.app_name_g,
-        BuildConfig.GOOGLE_PLAY_LICENSING_KEY,
         productIdList = arrayListOf(productIdX1, productIdX2, productIdX3),
         productIdListRu = arrayListOf(productIdX1, productIdX2, productIdX3),
         subscriptionIdList = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
@@ -109,4 +126,22 @@ fun SimpleActivity.launchPurchase() {
         playStoreInstalled = isPlayStoreInstalled(),
         ruStoreInstalled = isRuStoreInstalled()
     )
+}
+
+fun SimpleActivity.showSnackbar(view: View) {
+    view.performHapticFeedback()
+
+    val snackbar = Snackbar.make(view, com.goodwy.strings.R.string.support_project_to_unlock, Snackbar.LENGTH_SHORT)
+        .setAction(com.goodwy.commons.R.string.support) {
+            launchPurchase()
+        }
+
+    val bgDrawable = ResourcesCompat.getDrawable(view.resources, com.goodwy.commons.R.drawable.button_background_16dp, null)
+    snackbar.view.background = bgDrawable
+    val properBackgroundColor = getProperBackgroundColor()
+    val backgroundColor = if (properBackgroundColor == Color.BLACK) getBottomNavigationBackgroundColor().lightenColor(6) else getBottomNavigationBackgroundColor().darkenColor(6)
+    snackbar.setBackgroundTint(backgroundColor)
+    snackbar.setTextColor(getProperTextColor())
+    snackbar.setActionTextColor(getProperPrimaryColor())
+    snackbar.show()
 }

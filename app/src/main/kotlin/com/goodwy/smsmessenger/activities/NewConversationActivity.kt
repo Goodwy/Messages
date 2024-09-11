@@ -2,6 +2,7 @@ package com.goodwy.smsmessenger.activities
 
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
@@ -175,19 +176,29 @@ class NewConversationActivity : SimpleActivity() {
                 val contact = it as SimpleContact
                 val phoneNumbers = contact.phoneNumbers
                 if (phoneNumbers.size > 1) {
-                    val primaryNumber = contact.phoneNumbers.find { it.isPrimary }
-                    if (primaryNumber != null) {
-                        launchThreadActivity(primaryNumber.value, contact.name)
-                    } else {
-                        val items = ArrayList<RadioItem>()
-                        phoneNumbers.forEachIndexed { index, phoneNumber ->
-                            val type = getPhoneNumberTypeText(phoneNumber.type, phoneNumber.label)
-                            items.add(RadioItem(index, "${phoneNumber.normalizedNumber} ($type)", phoneNumber.normalizedNumber))
-                        }
+//                    val primaryNumber = contact.phoneNumbers.find { it.isPrimary }
+//                    if (primaryNumber != null) {
+//                        launchThreadActivity(primaryNumber.value, contact.name)
+//                    } else {
+//                        val items = ArrayList<RadioItem>()
+//                        phoneNumbers.forEachIndexed { index, phoneNumber ->
+//                            val type = getPhoneNumberTypeText(phoneNumber.type, phoneNumber.label)
+//                            items.add(RadioItem(index, "${phoneNumber.normalizedNumber} ($type)", phoneNumber.normalizedNumber))
+//                        }
+//
+//                        RadioGroupDialog(this, items) {
+//                            launchThreadActivity(it as String, contact.name)
+//                        }
+//                    }
+                    val items = ArrayList<RadioItem>()
+                    phoneNumbers.forEachIndexed { index, phoneNumber ->
+                        val type = getPhoneNumberTypeText(phoneNumber.type, phoneNumber.label)
+                        val favorite = if (phoneNumber.isPrimary) " ★" else ""
+                        items.add(RadioItem(index, "${phoneNumber.value} ($type) $favorite", phoneNumber.normalizedNumber))
+                    }
 
-                        RadioGroupDialog(this, items) {
-                            launchThreadActivity(it as String, contact.name)
-                        }
+                    RadioGroupDialog(this, items) {
+                        launchThreadActivity(it as String, contact.name)
                     }
                 } else {
                     launchThreadActivity(phoneNumbers.first().normalizedNumber, contact.name)
@@ -241,15 +252,40 @@ class NewConversationActivity : SimpleActivity() {
     }
 
     private fun setupLetterFastscroller(contacts: ArrayList<SimpleContact>) {
+        try {
+            //Decrease the font size based on the number of letters in the letter scroller
+            val all = contacts.map { it.name.substring(0, 1) }
+            val unique: Set<String> = HashSet(all)
+            val sizeUnique = unique.size
+            if (isHighScreenSize()) {
+                if (sizeUnique > 48) binding.contactsLetterFastscroller.textAppearanceRes = R.style.LetterFastscrollerStyleTooTiny
+                else if (sizeUnique > 37) binding.contactsLetterFastscroller.textAppearanceRes = R.style.LetterFastscrollerStyleTiny
+                else binding.contactsLetterFastscroller.textAppearanceRes = R.style.LetterFastscrollerStyleSmall
+            } else {
+                if (sizeUnique > 36) binding.contactsLetterFastscroller.textAppearanceRes = R.style.LetterFastscrollerStyleTooTiny
+                else if (sizeUnique > 30) binding.contactsLetterFastscroller.textAppearanceRes = R.style.LetterFastscrollerStyleTiny
+                else binding.contactsLetterFastscroller.textAppearanceRes = R.style.LetterFastscrollerStyleSmall
+            }
+        } catch (_: Exception) { }
+
         binding.contactsLetterFastscroller.setupWithRecyclerView(binding.contactsList, { position ->
             try {
                 val name = contacts[position].name
-                val character = if (name.isNotEmpty()) name.substring(0, 1) else ""
+                val emoji = name.take(2)
+                val character = if (emoji.isEmoji()) emoji else if (name.isNotEmpty()) name.substring(0, 1) else ""
                 FastScrollItemIndicator.Text(character.uppercase(Locale.getDefault()).normalizeString())
             } catch (e: Exception) {
                 FastScrollItemIndicator.Text("")
             }
         })
+    }
+
+    private fun isHighScreenSize(): Boolean {
+        return when (resources.configuration.screenLayout
+            and Configuration.SCREENLAYOUT_LONG_MASK) {
+            Configuration.SCREENLAYOUT_LONG_NO -> false
+            else -> true
+        }
     }
 
     private fun launchThreadActivity(phoneNumber: String, name: String) {

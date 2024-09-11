@@ -47,6 +47,8 @@ const val IS_ARCHIVE_AVAILABLE = "is_archive_available"
 const val CUSTOM_NOTIFICATIONS = "custom_notifications"
 const val SIM_TO_REPLY = "sim_to_reply"
 const val SHOW_SIM_SELECTION_DIALOG = "show_sim_selection_dialog"
+const val COPY_NUMBER_AND_DELETE_PREF = "copy_number_and_delete_pref"
+const val FONT_SIZE_MESSAGE = "font_size_message"
 
 private const val PATH = "com.goodwy.smsmessenger.action."
 const val MARK_AS_READ = PATH + "mark_as_read"
@@ -113,6 +115,7 @@ const val BUBBLE_IN_CONTACT_COLOR = "bubble_in_contact_color"
 const val UNREAD_AT_TOP = "unread_at_top"
 
 const val COPY_NUMBER = PATH + "copy_number"
+const val COPY_NUMBER_AND_DELETE = PATH + "copy_number_and_delete"
 
 // action on message click constants
 const val ACTION_ON_MESSAGE_CLICK = "action_on_message_click"
@@ -140,4 +143,8 @@ const val SWIPE_ACTION_ARCHIVE = 3
 const val SWIPE_ACTION_BLOCK = 4 //!! isNougatPlus()
 const val SWIPE_ACTION_CALL = 5
 const val SWIPE_ACTION_MESSAGE = 6
+const val SWIPE_ACTION_EDIT = 7
+const val SWIPE_ACTION_SHARE = 8
+const val SWIPE_ACTION_OPEN = 9
+const val SWIPE_ACTION_RESTORE = 10
 const val SWIPE_VIBRATION = "swipe_vibration"

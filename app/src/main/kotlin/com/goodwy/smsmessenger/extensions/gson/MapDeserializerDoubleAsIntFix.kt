@@ -25,6 +25,7 @@ class MapDeserializerDoubleAsIntFix : JsonDeserializer<Map<String, Any>?> {
                 }
                 return list
             }
+
             element.isJsonObject -> {
                 val map: MutableMap<String, Any?> = LinkedTreeMap()
                 val obj = element.asJsonObject
@@ -34,6 +35,7 @@ class MapDeserializerDoubleAsIntFix : JsonDeserializer<Map<String, Any>?> {
                 }
                 return map
             }
+
             element.isJsonPrimitive -> {
                 val prim = element.asJsonPrimitive
                 when {

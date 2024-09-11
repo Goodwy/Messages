@@ -59,10 +59,12 @@ class ThreadAdapter(
     recyclerView: MyRecyclerView,
     itemClick: (Any) -> Unit,
     val isRecycleBin: Boolean,
+    val isGroupChat: Boolean,
     val deleteMessages: (messages: List<Message>, toRecycleBin: Boolean, fromRecycleBin: Boolean) -> Unit
 ) : MyRecyclerViewListAdapter<ThreadItem>(activity, recyclerView, ThreadItemDiffCallback(), itemClick) {
     private var fontSize = activity.getTextSize()
     private var fontSizeSmall = activity.getTextSizeSmall()
+    private var fontSizeMessage = activity.getTextSizeMessage()
 
     @SuppressLint("MissingPermission")
     private val hasMultipleSIMCards = (activity.subscriptionManagerCompat().activeSubscriptionInfoList?.size ?: 0) > 1
@@ -196,8 +198,8 @@ class ThreadAdapter(
         MessageDetailsDialog(activity, message)
     }
 
-    private fun askConfirmDelete() {
-        val itemsCnt = selectedKeys.size
+    private fun askConfirmDelete(message: Message? = null) {
+        val itemsCnt = if (message != null) 1 else selectedKeys.size
 
         // not sure how we can get UnknownFormatConversionException here, so show the error and hope that someone reports it
         val items = try {
@@ -216,7 +218,7 @@ class ThreadAdapter(
 
         DeleteConfirmationDialog(activity, question, activity.config.useRecycleBin && !isRecycleBin) { skipRecycleBin ->
             ensureBackgroundThread {
-                val messagesToRemove = getSelectedItems()
+                val messagesToRemove = if (message != null) arrayListOf(message) else getSelectedItems()
                 if (messagesToRemove.isNotEmpty()) {
                     val toRecycleBin = !skipRecycleBin && activity.config.useRecycleBin && !isRecycleBin
                     deleteMessages(messagesToRemove.filterIsInstance<Message>(), toRecycleBin, false)
@@ -280,10 +282,10 @@ class ThreadAdapter(
     private fun setupView(holder: ViewHolder, view: View, message: Message) {
         ItemMessageBinding.bind(view).apply {
             threadMessageHolder.isSelected = selectedKeys.contains(message.hashCode())
+            threadMessageBodyWrapper.beVisibleIf(message.body.isNotEmpty())
             threadMessageBody.apply {
                 text = message.body
-                setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize)
-                beVisibleIf(message.body.isNotEmpty())
+                setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSizeMessage)
                 setOnLongClickListener {
                     holder.viewLongClicked()
                     true
@@ -308,7 +310,7 @@ class ThreadAdapter(
                             }
                             ACTION_COPY_MESSAGE -> activity.copyToClipboard(message.body)
                             ACTION_SELECT_TEXT -> SelectTextDialog(activity, message.body)
-                            ACTION_NOTHING -> showPopupMenu(message.body, this)
+                            ACTION_NOTHING -> showPopupMenu(message, this)
                             else -> return@setOnClickListener
                         }
                     }
@@ -341,13 +343,17 @@ class ThreadAdapter(
         }
     }
 
-    private fun showPopupMenu(text: String, view: View) {
+    private fun showPopupMenu(message: Message, view: View) {
         val wrapper: Context = ContextThemeWrapper(activity, activity.getPopupMenuTheme())
         val popupMenu = PopupMenu(wrapper, view, Gravity.END)
+        val text = message.body
         val numbersList = text.getListNumbersFromText()
-        popupMenu.menu.add(1, 1, 1, com.goodwy.commons.R.string.share).setIcon(com.goodwy.commons.R.drawable.ic_ios_share)
-        popupMenu.menu.add(1, 2, 2, com.goodwy.commons.R.string.select_text).setIcon(R.drawable.ic_text_select)
-        popupMenu.menu.add(1, 3, 3, com.goodwy.commons.R.string.copy).setIcon(com.goodwy.commons.R.drawable.ic_copy_vector)
+        popupMenu.menu.add(1, 1, 1, com.goodwy.commons.R.string.delete).setIcon(com.goodwy.commons.R.drawable.ic_delete_outline)
+        popupMenu.menu.add(1, 2, 2, com.goodwy.commons.R.string.share).setIcon(com.goodwy.commons.R.drawable.ic_ios_share)
+        popupMenu.menu.add(1, 3, 3, com.goodwy.commons.R.string.properties).setIcon(com.goodwy.commons.R.drawable.ic_info_vector)
+        popupMenu.menu.add(1, 4, 4, R.string.forward_message).setIcon(com.goodwy.commons.R.drawable.ic_redo_vector)
+        popupMenu.menu.add(1, 5, 5, com.goodwy.commons.R.string.select_text).setIcon(R.drawable.ic_text_select)
+        popupMenu.menu.add(1, 6, 6, com.goodwy.commons.R.string.copy).setIcon(com.goodwy.commons.R.drawable.ic_copy_vector)
         if (numbersList.isNotEmpty()) {
             numbersList.apply {
                 val size = numbersList.size
@@ -361,21 +367,29 @@ class ThreadAdapter(
         }
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                1 -> {
-                    activity.shareTextIntent(text)
+                1 -> askConfirmDelete(message)
+
+                2 -> activity.shareTextIntent(text)
+
+                3 -> MessageDetailsDialog(activity, message)
+
+                4 -> {
+                    val attachment = message.attachment?.attachments?.firstOrNull()
+                    Intent(activity, NewConversationActivity::class.java).apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, message.body)
+
+                        if (attachment != null) {
+                            putExtra(Intent.EXTRA_STREAM, attachment.getUri())
+                        }
+
+                        activity.startActivity(this)
+                    }
                 }
 
-                2 -> {
-                    SelectTextDialog(activity, text)
-                }
+                5 -> SelectTextDialog(activity, text)
 
-                3 -> {
-                    activity.copyToClipboard(text)
-                }
-
-//                4 -> {
-//                    if (number != null) activity.copyToClipboard(number)
-//                }
+                6 -> activity.copyToClipboard(text)
 
                 else -> {
                     if (numbersList.isNotEmpty()) activity.copyToClipboard(numbersList[item.itemId - 4])
@@ -458,10 +472,14 @@ class ThreadAdapter(
 //                }
 //            }
 
-            threadMessageBody.apply {
-//                background = AppCompatResources.getDrawable(activity, R.drawable.item_received_background)
-//                setTextColor(textColor)
-//                setLinkTextColor(activity.getProperPrimaryColor())
+
+            val letterBackgroundColors = activity.getLetterBackgroundColors()
+            val primaryOrSenderColor =
+                if (activity.config.bubbleInContactColor) letterBackgroundColors[abs(message.senderName.hashCode()) % letterBackgroundColors.size].toInt()
+                else activity.getProperPrimaryColor()
+            val backgroundReceived = if (activity.config.bubbleInvertColor) primaryOrSenderColor else activity.getBottomNavigationBackgroundColor()
+
+            threadMessageBodyWrapper.apply {
 
                 val isRtl = activity.isRTLLayout
                 val bubbleStyle = activity.config.bubbleStyle
@@ -474,13 +492,9 @@ class ThreadAdapter(
                 }
                 background = ResourcesCompat.getDrawable(resources, bubbleReceived, activity.theme)
                 setPaddingBubble(activity, bubbleStyle)
-
-                val letterBackgroundColors = activity.getLetterBackgroundColors()
-                val primaryOrSenderColor = if (activity.config.bubbleInContactColor) letterBackgroundColors[abs(message.senderName.hashCode()) % letterBackgroundColors.size].toInt()
-                                                else activity.getProperPrimaryColor()
-                val backgroundReceived = if (activity.config.bubbleInvertColor) primaryOrSenderColor else activity.getBottomNavigationBackgroundColor()
                 background.applyColorFilter(backgroundReceived)
-
+            }
+            threadMessageBody.apply {
                 if (!activity.config.bubbleInContactColor) {
                     val contrastColorReceived = backgroundReceived.getContrastColor()
                     setTextColor(contrastColorReceived)
@@ -488,9 +502,26 @@ class ThreadAdapter(
                 }
             }
 
-            if (!activity.isFinishing && !activity.isDestroyed) {
-                SimpleContactsHelper(activity).loadContactImage(message.senderPhotoUri, threadMessageSenderPhoto, message.senderName)
+            if (isGroupChat && message.body.isNotEmpty() && message.isReceivedMessage()) {
+                threadMessageSenderName.apply {
+                    beVisible()
+                    text = message.senderName
+                    setTextColor(letterBackgroundColors[abs(message.senderName.hashCode()) % letterBackgroundColors.size].toInt())
+                    setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSizeMessage * 0.9f)
+                    setOnClickListener {
+                        val contact = message.getSender()!!
+                        activity.getContactFromAddress(contact.phoneNumbers.first().normalizedNumber) {
+                            if (it != null) {
+                                activity.startContactDetailsIntent(it)
+                            }
+                        }
+                    }
+                }
             }
+
+//            if (!activity.isFinishing && !activity.isDestroyed) {
+//                SimpleContactsHelper(activity).loadContactImage(message.senderPhotoUri, threadMessageSenderPhoto, message.senderName)
+//            }
 //            if (!activity.isFinishing && !activity.isDestroyed) {
 //                val contactLetterIcon = SimpleContactsHelper(activity).getContactLetterIcon(message.senderName)
 //                val placeholder = BitmapDrawable(activity.resources, contactLetterIcon)
@@ -511,6 +542,14 @@ class ThreadAdapter(
     }
 
     private fun setupSentMessageView(messageBinding: ItemMessageBinding, message: Message) {
+
+        val letterBackgroundColors = activity.getLetterBackgroundColors()
+        val primaryOrSenderColor = if (activity.config.bubbleInContactColor) letterBackgroundColors[abs(
+            message.senderName.hashCode().hashCode()
+        ) % letterBackgroundColors.size].toInt()
+        else activity.getProperPrimaryColor()
+        val backgroundReceived = if (activity.config.bubbleInvertColor) activity.getBottomNavigationBackgroundColor() else primaryOrSenderColor
+
         messageBinding.apply {
             with(ConstraintSet()) {
                 clone(threadMessageHolder)
@@ -522,7 +561,7 @@ class ThreadAdapter(
             val primaryColor = activity.getProperPrimaryColor()
             val contrastColor = primaryColor.getContrastColor()
 
-            threadMessageBody.apply {
+            threadMessageBodyWrapper.apply {
                 updateLayoutParams<RelativeLayout.LayoutParams> {
                     removeRule(RelativeLayout.END_OF)
                     addRule(RelativeLayout.ALIGN_PARENT_END)
@@ -539,12 +578,9 @@ class ThreadAdapter(
                 }
                 background = AppCompatResources.getDrawable(activity, bubbleReceived)
                 setPaddingBubble(activity, bubbleStyle, false)
-
-                val letterBackgroundColors = activity.getLetterBackgroundColors()
-                val primaryOrSenderColor = if (activity.config.bubbleInContactColor) letterBackgroundColors[abs(message.senderName.hashCode().hashCode()) % letterBackgroundColors.size].toInt()
-                else activity.getProperPrimaryColor()
-                val backgroundReceived = if (activity.config.bubbleInvertColor) activity.getBottomNavigationBackgroundColor() else primaryOrSenderColor
                 background.applyColorFilter(backgroundReceived)
+            }
+            threadMessageBody.apply {
 
                 if (!activity.config.bubbleInContactColor) {
                     val contrastColorReceived = backgroundReceived.getContrastColor()
@@ -731,9 +767,9 @@ class ThreadAdapter(
         super.onViewRecycled(holder)
         if (!activity.isDestroyed && !activity.isFinishing) {
             val binding = (holder as ThreadViewHolder).binding
-            if (binding is ItemMessageBinding) {
-                Glide.with(activity).clear(binding.threadMessageSenderPhoto)
-            }
+//            if (binding is ItemMessageBinding) {
+//                Glide.with(activity).clear(binding.threadMessageSenderPhoto)
+//            }
         }
     }
 

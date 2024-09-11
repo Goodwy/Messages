@@ -2,7 +2,6 @@ package com.goodwy.smsmessenger.activities
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
@@ -142,7 +141,11 @@ class ConversationDetailsActivity : SimpleActivity() {
             window.decorView.setBackgroundColor(colorToWhite)
             window.statusBarColor = colorToWhite
             //window.navigationBarColor = colorToWhite
-        } else window.decorView.setBackgroundColor(getProperBackgroundColor())
+            binding.conversationDetailsAppbar.setBackgroundColor(colorToWhite)
+        } else {
+            window.decorView.setBackgroundColor(getProperBackgroundColor())
+            binding.conversationDetailsAppbar.setBackgroundColor(getProperBackgroundColor())
+        }
 
         binding.apply {
             arrayOf(
@@ -192,8 +195,6 @@ class ConversationDetailsActivity : SimpleActivity() {
         }
     }
 
-    private fun getNotificationManager() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
         val name = conversation?.title
@@ -208,13 +209,13 @@ class ConversationDetailsActivity : SimpleActivity() {
             enableLights(true)
             setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes)
             enableVibration(true)
-            getNotificationManager().createNotificationChannel(this)
+            notificationManager.createNotificationChannel(this)
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun removeNotificationChannel() {
-        getNotificationManager().deleteNotificationChannel(threadId.hashCode().toString())
+        notificationManager.deleteNotificationChannel(threadId.hashCode().toString())
     }
 
     private fun setupTextViews() {
@@ -372,6 +373,7 @@ class ConversationDetailsActivity : SimpleActivity() {
                         root.post {
                             threeButton.setCompoundDrawablesWithIntrinsicBounds(null, drawable, null, null)
                             threeButton.setText(com.goodwy.commons.R.string.add_contact)
+                            topConversationDetails.conversationDetailsImage.contentDescription = getString(com.goodwy.commons.R.string.add_contact)
 
                             arrayOf(
                                 threeButton, topConversationDetails.conversationDetailsImage
@@ -410,7 +412,7 @@ class ConversationDetailsActivity : SimpleActivity() {
         val isBlockNumbers = isBlockNumbers()
         val blockColor = if (isBlockNumbers) { primaryColor } else { red }
         blockButton.setTextColor(blockColor)
-        val unblockText = if (participants.size == 1) com.goodwy.commons.R.string.unblock_number else com.goodwy.commons.R.string.unblock_numbers
+        val unblockText = if (participants.size == 1) com.goodwy.strings.R.string.unblock_number else com.goodwy.strings.R.string.unblock_numbers
         val blockText = if (participants.size == 1) com.goodwy.commons.R.string.block_number else com.goodwy.commons.R.string.block_numbers
         blockButton.text = if (isBlockNumbers) { resources.getString(unblockText) } else { resources.getString(blockText)}
         blockButton.setOnClickListener {
@@ -438,7 +440,7 @@ class ConversationDetailsActivity : SimpleActivity() {
         val numbers = participants.getAddresses()
         val numbersString = TextUtils.join(", ", numbers)
         val isBlockNumbers = isBlockNumbers()
-        val baseString = if (isBlockNumbers) com.goodwy.commons.R.string.unblock_confirmation else com.goodwy.commons.R.string.block_confirmation
+        val baseString = if (isBlockNumbers) com.goodwy.strings.R.string.unblock_confirmation else com.goodwy.commons.R.string.block_confirmation
         val question = String.format(resources.getString(baseString), numbersString)
 
         ConfirmationDialog(this, question) {
@@ -451,7 +453,7 @@ class ConversationDetailsActivity : SimpleActivity() {
                         binding.blockButton.setTextColor(resources.getColor(com.goodwy.commons.R.color.red_missed))
                     } else {
                         addBlockedNumber(it)
-                        val unblockText = if (participants.size == 1) com.goodwy.commons.R.string.unblock_number else com.goodwy.commons.R.string.unblock_numbers
+                        val unblockText = if (participants.size == 1) com.goodwy.strings.R.string.unblock_number else com.goodwy.strings.R.string.unblock_numbers
                         binding.blockButton.text = getString(unblockText)
                         binding.blockButton.setTextColor(getProperPrimaryColor())
                     }

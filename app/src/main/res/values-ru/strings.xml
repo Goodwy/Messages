@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Простые сообщения</string>
+    <!--TODO Edit-->
     <string name="app_launcher_name">Сообщения</string>
     <string name="type_a_message">Введите сообщение…</string>
     <string name="message_not_sent_short">Сообщение не отправлено</string>
@@ -138,8 +138,4 @@
     <string name="faq_2_text">Размер MMS ограничивается операторами связи, можно попробовать уменьшить лимит в настройках приложения.</string>
     <string name="faq_3_title">Приложение поддерживает отложенную отправку сообщений\?</string>
     <string name="faq_3_text">Да, вы можете запланировать отправку сообщений в будущем, нажав и удерживая кнопку \"Отправить\" и выбрав нужную дату и время.</string>
-    <!--
-        Haven't found some strings? There's more at
-        https://github.com/SimpleMobileTools/Simple-Commons/tree/master/commons/src/main/res
-    -->
 </resources>

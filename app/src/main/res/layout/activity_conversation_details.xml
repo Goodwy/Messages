@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/conversation_details_appbar"
+        android:id="@+id/conversationDetailsAppbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -146,7 +146,7 @@
         android:id="@+id/conversation_details_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/conversation_details_appbar"
+        android:layout_below="@+id/conversationDetailsAppbar"
         android:paddingStart="@dimen/activity_padding_left_right"
         android:paddingEnd="@dimen/activity_padding_left_right"
         android:scrollbars="none"
@@ -187,11 +187,6 @@
                 android:paddingBottom="@dimen/bigger_margin"
                 android:textSize="@dimen/bigger_text_size"
                 tools:text="Conversation name"
-                android:visibility="gone" />
-
-            <include
-                android:id="@+id/settings_conversation_name_divider"
-                layout="@layout/divider"
                 android:visibility="gone" />
 
             <LinearLayout
@@ -254,7 +249,7 @@
                     tools:visibility="visible">
 
                     <com.goodwy.commons.views.MyTextView
-                        android:id="@+id/conversation_number_type"
+                        android:id="@+id/conversationNumberType"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/mobile"
@@ -273,7 +268,7 @@
                 </LinearLayout>
 
                 <com.goodwy.commons.views.MyTextView
-                    android:id="@+id/conversation_number"
+                    android:id="@+id/conversationNumber"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/conversation_number_type_container"

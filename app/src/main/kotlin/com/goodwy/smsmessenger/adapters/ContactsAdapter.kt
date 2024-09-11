@@ -72,13 +72,13 @@ class ContactsAdapter(
             itemContactName.apply {
                 text = contact.name
                 setTextColor(textColor)
-                setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize * 1.2f)
+                setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize)
             }
 
             itemContactNumber.apply {
-                text = TextUtils.join(", ", contact.phoneNumbers.map { it.normalizedNumber })
+                text = TextUtils.join(", ", contact.phoneNumbers.map { it.value })
                 setTextColor(textColor)
-                setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize)
+                setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize * 0.8f)
             }
 
             itemContactImage.beGoneIf(!activity.config.showContactThumbnails)

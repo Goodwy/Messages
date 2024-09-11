@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.telephony.SubscriptionInfo
 import com.goodwy.commons.activities.BaseSimpleActivity
 import com.goodwy.commons.dialogs.BasePropertiesDialog
-import com.goodwy.commons.extensions.*
+import com.goodwy.commons.extensions.getAlertDialogBuilder
+import com.goodwy.commons.extensions.getTimeFormat
+import com.goodwy.commons.extensions.setupDialogStuff
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.extensions.config
 import com.goodwy.smsmessenger.extensions.subscriptionManagerCompat

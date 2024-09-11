@@ -2,13 +2,11 @@ package com.goodwy.smsmessenger.adapters
 
 import android.view.Menu
 import com.goodwy.commons.dialogs.ConfirmationDialog
-import com.goodwy.commons.extensions.baseConfig
-import com.goodwy.commons.extensions.isRTLLayout
-import com.goodwy.commons.extensions.notificationManager
-import com.goodwy.commons.extensions.toast
+import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.helpers.isNougatPlus
 import com.goodwy.commons.views.MyRecyclerView
+import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
 import com.goodwy.smsmessenger.extensions.*
@@ -206,9 +204,8 @@ class ArchivedConversationsAdapter(
     private fun swipedCall(conversation: Conversation) {
         if (conversation.isGroupConversation) activity.toast(com.goodwy.commons.R.string.no_phone_number_found)
         else {
-            activity.dialNumber(conversation.phoneNumber) {
-                finishActMode()
-            }
+            activity.launchCallIntent(conversation.phoneNumber, key = BuildConfig.RIGHT_APP_KEY)
+            finishActMode()
         }
     }
 }

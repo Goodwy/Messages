@@ -48,16 +48,13 @@ class NotificationHelper(private val context: Context) {
         alertOnlyOnce: Boolean = false,
         subscriptionId: Int? = null
     ) {
-        //maybeCreateChannel(name = context.getString(R.string.channel_received_sms))
-
-        val notificationId = threadId.hashCode()
-
         val hasCustomNotifications = context.config.customNotifications.contains(threadId.toString())
-        val notificationChannel = if (hasCustomNotifications) notificationId.toString() else NOTIFICATION_CHANNEL
+        val notificationChannelId = if (hasCustomNotifications) threadId.toString() else NOTIFICATION_CHANNEL
         if (!hasCustomNotifications) {
-            maybeCreateChannel(notificationChannel, context.getString(R.string.channel_received_sms))
+            maybeCreateChannel(notificationChannelId, context.getString(R.string.channel_received_sms))
         }
 
+        val notificationId = threadId.hashCode()
         val contentIntent = Intent(context, ThreadActivity::class.java).apply {
             putExtra(THREAD_ID, threadId)
         }
@@ -109,7 +106,7 @@ class NotificationHelper(private val context: Context) {
         } else {
             null
         }
-        val builder = NotificationCompat.Builder(context, notificationChannel).apply {
+        val builder = NotificationCompat.Builder(context, notificationChannelId).apply {
             when (context.config.lockScreenVisibilitySetting) {
                 LOCK_SCREEN_SENDER_MESSAGE -> {
                     setLargeIcon(largeIcon)
@@ -140,7 +137,25 @@ class NotificationHelper(private val context: Context) {
         }
 
         builder.addAction(com.goodwy.commons.R.drawable.ic_check_vector, context.getString(R.string.mark_as_read), markAsReadPendingIntent)
-            .setChannelId(notificationChannel)
+            .setChannelId(notificationChannelId)
+
+        val number = body.getNumbersFromText()
+        if (number != null) {
+            val copyNumberAndDelete = context.config.copyNumberAndDelete
+            val copyNumberIntent = Intent(context, CopyNumberReceiver::class.java).apply {
+                action = if (copyNumberAndDelete) COPY_NUMBER_AND_DELETE else COPY_NUMBER
+                putExtra(THREAD_TEXT, number)
+                putExtra(THREAD_ID, threadId)
+                if (copyNumberAndDelete) {
+                    putExtra(MESSAGE_ID, messageId)
+                }
+            }
+            val textCopyNumber = context.getString(com.goodwy.commons.R.string.copy) + " \"${number}\""
+            val copyNumber =
+                PendingIntent.getBroadcast(context, threadId.hashCode(), copyNumberIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+            builder.addAction(com.goodwy.commons.R.drawable.ic_copy_vector, textCopyNumber, copyNumber)
+                .setChannelId(NOTIFICATION_CHANNEL)
+        }
 
         if (isNoReplySms) {
             builder.addAction(
@@ -150,19 +165,6 @@ class NotificationHelper(private val context: Context) {
             ).setChannelId(NOTIFICATION_CHANNEL)
         }
 
-        val number = body.getNumbersFromText()
-        if (number != null) {
-            val copyNumberIntent = Intent(context, CopyNumberReceiver::class.java).apply {
-                action = COPY_NUMBER
-                putExtra(THREAD_TEXT, number)
-            }
-            val textCopyNumber = context.getString(com.goodwy.commons.R.string.copy) + " \"${number}\""
-            val copyNumber =
-                PendingIntent.getBroadcast(context, threadId.hashCode(), copyNumberIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
-            builder.addAction(com.goodwy.commons.R.drawable.ic_copy_vector, textCopyNumber, copyNumber)
-                .setChannelId(NOTIFICATION_CHANNEL)
-        }
-
         notificationManager.notify(notificationId, builder.build())
     }
 
@@ -170,9 +172,9 @@ class NotificationHelper(private val context: Context) {
     fun showSendingFailedNotification(recipientName: String, threadId: Long) {
         //maybeCreateChannel(name = context.getString(R.string.message_not_sent_short))
         val hasCustomNotifications = context.config.customNotifications.contains(threadId.toString())
-        val notificationChannel = if (hasCustomNotifications) threadId.hashCode().toString() else NOTIFICATION_CHANNEL
+        val notificationChannelId = if (hasCustomNotifications) threadId.hashCode().toString() else NOTIFICATION_CHANNEL
         if (!hasCustomNotifications) {
-            maybeCreateChannel(notificationChannel, context.getString(R.string.message_not_sent_short))
+            maybeCreateChannel(notificationChannelId, context.getString(R.string.message_not_sent_short))
         }
 
         val notificationId = generateRandomId().hashCode()
@@ -183,7 +185,7 @@ class NotificationHelper(private val context: Context) {
 
         val summaryText = String.format(context.getString(R.string.message_sending_error), recipientName)
         val largeIcon = SimpleContactsHelper(context).getContactLetterIcon(recipientName)
-        val builder = NotificationCompat.Builder(context, notificationChannel)
+        val builder = NotificationCompat.Builder(context, notificationChannelId)
             .setContentTitle(context.getString(R.string.message_not_sent_short))
             .setContentText(summaryText)
             .setColor(context.getProperPrimaryColor())
@@ -195,7 +197,7 @@ class NotificationHelper(private val context: Context) {
             .setDefaults(Notification.DEFAULT_LIGHTS)
             .setCategory(Notification.CATEGORY_MESSAGE)
             .setAutoCancel(true)
-            .setChannelId(notificationChannel)
+            .setChannelId(notificationChannelId)
 
         notificationManager.notify(notificationId, builder.build())
     }
@@ -208,7 +210,6 @@ class NotificationHelper(private val context: Context) {
                 .setLegacyStreamType(AudioManager.STREAM_NOTIFICATION)
                 .build()
 
-            //val id = NOTIFICATION_CHANNEL
             val importance = IMPORTANCE_HIGH
             NotificationChannel(id, name, importance).apply {
                 setBypassDnd(false)

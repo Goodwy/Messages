@@ -142,7 +142,7 @@
             app:layoutManager="com.goodwy.commons.views.MyLinearLayoutManager" />
 
         <com.reddit.indicatorfastscroll.FastScrollerView
-            android:id="@+id/contacts_letter_fastscroller"
+            android:id="@+id/contactsLetterFastscroller"
             android:layout_width="32dp"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/contacts_list"
@@ -154,9 +154,9 @@
             android:id="@+id/contacts_letter_fastscroller_thumb"
             android:layout_width="@dimen/fab_size"
             android:layout_height="match_parent"
-            android:layout_alignTop="@+id/contacts_letter_fastscroller"
-            android:layout_alignBottom="@+id/contacts_letter_fastscroller"
+            android:layout_alignTop="@+id/contactsLetterFastscroller"
+            android:layout_alignBottom="@+id/contactsLetterFastscroller"
             android:layout_marginEnd="@dimen/activity_margin"
-            android:layout_toStartOf="@+id/contacts_letter_fastscroller" />
+            android:layout_toStartOf="@+id/contactsLetterFastscroller" />
     </RelativeLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

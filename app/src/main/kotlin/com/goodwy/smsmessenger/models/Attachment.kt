@@ -14,7 +14,8 @@ data class Attachment(
     @ColumnInfo(name = "mimetype") var mimetype: String,
     @ColumnInfo(name = "width") var width: Int,
     @ColumnInfo(name = "height") var height: Int,
-    @ColumnInfo(name = "filename") var filename: String) {
+    @ColumnInfo(name = "filename") var filename: String
+) {
 
     fun getUri() = Uri.parse(uriString)
 }

@@ -2,6 +2,7 @@ package com.goodwy.smsmessenger.helpers
 
 import android.content.Context
 import com.goodwy.commons.helpers.BaseConfig
+import com.goodwy.commons.helpers.FONT_SIZE
 import com.goodwy.smsmessenger.extensions.getDefaultKeyboardHeight
 import com.goodwy.smsmessenger.models.Conversation
 
@@ -161,6 +162,14 @@ class Config(context: Context) : BaseConfig(context) {
     var showSimSelectionDialog: Boolean
         get() = prefs.getBoolean(SHOW_SIM_SELECTION_DIALOG, false)
         set(showSimSelectionDialog) = prefs.edit().putBoolean(SHOW_SIM_SELECTION_DIALOG, showSimSelectionDialog).apply()
+
+    var copyNumberAndDelete: Boolean
+        get() = prefs.getBoolean(COPY_NUMBER_AND_DELETE_PREF, false)
+        set(copyNumberAndDelete) = prefs.edit().putBoolean(COPY_NUMBER_AND_DELETE_PREF, copyNumberAndDelete).apply()
+
+    var fontSizeMessage: Int
+        get() = prefs.getInt(FONT_SIZE_MESSAGE, 1)
+        set(fontSizeMessage) = prefs.edit().putInt(FONT_SIZE_MESSAGE, fontSizeMessage).apply()
 
     //Swipe
     var swipeRightAction: Int

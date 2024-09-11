@@ -1,30 +1,29 @@
 [versions]
 #jetbrains
-kotlin = "1.9.0"
-kotlinxSerializationJson = "1.5.1"
+kotlin = "1.9.21"
+kotlinxSerializationJson = "1.6.0"
 #KSP
-ksp = "1.9.0-1.0.12"
+ksp = "1.9.21-1.0.16"
 #AndroidX
 androidx-constraintlayout = "2.1.4"
 androidx-swiperefreshlayout = "1.1.0"
-androidx-lifecycleprocess = "2.6.1"
+androidx-lifecycleprocess = "2.7.0"
 #Eventbus
 eventbus = "3.3.1"
 #Room
-room = "2.6.0-alpha03"
+room = "2.6.1"
 #Simple Mobile Tools
-#simple-commons = "b72ded2a75"
 android-smsmms = "c3e678befd"
-indicator-fast-scroll = "4524cd0b61"
+indicatorFastScroll = "e37b5b2ad6"
 #Goodwy
-right-commons = "39f82ad042"
-rustore = "3.1.0"
+right-commons = "214aa2cd3f"
+rustore = "5.1.1"
 behavioRule = "1.0.1"
 rxAnimation = "2.1.1"
 rxJava3 = "3.1.5"
-swipeToActionLayout = "1.5.0"
+swipeToActionLayout = "bd1eb3c8a3"
 #Gradle
-gradlePlugins-agp = "8.1.1"
+gradlePlugins-agp = "8.2.2"
 #build
 app-build-compileSDKVersion = "34"
 app-build-targetSDK = "34"
@@ -36,8 +35,8 @@ ez-vcard = "0.11.3"
 shortcut-badger = "1.1.22"
 #versioning
 app-version-appId = "com.goodwy.smsmessenger"
-app-version-versionCode = "513"
-app-version-versionName = "5.1.3"
+app-version-versionCode = "520"
+app-version-versionName = "5.2.0"
 [libraries]
 #AndroidX
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
@@ -48,10 +47,8 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 #Simple Mobile Tools
-#simple-mobile-tools-commons = { module = "com.github.SimpleMobileTools:Simple-Commons", version.ref = "simple-commons" }
-#indicator-fast-scroll = { module = "com.github.tibbi:IndicatorFastScroll", version.ref = "indicator-fast-scroll" }
-indicator-fast-scroll = { module = "com.github.goodwy:IndicatorFastScroll", version.ref = "indicator-fast-scroll" }
-android-smsmms = { module = "com.github.tibbi:android-smsmms", version.ref = "android-smsmms" }
+indicator-fast-scroll = { module = "com.github.goodwy:IndicatorFastScroll", version.ref = "indicatorFastScroll" }
+android-smsmms = { module = "org.fossify:android-smsmms", version.ref = "android-smsmms" }
 #EventBus
 eventbus = { module = "org.greenrobot:eventbus", version.ref = "eventbus" }
 #Helpers
@@ -67,7 +64,7 @@ rx-animation = { module = "com.mikhaellopez:rxanimation", version.ref = "rxAnima
 rx-java = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxJava3" }
 androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycleprocess" }
 androidx-lifecycle-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycleprocess" }
-swipe-action = { module = "com.github.Tunous:SwipeActionView", version.ref = "swipeToActionLayout" }
+swipe-action = { module = "com.github.Goodwy:SwipeActionView", version.ref = "swipeToActionLayout" }
 [bundles]
 room = [
     "androidx-room-ktx",

@@ -12,7 +12,7 @@
 
     <RelativeLayout
         android:id="@+id/swipeRightIconHolder"
-        android:layout_width="82dp"
+        android:layout_width="@dimen/swipe_width"
         android:layout_height="match_parent"
         android:layout_gravity="left|center_vertical"
         android:background="@color/primary"
@@ -22,13 +22,15 @@
             android:id="@+id/swipeRightIcon"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:layout_centerInParent='true'
+            android:layout_marginLeft='@dimen/big_margin'
+            android:layout_alignParentLeft='true'
+            android:layout_centerVertical='true'
             android:src="@drawable/ic_mark_read"/>
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/swipeLeftIconHolder"
-        android:layout_width="82dp"
+        android:layout_width="@dimen/swipe_width"
         android:layout_height="match_parent"
         android:layout_gravity="right|center_vertical"
         android:background="@color/red_call"
@@ -38,7 +40,9 @@
             android:id="@+id/swipeLeftIcon"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:layout_centerInParent='true'
+            android:layout_marginRight='@dimen/big_margin'
+            android:layout_alignParentRight='true'
+            android:layout_centerVertical='true'
             android:src="@drawable/ic_delete_outline"/>
     </RelativeLayout>
 
@@ -129,9 +133,22 @@
                 app:layout_goneMarginStart="@dimen/normal_margin"
                 app:layout_constraintTop_toBottomOf="@+id/conversationAddress"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/pinIndicator"
+                app:layout_constraintEnd_toStartOf="@+id/draftClear"
                 app:layout_constraintStart_toEndOf="@+id/draftIndicator"
                 tools:text="Hey buddy!" />
+
+            <ImageView
+                android:id="@+id/draftClear"
+                android:layout_width="@dimen/pin_icon_size"
+                android:layout_height="@dimen/pin_icon_size"
+                android:layout_marginBottom="-2dp"
+                android:layout_marginEnd="4dp"
+                android:src="@drawable/ic_cross_vector"
+                android:background="?selectableItemBackgroundBorderless"
+                app:layout_constraintTop_toTopOf="@+id/conversationBodyShort"
+                app:layout_constraintBottom_toBottomOf="@+id/conversationBodyShort"
+                app:layout_constraintStart_toEndOf="@+id/conversationBodyShort"
+                app:layout_constraintEnd_toStartOf="@+id/pinIndicator" />
 
             <ImageView
                 android:id="@+id/pinIndicator"

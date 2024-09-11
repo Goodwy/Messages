@@ -124,7 +124,7 @@
         app:layout_constraintStart_toEndOf="@+id/threadAddAttachmentHolder" >
 
         <com.goodwy.commons.views.MyEditText
-            android:id="@+id/thread_type_message"
+            android:id="@+id/threadTypeMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
@@ -132,6 +132,7 @@
             android:hint="@string/type_a_message"
             android:inputType="textCapSentences|textMultiLine"
             android:minHeight="@dimen/medium_icon_size"
+            android:maxLines="8"
             android:paddingStart="@dimen/normal_margin"
             android:paddingTop="@dimen/smaller_margin"
             android:paddingEnd="@dimen/normal_margin"
@@ -147,12 +148,13 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="@dimen/small_margin"
-            android:layout_marginEnd="@dimen/small_margin"
+            android:layout_marginRight="@dimen/small_margin"
             android:background="?selectableItemBackgroundBorderless"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:visibility="gone"
-            tools:visibility="visible" >
+            tools:visibility="visible"
+            tools:ignore="RtlHardcoded">
 
             <ImageView
                 android:id="@+id/threadSelectSimIcon"

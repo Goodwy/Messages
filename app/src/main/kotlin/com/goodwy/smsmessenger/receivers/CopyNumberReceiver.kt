@@ -6,9 +6,7 @@ import android.content.Intent
 import com.goodwy.commons.extensions.copyToClipboard
 import com.goodwy.commons.extensions.notificationManager
 import com.goodwy.commons.helpers.ensureBackgroundThread
-import com.goodwy.smsmessenger.extensions.conversationsDB
-import com.goodwy.smsmessenger.extensions.markThreadMessagesRead
-import com.goodwy.smsmessenger.extensions.updateUnreadCountBadge
+import com.goodwy.smsmessenger.extensions.*
 import com.goodwy.smsmessenger.helpers.*
 
 class CopyNumberReceiver : BroadcastReceiver() {
@@ -16,8 +14,27 @@ class CopyNumberReceiver : BroadcastReceiver() {
         when (intent.action) {
             COPY_NUMBER -> {
                 val body = intent.getStringExtra(THREAD_TEXT)
+                val threadId = intent.getLongExtra(THREAD_ID, 0L)
                 ensureBackgroundThread {
                     context.copyToClipboard(body!!)
+                    context.markThreadMessagesRead(threadId)
+                    context.conversationsDB.markRead(threadId)
+                    context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
+                    refreshMessages()
+                }
+            }
+            COPY_NUMBER_AND_DELETE -> {
+                val body = intent.getStringExtra(THREAD_TEXT)
+                val threadId = intent.getLongExtra(THREAD_ID, 0L)
+                val messageId = intent.getLongExtra(MESSAGE_ID, 0L)
+                ensureBackgroundThread {
+                    context.copyToClipboard(body!!)
+                    context.markThreadMessagesRead(threadId)
+                    context.conversationsDB.markRead(threadId)
+                    context.deleteMessage(messageId, false)
+                    context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
+                    context.updateLastConversationMessage(threadId)
+                    refreshMessages()
                 }
             }
         }

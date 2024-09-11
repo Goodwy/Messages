@@ -76,7 +76,7 @@ class MessageBubbleSettingDialog(
                 callback(currentBubbleStyle)
             }
             .apply {
-                activity.setupDialogStuff(binding.root, this, com.goodwy.commons.R.string.speech_bubble) { alertDialog ->
+                activity.setupDialogStuff(binding.root, this, com.goodwy.strings.R.string.speech_bubble) { alertDialog ->
                     dialog = alertDialog
                 }
             }
@@ -87,7 +87,7 @@ class MessageBubbleSettingDialog(
             .shake(shakeTranslation = 2f)
             .subscribe()
 
-        val snackbar = Snackbar.make(binding.root, com.goodwy.commons.R.string.support_project_to_unlock, Snackbar.LENGTH_SHORT)
+        val snackbar = Snackbar.make(binding.root, com.goodwy.strings.R.string.support_project_to_unlock, Snackbar.LENGTH_SHORT)
             .setAction(com.goodwy.commons.R.string.support) {
                 dialog?.dismiss()
                 activity.launchPurchase()

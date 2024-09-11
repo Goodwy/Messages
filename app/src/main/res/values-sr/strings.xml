@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--TODO Change-->
-    <string name="app_name">Једноставан SMS Messenger</string>
-    <string name="app_launcher_name">SMS Messenger</string>
+    <string name="app_launcher_name">Поруке</string>
     <string name="type_a_message">Унесите поруку…</string>
     <string name="message_not_sent_short">Порука није послата</string>
     <string name="message_not_sent_touch_retry">Није послато. Додирните за поновни покушај.</string>

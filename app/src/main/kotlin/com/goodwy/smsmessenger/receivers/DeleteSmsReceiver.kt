@@ -14,7 +14,7 @@ import com.goodwy.smsmessenger.helpers.MESSAGE_ID
 import com.goodwy.smsmessenger.helpers.THREAD_ID
 import com.goodwy.smsmessenger.helpers.refreshMessages
 
-class DeleteSmsReceiver: BroadcastReceiver() {
+class DeleteSmsReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val threadId = intent.getLongExtra(THREAD_ID, 0L)

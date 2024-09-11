@@ -1,5 +1,7 @@
 package com.goodwy.smsmessenger.adapters
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.graphics.Typeface
 import android.graphics.drawable.LayerDrawable
 import android.os.Parcelable
@@ -7,9 +9,12 @@ import android.text.format.DateUtils
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.behaviorule.arturdumchev.library.pixels
 import com.bumptech.glide.Glide
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
 import com.goodwy.commons.adapters.MyRecyclerViewListAdapter
@@ -20,13 +25,15 @@ import com.goodwy.commons.views.MyRecyclerView
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
 import com.goodwy.smsmessenger.databinding.ItemConversationBinding
-import com.goodwy.smsmessenger.extensions.*
+import com.goodwy.smsmessenger.extensions.config
+import com.goodwy.smsmessenger.extensions.deleteSmsDraft
+import com.goodwy.smsmessenger.extensions.getAllDrafts
+import com.goodwy.smsmessenger.extensions.setHeightAndWidth
 import com.goodwy.smsmessenger.helpers.*
 import com.goodwy.smsmessenger.models.Conversation
 import me.thanel.swipeactionview.SwipeActionView
 import me.thanel.swipeactionview.SwipeDirection
 import me.thanel.swipeactionview.SwipeGestureListener
-import org.jetbrains.annotations.NotNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
@@ -143,6 +150,15 @@ abstract class BaseConversationsAdapter(
             draftIndicator.setTextColor(properPrimaryColor)
             conversationFrame.setBackgroundColor(backgroundColor)
 
+            draftClear.apply {
+                beVisibleIf(smsDraft != null)
+                setColorFilter(properPrimaryColor)
+                setOnClickListener {
+                    context.deleteSmsDraft(conversation.threadId)
+                    updateDrafts()
+                }
+            }
+
             if (activity.config.unreadIndicatorPosition == UNREAD_INDICATOR_START) {
                 unreadIndicatorEnd.beGone()
                 unreadIndicator.beInvisibleIf(conversation.read)
@@ -214,17 +230,20 @@ abstract class BaseConversationsAdapter(
             }
 
             conversationImage.beGoneIf(!showContactThumbnails)
-            //SimpleContactsHelper(activity).loadContactImage(conversation.photoUri, conversationImage, title, placeholder)
-            if (title == conversation.phoneNumber) {
-                val drawable = ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, activity.theme)
-                if (baseConfig.useColoredContacts) {
-                    val letterBackgroundColors = activity.getLetterBackgroundColors()
-                    val color = letterBackgroundColors[abs(conversation.phoneNumber.hashCode()) % letterBackgroundColors.size].toInt()
-                    (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
+            if (showContactThumbnails) {
+                val size = (root.context.pixels(com.goodwy.commons.R.dimen.normal_icon_size) * contactThumbnailsSize).toInt()
+                conversationImage.setHeightAndWidth(size)
+                if (title == conversation.phoneNumber) {
+                    val drawable = ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, activity.theme)
+                    if (baseConfig.useColoredContacts) {
+                        val letterBackgroundColors = activity.getLetterBackgroundColors()
+                        val color = letterBackgroundColors[abs(conversation.phoneNumber.hashCode()) % letterBackgroundColors.size].toInt()
+                        (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
+                    }
+                    conversationImage.setImageDrawable(drawable)
+                } else {
+                    SimpleContactsHelper(activity).loadContactImage(conversation.photoUri, conversationImage, title, placeholder)
                 }
-                conversationImage.setImageDrawable(drawable)
-            } else {
-                SimpleContactsHelper(activity).loadContactImage(conversation.photoUri, conversationImage, title, placeholder)
             }
 
             //swipe
@@ -246,25 +265,56 @@ abstract class BaseConversationsAdapter(
             }
 
             arrayOf(
-                swipeRightIcon, swipeRightIcon
+                swipeLeftIcon, swipeRightIcon
             ).forEach {
                 it.setColorFilter(properPrimaryColor.getContrastColor())
             }
 
+            swipeView.useHapticFeedback = activity.config.swipeVibration
             swipeView.swipeGestureListener = object : SwipeGestureListener {
                 override fun onSwipedLeft(swipeActionView: SwipeActionView): Boolean {
                     swipedLeft(conversation)
-                    if (activity.config.swipeVibration) swipeView.performHapticFeedback()
+                    slideLeftReturn(swipeLeftIcon, swipeLeftIconHolder)
                     return true
                 }
 
                 override fun onSwipedRight(swipeActionView: SwipeActionView): Boolean {
                     swipedRight(conversation)
-                    if (activity.config.swipeVibration) swipeView.performHapticFeedback()
+                    slideRightReturn(swipeRightIcon, swipeRightIconHolder)
                     return true
+                }
+
+                override fun onSwipedActivated(swipedRight: Boolean) {
+                    if (swipedRight) slideRight(swipeRightIcon, swipeRightIconHolder)
+                    else slideLeft(swipeLeftIcon)
+                }
+
+                override fun onSwipedDeactivated(swipedRight: Boolean) {
+                    if (swipedRight) slideRightReturn(swipeRightIcon, swipeRightIconHolder)
+                    else slideLeftReturn(swipeLeftIcon, swipeLeftIconHolder)
                 }
             }
         }
+    }
+
+    private fun slideRight(view: View, parent: View) {
+        view.animate()
+            .x(parent.right - activity.resources.getDimension(com.goodwy.commons.R.dimen.big_margin) - view.width)
+    }
+
+    private fun slideLeft(view: View) {
+        view.animate()
+            .x(activity.resources.getDimension(com.goodwy.commons.R.dimen.big_margin))
+    }
+
+    private fun slideRightReturn(view: View, parent: View) {
+        view.animate()
+            .x(parent.left + activity.resources.getDimension(com.goodwy.commons.R.dimen.big_margin))
+    }
+
+    private fun slideLeftReturn(view: View, parent: View) {
+        view.animate()
+            .x(parent.width - activity.resources.getDimension(com.goodwy.commons.R.dimen.big_margin) - view.width)
     }
 
     override fun onChange(position: Int) = currentList.getOrNull(position)?.title ?: ""

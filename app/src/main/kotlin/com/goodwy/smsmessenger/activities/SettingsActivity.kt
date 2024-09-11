@@ -2,11 +2,12 @@ package com.goodwy.smsmessenger.activities
 
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.View
+import android.provider.DocumentsContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -26,18 +27,22 @@ import com.goodwy.smsmessenger.dialogs.MessageBubbleSettingDialog
 import com.goodwy.smsmessenger.extensions.*
 import com.goodwy.smsmessenger.helpers.*
 import com.goodwy.smsmessenger.models.*
+import com.mikhaellopez.rxanimation.RxAnimation
+import com.mikhaellopez.rxanimation.shake
+import kotlin.math.abs
+import kotlin.system.exitProcess
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToStream
 import ru.rustore.sdk.core.feature.model.FeatureAvailabilityResult
-import java.util.*
-import kotlin.system.exitProcess
+import java.util.Locale
 
 class SettingsActivity : SimpleActivity() {
     private var blockedNumbersAtPause = -1
     private var recycleBinMessages = 0
     private val messagesFileType = "application/json"
-    private val messageImportFileTypes = listOf("application/json", "application/xml", "text/xml")
+    private val messageImportFileTypes = listOf("application/json", "application/xml", "text/xml", "application/octet-stream")
     private var wasProtectionHandled = false
 
     private val binding by viewBinding(ActivitySettingsBinding::inflate)
@@ -161,8 +166,6 @@ class SettingsActivity : SimpleActivity() {
         setupContactsColorList()
         setupColorSimIcons()
         setupSimCardColorList()
-        setupThreadTopStyle()
-        setupMessageBubble()
 
         setupManageBlockedNumbers()
         setupManageBlockedKeywords()
@@ -171,10 +174,22 @@ class SettingsActivity : SimpleActivity() {
         setupUseEnglish()
         setupLanguage()
 
+        setupUseSwipeToAction()
+        setupSwipeVibration()
+        setupSwipeRightAction()
+        setupSwipeLeftAction()
+        setupArchiveConfirmation()
+        setupDeleteConfirmation()
+
         setupCustomizeNotifications()
         setupLockScreenVisibility()
+        setupCopyNumberAndDelete()
 
+        setupThreadTopStyle()
+        setupMessageBubble()
+        setupFontSizeMessage()
         setupActionOnMessageClick()
+
         setupSendOnEnter()
         setupShowSimSelectionDialog()
         setupEnableDeliveryReports()
@@ -186,18 +201,12 @@ class SettingsActivity : SimpleActivity() {
 
         setupShowDividers()
         setupShowContactThumbnails()
+        setupContactThumbnailsSize()
         setupUseRelativeDate()
         setupUnreadAtTop()
         setupLinesCount()
         setupUnreadIndicatorPosition()
         setupHideTopBarWhenScroll()
-
-        setupUseSwipeToAction()
-        setupSwipeVibration()
-        setupSwipeRightAction()
-        setupSwipeLeftAction()
-        setupArchiveConfirmation()
-        setupDeleteConfirmation()
 
         setupUseRecycleBin()
         setupEmptyRecycleBin()
@@ -220,6 +229,7 @@ class SettingsActivity : SimpleActivity() {
                 settingsAppearanceLabel,
                 settingsGeneralLabel,
                 settingsNotificationsLabel,
+                settingsMessagesLabel,
                 settingsOutgoingMessagesLabel,
                 settingsListViewLabel,
                 settingsSwipeGesturesLabel,
@@ -235,6 +245,7 @@ class SettingsActivity : SimpleActivity() {
                 settingsColorCustomizationHolder,
                 settingsGeneralHolder,
                 settingsNotificationsHolder,
+                settingsMessagesHolder,
                 settingsOutgoingMessagesHolder,
                 settingsListViewHolder,
                 settingsSwipeGesturesHolder,
@@ -243,7 +254,7 @@ class SettingsActivity : SimpleActivity() {
                 settingsBackupsHolder,
                 settingsOtherHolder
             ).forEach {
-                it.background.applyColorFilter(getBottomNavigationBackgroundColor())
+                it.setCardBackgroundColor(getBottomNavigationBackgroundColor())
             }
 
             arrayOf(
@@ -295,7 +306,7 @@ class SettingsActivity : SimpleActivity() {
     private fun setupMessagesExport() {
         binding.settingsExportMessagesHolder.setOnClickListener {
             ExportMessagesDialog(this) { fileName ->
-                saveDocument.launch(fileName)
+                saveDocument.launch("$fileName.json")
             }
         }
     }
@@ -306,8 +317,10 @@ class SettingsActivity : SimpleActivity() {
         }
     }
 
+    @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
     private fun exportMessages(uri: Uri) {
         ensureBackgroundThread {
+            var success = false
             try {
                 MessagesReader(this).getMessagesToExport(config.exportSms, config.exportMms) { messagesToExport ->
                     if (messagesToExport.isEmpty()) {
@@ -315,16 +328,23 @@ class SettingsActivity : SimpleActivity() {
                         return@getMessagesToExport
                     }
                     val json = Json { encodeDefaults = true }
-                    val jsonString = json.encodeToString(messagesToExport)
-                    val outputStream = contentResolver.openOutputStream(uri)!!
-
-                    outputStream.use {
-                        it.write(jsonString.toByteArray())
+                    contentResolver.openOutputStream(uri)!!.buffered().use { outputStream ->
+                        json.encodeToStream(messagesToExport, outputStream)
                     }
+                    success = true
                     toast(com.goodwy.commons.R.string.exporting_successful)
                 }
-            } catch (e: Exception) {
-                showErrorToast(e)
+            } catch (e: Throwable) { // also catch OutOfMemoryError etc.
+                showErrorToast(e.toString())
+            } finally {
+                if (!success) {
+                    // delete the file to avoid leaving behind an empty/corrupt file
+                    try {
+                        DocumentsContract.deleteDocument(contentResolver, uri)
+                    } catch (ignored: Exception) {
+                        // ignored because we don't want to overwhelm the user with two error messages
+                    }
+                }
             }
         }
     }
@@ -359,7 +379,6 @@ class SettingsActivity : SimpleActivity() {
         settingsCustomizeColorsHolder.setOnClickListener {
             startCustomizationActivity(
                 showAccentColor = false,
-                licensingKey = BuildConfig.GOOGLE_PLAY_LICENSING_KEY,
                 productIdList = arrayListOf(productIdX1, productIdX2, productIdX3),
                 productIdListRu = arrayListOf(productIdX1, productIdX2, productIdX3),
                 subscriptionIdList = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
@@ -372,6 +391,7 @@ class SettingsActivity : SimpleActivity() {
         }
     }
 
+    @SuppressLint("NewApi")
     private fun setupCustomizeNotifications() = binding.apply {
         settingsCustomizeNotificationsHolder.beVisibleIf(isOreoPlus())
 
@@ -446,6 +466,32 @@ class SettingsActivity : SimpleActivity() {
         }
     }
 
+    private fun setupFontSizeMessage() = binding.apply {
+        settingsFontSizeMessage.text = getFontSizeMessageText()
+        settingsFontSizeMessageHolder.setOnClickListener {
+            val items = arrayListOf(
+                RadioItem(FONT_SIZE_SMALL, getString(com.goodwy.commons.R.string.small)),
+                RadioItem(FONT_SIZE_MEDIUM, getString(com.goodwy.commons.R.string.medium)),
+                RadioItem(FONT_SIZE_LARGE, getString(com.goodwy.commons.R.string.large)),
+                RadioItem(FONT_SIZE_EXTRA_LARGE, getString(com.goodwy.commons.R.string.extra_large))
+            )
+
+            RadioGroupDialog(this@SettingsActivity, items, config.fontSizeMessage, com.goodwy.commons.R.string.font_size) {
+                config.fontSizeMessage = it as Int
+                settingsFontSizeMessage.text = getFontSizeMessageText()
+            }
+        }
+    }
+
+    private fun getFontSizeMessageText() = getString(
+        when (config.fontSizeMessage) {
+            FONT_SIZE_SMALL -> com.goodwy.commons.R.string.small
+            FONT_SIZE_MEDIUM -> com.goodwy.commons.R.string.medium
+            FONT_SIZE_LARGE -> com.goodwy.commons.R.string.large
+            else -> com.goodwy.commons.R.string.extra_large
+        }
+    )
+
     private fun setupUseEnglish() = binding.apply {
         settingsUseEnglishHolder.beVisibleIf((config.wasUseEnglishToggled || Locale.getDefault().language != "en") && !isTiramisuPlus())
         settingsUseEnglish.isChecked = config.useEnglish
@@ -456,6 +502,7 @@ class SettingsActivity : SimpleActivity() {
         }
     }
 
+    @SuppressLint("NewApi")
     private fun setupLanguage() = binding.apply {
         settingsLanguage.text = Locale.getDefault().displayLanguage
         settingsLanguageHolder.beVisibleIf(isTiramisuPlus())
@@ -535,26 +582,28 @@ class SettingsActivity : SimpleActivity() {
         }
     }
 
+    @SuppressLint("PrivateResource")
     private fun setupActionOnMessageClick() = binding.apply {
         settingsActionOnMessageClick.text = getActionOnMessageClickText()
         settingsActionOnMessageClickHolder.setOnClickListener {
             val items = arrayListOf(
-                RadioItem(ACTION_COPY_CODE, getString(com.goodwy.commons.R.string.copy_code), icon = com.goodwy.commons.R.drawable.ic_copy_vector),
+                RadioItem(ACTION_COPY_CODE, getString(com.goodwy.strings.R.string.copy_code), icon = com.goodwy.commons.R.drawable.ic_copy_vector),
                 RadioItem(ACTION_COPY_MESSAGE, getString(com.goodwy.commons.R.string.copy_to_clipboard), icon = com.goodwy.commons.R.drawable.ic_copy_vector),
                 RadioItem(ACTION_SELECT_TEXT, getString(com.goodwy.commons.R.string.select_text), icon = R.drawable.ic_text_select),
                 RadioItem(ACTION_NOTHING, getString(com.google.android.material.R.string.exposed_dropdown_menu_content_description), icon = R.drawable.ic_menu_open),
             )
 
-            RadioGroupIconDialog(this@SettingsActivity, items, config.actionOnMessageClickSetting, com.goodwy.commons.R.string.action_on_message_click) {
+            RadioGroupIconDialog(this@SettingsActivity, items, config.actionOnMessageClickSetting, com.goodwy.strings.R.string.action_on_message_click) {
                 config.actionOnMessageClickSetting = it as Int
                 settingsActionOnMessageClick.text = getActionOnMessageClickText()
             }
         }
     }
 
+    @SuppressLint("PrivateResource")
     private fun getActionOnMessageClickText() = getString(
         when (config.actionOnMessageClickSetting) {
-            ACTION_COPY_CODE -> com.goodwy.commons.R.string.copy_code
+            ACTION_COPY_CODE -> com.goodwy.strings.R.string.copy_code
             ACTION_COPY_MESSAGE -> com.goodwy.commons.R.string.copy_to_clipboard
             ACTION_SELECT_TEXT -> com.goodwy.commons.R.string.select_text
             else -> com.google.android.material.R.string.exposed_dropdown_menu_content_description
@@ -626,6 +675,14 @@ class SettingsActivity : SimpleActivity() {
         }
     }
 
+    private fun setupCopyNumberAndDelete() = binding.apply {
+        settingsCopyNumberAndDelete.isChecked = config.copyNumberAndDelete
+        settingsCopyNumberAndDeleteHolder.setOnClickListener {
+            settingsCopyNumberAndDelete.toggle()
+            config.copyNumberAndDelete = settingsCopyNumberAndDelete.isChecked
+        }
+    }
+
     private fun getLockScreenVisibilityText() = getString(
         when (config.lockScreenVisibilitySetting) {
             LOCK_SCREEN_SENDER_MESSAGE -> R.string.sender_and_message
@@ -684,12 +741,13 @@ class SettingsActivity : SimpleActivity() {
             settingsSwipeVibrationHolder.setOnClickListener {
                 settingsSwipeVibration.toggle()
                 config.swipeVibration = settingsSwipeVibration.isChecked
+                config.tabsChanged = true
             }
         }
     }
 
     private fun setupSwipeRightAction() = binding.apply {
-        if (isRTLLayout) settingsSwipeRightActionLabel.text = getString(com.goodwy.commons.R.string.swipe_left_action)
+        if (isRTLLayout) settingsSwipeRightActionLabel.text = getString(com.goodwy.strings.R.string.swipe_left_action)
         settingsSwipeRightAction.text = getSwipeActionText(false)
         settingsSwipeRightActionHolder.setOnClickListener {
             val items = if (isNougatPlus()) arrayListOf(
@@ -708,7 +766,7 @@ class SettingsActivity : SimpleActivity() {
             )
 
             val title =
-                if (isRTLLayout) com.goodwy.commons.R.string.swipe_left_action else com.goodwy.commons.R.string.swipe_right_action
+                if (isRTLLayout) com.goodwy.strings.R.string.swipe_left_action else com.goodwy.strings.R.string.swipe_right_action
             RadioGroupIconDialog(this@SettingsActivity, items, config.swipeRightAction, title) {
                 config.swipeRightAction = it as Int
                 config.tabsChanged = true
@@ -720,7 +778,7 @@ class SettingsActivity : SimpleActivity() {
     }
 
     private fun setupSwipeLeftAction() = binding.apply {
-        val stringId = if (isRTLLayout) com.goodwy.commons.R.string.swipe_right_action else com.goodwy.commons.R.string.swipe_left_action
+        val stringId = if (isRTLLayout) com.goodwy.strings.R.string.swipe_right_action else com.goodwy.strings.R.string.swipe_left_action
         settingsSwipeLeftActionLabel.text = addLockedLabelIfNeeded(stringId, isPro())
         settingsSwipeLeftAction.text = getSwipeActionText(true)
         settingsSwipeLeftActionHolder.setOnClickListener {
@@ -741,7 +799,7 @@ class SettingsActivity : SimpleActivity() {
                 )
 
                 val title =
-                    if (isRTLLayout) com.goodwy.commons.R.string.swipe_right_action else com.goodwy.commons.R.string.swipe_left_action
+                    if (isRTLLayout) com.goodwy.strings.R.string.swipe_right_action else com.goodwy.strings.R.string.swipe_left_action
                 RadioGroupIconDialog(this@SettingsActivity, items, config.swipeLeftAction, title) {
                     config.swipeLeftAction = it as Int
                     config.tabsChanged = true
@@ -885,9 +943,49 @@ class SettingsActivity : SimpleActivity() {
         settingsShowContactThumbnailsHolder.setOnClickListener {
             settingsShowContactThumbnails.toggle()
             config.showContactThumbnails = settingsShowContactThumbnails.isChecked
+            settingsContactThumbnailsSizeHolder.beVisibleIf(config.showContactThumbnails)
             config.tabsChanged = true
         }
     }
+
+    private fun setupContactThumbnailsSize() = binding.apply {
+        val pro = isPro()
+        settingsContactThumbnailsSizeHolder.beVisibleIf(config.showContactThumbnails)
+        settingsContactThumbnailsSizeHolder.alpha = if (pro) 1f else 0.4f
+        settingsContactThumbnailsSizeLabel.text = addLockedLabelIfNeeded(com.goodwy.strings.R.string.contact_thumbnails_size, pro)
+        settingsContactThumbnailsSize.text = getContactThumbnailsSizeText()
+        settingsContactThumbnailsSizeHolder.setOnClickListener {
+            if (pro) {
+                val items = arrayListOf(
+                    RadioItem(FONT_SIZE_SMALL, getString(com.goodwy.commons.R.string.small), CONTACT_THUMBNAILS_SIZE_SMALL),
+                    RadioItem(FONT_SIZE_MEDIUM, getString(com.goodwy.commons.R.string.medium), CONTACT_THUMBNAILS_SIZE_MEDIUM),
+                    RadioItem(FONT_SIZE_LARGE, getString(com.goodwy.commons.R.string.large), CONTACT_THUMBNAILS_SIZE_LARGE),
+                    RadioItem(FONT_SIZE_EXTRA_LARGE, getString(com.goodwy.commons.R.string.extra_large), CONTACT_THUMBNAILS_SIZE_EXTRA_LARGE)
+                )
+
+                RadioGroupDialog(this@SettingsActivity, items, config.contactThumbnailsSize, com.goodwy.strings.R.string.contact_thumbnails_size) {
+                    config.contactThumbnailsSize = it as Int
+                    settingsContactThumbnailsSize.text = getContactThumbnailsSizeText()
+                    config.tabsChanged = true
+                }
+            } else {
+                RxAnimation.from(settingsContactThumbnailsSizeHolder)
+                    .shake(shakeTranslation = 2f)
+                    .subscribe()
+
+                showSnackbar(binding.root)
+            }
+        }
+    }
+
+    private fun getContactThumbnailsSizeText() = getString(
+        when (baseConfig.contactThumbnailsSize) {
+            CONTACT_THUMBNAILS_SIZE_SMALL -> com.goodwy.commons.R.string.small
+            CONTACT_THUMBNAILS_SIZE_MEDIUM -> com.goodwy.commons.R.string.medium
+            CONTACT_THUMBNAILS_SIZE_LARGE -> com.goodwy.commons.R.string.large
+            else -> com.goodwy.commons.R.string.extra_large
+        }
+    )
 
     private fun setupUseRelativeDate() = binding.apply {
         settingsRelativeDate.isChecked = config.useRelativeDate
@@ -917,7 +1015,7 @@ class SettingsActivity : SimpleActivity() {
                 RadioItem(4, "4", icon = R.drawable.ic_lines_count_4)
             )
 
-            RadioGroupIconDialog(this@SettingsActivity, items, config.linesCount, com.goodwy.commons.R.string.lines_count) {
+            RadioGroupIconDialog(this@SettingsActivity, items, config.linesCount, com.goodwy.strings.R.string.lines_count) {
                 config.linesCount = it as Int
                 settingsLinesCount.text = it.toString()
                 config.tabsChanged = true
@@ -929,11 +1027,11 @@ class SettingsActivity : SimpleActivity() {
         settingsUnreadIndicatorPosition.text = getUnreadIndicatorPositionText()
         settingsUnreadIndicatorPositionHolder.setOnClickListener {
             val items = arrayListOf(
-                RadioItem(UNREAD_INDICATOR_START, getString(com.goodwy.commons.R.string.start), icon = R.drawable.ic_unread_start),
-                RadioItem(UNREAD_INDICATOR_END, getString(com.goodwy.commons.R.string.end), icon = R.drawable.ic_unread_end)
+                RadioItem(UNREAD_INDICATOR_START, getString(com.goodwy.strings.R.string.start), icon = R.drawable.ic_unread_start),
+                RadioItem(UNREAD_INDICATOR_END, getString(com.goodwy.strings.R.string.end), icon = R.drawable.ic_unread_end)
             )
 
-            RadioGroupIconDialog(this@SettingsActivity, items, config.unreadIndicatorPosition, com.goodwy.commons.R.string.unread_indicator_position) {
+            RadioGroupIconDialog(this@SettingsActivity, items, config.unreadIndicatorPosition, com.goodwy.strings.R.string.unread_indicator_position) {
                 config.unreadIndicatorPosition = it as Int
                 settingsUnreadIndicatorPosition.text = getUnreadIndicatorPositionText()
                 config.tabsChanged = true
@@ -943,8 +1041,8 @@ class SettingsActivity : SimpleActivity() {
 
     private fun getUnreadIndicatorPositionText() = getString(
         when (config.unreadIndicatorPosition) {
-            UNREAD_INDICATOR_START -> com.goodwy.commons.R.string.start
-            else -> com.goodwy.commons.R.string.end
+            UNREAD_INDICATOR_START -> com.goodwy.strings.R.string.start
+            else -> com.goodwy.strings.R.string.end
         }
     )
 
@@ -958,21 +1056,13 @@ class SettingsActivity : SimpleActivity() {
     }
 
     private fun setupUseColoredContacts() = binding.apply {
-        updateWrapperUseColoredContacts()
         settingsColoredContacts.isChecked = config.useColoredContacts
         settingsColoredContactsHolder.setOnClickListener {
             settingsColoredContacts.toggle()
             config.useColoredContacts = settingsColoredContacts.isChecked
-            config.tabsChanged = true
             settingsContactColorListHolder.beVisibleIf(config.useColoredContacts)
-            updateWrapperUseColoredContacts()
+            config.tabsChanged = true
         }
-    }
-
-    private fun updateWrapperUseColoredContacts() {
-        val getBottomNavigationBackgroundColor = getBottomNavigationBackgroundColor()
-        val wrapperColor = if (config.useColoredContacts) getBottomNavigationBackgroundColor.lightenColor(4) else getBottomNavigationBackgroundColor
-        binding.settingsColoredContactsWrapper.background.applyColorFilter(wrapperColor)
     }
 
     private fun setupContactsColorList() = binding.apply {
@@ -1004,7 +1094,13 @@ class SettingsActivity : SimpleActivity() {
         settingsSimCardColorListIcon2.setColorFilter(config.simIconsColors[2])
         if (isPro()) {
             settingsSimCardColorListIcon1.setOnClickListener {
-                ColorPickerDialog(this@SettingsActivity, config.simIconsColors[1], addDefaultColorButton = true, colorDefault = resources.getColor(com.goodwy.commons.R.color.ic_dialer), title = resources.getString(com.goodwy.commons.R.string.color_sim_card_icons)) { wasPositivePressed, color ->
+                ColorPickerDialog(
+                    this@SettingsActivity,
+                    config.simIconsColors[1],
+                    addDefaultColorButton = true,
+                    colorDefault = resources.getColor(com.goodwy.commons.R.color.ic_dialer),
+                    title = resources.getString(com.goodwy.strings.R.string.color_sim_card_icons)
+                ) { wasPositivePressed, color ->
                     if (wasPositivePressed) {
                         if (hasColorChanged(config.simIconsColors[1], color)) {
                             addSimCardColor(1, color)
@@ -1014,7 +1110,13 @@ class SettingsActivity : SimpleActivity() {
                 }
             }
             settingsSimCardColorListIcon2.setOnClickListener {
-                ColorPickerDialog(this@SettingsActivity, config.simIconsColors[2], addDefaultColorButton = true, colorDefault = resources.getColor(com.goodwy.commons.R.color.color_primary), title = resources.getString(com.goodwy.commons.R.string.color_sim_card_icons)) { wasPositivePressed, color ->
+                ColorPickerDialog(
+                    this@SettingsActivity,
+                    config.simIconsColors[2],
+                    addDefaultColorButton = true,
+                    colorDefault = resources.getColor(com.goodwy.commons.R.color.color_primary),
+                    title = resources.getString(com.goodwy.strings.R.string.color_sim_card_icons)
+                ) { wasPositivePressed, color ->
                     if (wasPositivePressed) {
                         if (hasColorChanged(config.simIconsColors[2], color)) {
                             addSimCardColor(2, color)
@@ -1045,7 +1147,7 @@ class SettingsActivity : SimpleActivity() {
         baseConfig.simIconsColors = recentColors
     }
 
-    private fun hasColorChanged(old: Int, new: Int) = Math.abs(old - new) > 1
+    private fun hasColorChanged(old: Int, new: Int) = abs(old - new) > 1
 
     private fun setupTipJar() = binding.apply {
         settingsTipJarHolder.apply {
@@ -1074,7 +1176,7 @@ class SettingsActivity : SimpleActivity() {
         )
 
         if (!resources.getBoolean(com.goodwy.commons.R.bool.hide_google_relations)) {
-            faqItems.add(FAQItem(com.goodwy.commons.R.string.faq_2_title_commons, com.goodwy.commons.R.string.faq_2_text_commons_g))
+            faqItems.add(FAQItem(com.goodwy.commons.R.string.faq_2_title_commons, com.goodwy.strings.R.string.faq_2_text_commons_g))
             //faqItems.add(FAQItem(R.string.faq_6_title_commons, R.string.faq_6_text_commons))
         }
 
@@ -1084,7 +1186,6 @@ class SettingsActivity : SimpleActivity() {
             versionName = BuildConfig.VERSION_NAME,
             faqItems = faqItems,
             showFAQBeforeMail = true,
-            licensingKey = BuildConfig.GOOGLE_PLAY_LICENSING_KEY,
             productIdList = arrayListOf(productIdX1, productIdX2, productIdX3),
             productIdListRu = arrayListOf(productIdX1, productIdX2, productIdX3),
             subscriptionIdList = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
@@ -1106,7 +1207,7 @@ class SettingsActivity : SimpleActivity() {
 //            }
             settingsTipJarHolder.beVisibleIf(isPro)
 
-            val stringId = if (isRTLLayout) com.goodwy.commons.R.string.swipe_right_action else com.goodwy.commons.R.string.swipe_left_action
+            val stringId = if (isRTLLayout) com.goodwy.strings.R.string.swipe_right_action else com.goodwy.strings.R.string.swipe_left_action
             settingsSwipeLeftActionLabel.text = addLockedLabelIfNeeded(stringId, isPro)
         }
     }

@@ -24,7 +24,9 @@ import com.goodwy.smsmessenger.adapters.ConversationsAdapter
 import com.goodwy.smsmessenger.adapters.SearchResultsAdapter
 import com.goodwy.smsmessenger.databinding.ActivityMainBinding
 import com.goodwy.smsmessenger.extensions.*
-import com.goodwy.smsmessenger.helpers.*
+import com.goodwy.smsmessenger.helpers.SEARCHED_MESSAGE_ID
+import com.goodwy.smsmessenger.helpers.THREAD_ID
+import com.goodwy.smsmessenger.helpers.THREAD_TITLE
 import com.goodwy.smsmessenger.models.Conversation
 import com.goodwy.smsmessenger.models.Events
 import com.goodwy.smsmessenger.models.Message
@@ -635,7 +637,7 @@ class MainActivity : SimpleActivity() {
         )
 
         if (!resources.getBoolean(com.goodwy.commons.R.bool.hide_google_relations)) {
-            faqItems.add(FAQItem(com.goodwy.commons.R.string.faq_2_title_commons, com.goodwy.commons.R.string.faq_2_text_commons_g))
+            faqItems.add(FAQItem(com.goodwy.commons.R.string.faq_2_title_commons, com.goodwy.strings.R.string.faq_2_text_commons_g))
             //faqItems.add(FAQItem(R.string.faq_6_title_commons, R.string.faq_6_text_commons))
         }
 
@@ -655,7 +657,6 @@ class MainActivity : SimpleActivity() {
             versionName = BuildConfig.VERSION_NAME,
             faqItems = faqItems,
             showFAQBeforeMail = true,
-            licensingKey = BuildConfig.GOOGLE_PLAY_LICENSING_KEY,
             productIdList = arrayListOf(productIdX1, productIdX2, productIdX3),
             productIdListRu = arrayListOf(productIdX1, productIdX2, productIdX3),
             subscriptionIdList = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
@@ -682,6 +683,10 @@ class MainActivity : SimpleActivity() {
             add(Release(510, R.string.release_510))
             add(Release(511, R.string.release_511))
             add(Release(512, R.string.release_512))
+            add(Release(513, R.string.release_513))
+            add(Release(514, R.string.release_514))
+            add(Release(515, R.string.release_515))
+            add(Release(520, R.string.release_520))
             checkWhatsNew(this, BuildConfig.VERSION_CODE)
         }
     }

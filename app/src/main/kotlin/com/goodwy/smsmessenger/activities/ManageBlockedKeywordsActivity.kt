@@ -2,11 +2,7 @@ package com.goodwy.smsmessenger.activities
 
 import android.os.Bundle
 import com.goodwy.commons.activities.BaseSimpleActivity
-import com.goodwy.commons.extensions.beVisibleIf
-import com.goodwy.commons.extensions.getProperPrimaryColor
-import com.goodwy.commons.extensions.underlineText
-import com.goodwy.commons.extensions.updateTextColors
-import com.goodwy.commons.extensions.viewBinding
+import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.APP_ICON_IDS
 import com.goodwy.commons.helpers.APP_LAUNCHER_NAME
 import com.goodwy.commons.helpers.NavigationIcon

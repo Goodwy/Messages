@@ -8,4 +8,5 @@ import androidx.room.PrimaryKey
 data class MessageAttachment(
     @PrimaryKey val id: Long,
     @ColumnInfo(name = "text") var text: String,
-    @ColumnInfo(name = "attachments") var attachments: ArrayList<Attachment>)
+    @ColumnInfo(name = "attachments") var attachments: ArrayList<Attachment>
+)

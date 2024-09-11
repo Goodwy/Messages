@@ -1,8 +1,8 @@
 package com.goodwy.smsmessenger.interfaces
 
 import androidx.room.*
-import com.goodwy.smsmessenger.models.RecycleBinMessage
 import com.goodwy.smsmessenger.models.Message
+import com.goodwy.smsmessenger.models.RecycleBinMessage
 
 @Dao
 interface MessagesDao {
