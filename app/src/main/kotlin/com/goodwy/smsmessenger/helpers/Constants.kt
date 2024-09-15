@@ -49,6 +49,7 @@ const val SIM_TO_REPLY = "sim_to_reply"
 const val SHOW_SIM_SELECTION_DIALOG = "show_sim_selection_dialog"
 const val COPY_NUMBER_AND_DELETE_PREF = "copy_number_and_delete_pref"
 const val FONT_SIZE_MESSAGE = "font_size_message"
+const val USE_SPEECH_TO_TEXT = "use_speech_to_text"
 
 private const val PATH = "com.goodwy.smsmessenger.action."
 const val MARK_AS_READ = PATH + "mark_as_read"

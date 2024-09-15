@@ -135,4 +135,5 @@ dependencies {
     implementation(libs.rx.java)
     implementation(libs.bundles.lifecycle)
     implementation(libs.swipe.action)
+    implementation(libs.google.services)
 }

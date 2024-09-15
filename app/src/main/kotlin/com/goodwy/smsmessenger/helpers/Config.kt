@@ -171,6 +171,10 @@ class Config(context: Context) : BaseConfig(context) {
         get() = prefs.getInt(FONT_SIZE_MESSAGE, 1)
         set(fontSizeMessage) = prefs.edit().putInt(FONT_SIZE_MESSAGE, fontSizeMessage).apply()
 
+    var useSpeechToText: Boolean
+        get() = prefs.getBoolean(USE_SPEECH_TO_TEXT, true)
+        set(useSpeechToText) = prefs.edit().putBoolean(USE_SPEECH_TO_TEXT, useSpeechToText).apply()
+
     //Swipe
     var swipeRightAction: Int
         get() = prefs.getInt(SWIPE_RIGHT_ACTION, SWIPE_ACTION_MARK_READ)

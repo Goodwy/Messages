@@ -64,7 +64,7 @@ class MainActivity : SimpleActivity() {
             useTransparentNavigation = true,
             useTopSearchMenu = true
         )
-        setupSearchMenuScrollListener(binding.conversationsList, binding.mainMenu)
+        if (config.changeColourTopBar) setupSearchMenuScrollListener(binding.conversationsList, binding.mainMenu)
 
         if (savedInstanceState == null) {
             checkAndDeleteOldRecycleBinMessages()
@@ -246,7 +246,8 @@ class MainActivity : SimpleActivity() {
 
     private fun updateMenuColors() {
         updateStatusbarColor(getProperBackgroundColor())
-        binding.mainMenu.updateColors(getRequiredStatusBarColor(), scrollingView?.computeVerticalScrollOffset() ?: 0)
+        val statusBarColor = if (config.changeColourTopBar) getRequiredStatusBarColor() else getProperBackgroundColor()
+        binding.mainMenu.updateColors(statusBarColor, scrollingView?.computeVerticalScrollOffset() ?: 0)
     }
 
     private fun loadMessages() {
@@ -687,6 +688,7 @@ class MainActivity : SimpleActivity() {
             add(Release(514, R.string.release_514))
             add(Release(515, R.string.release_515))
             add(Release(520, R.string.release_520))
+            add(Release(521, R.string.release_521))
             checkWhatsNew(this, BuildConfig.VERSION_CODE)
         }
     }

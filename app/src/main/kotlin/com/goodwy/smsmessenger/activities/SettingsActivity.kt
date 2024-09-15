@@ -207,6 +207,7 @@ class SettingsActivity : SimpleActivity() {
         setupLinesCount()
         setupUnreadIndicatorPosition()
         setupHideTopBarWhenScroll()
+        setupChangeColourTopBarWhenScroll()
 
         setupUseRecycleBin()
         setupEmptyRecycleBin()
@@ -1051,6 +1052,15 @@ class SettingsActivity : SimpleActivity() {
         settingsHideBarWhenScrollHolder.setOnClickListener {
             settingsHideBarWhenScroll.toggle()
             config.hideTopBarWhenScroll = settingsHideBarWhenScroll.isChecked
+            config.tabsChanged = true
+        }
+    }
+
+    private fun setupChangeColourTopBarWhenScroll() = binding.apply {
+        settingsChangeColourTopBar.isChecked = config.changeColourTopBar
+        settingsChangeColourTopBarHolder.setOnClickListener {
+            settingsChangeColourTopBar.toggle()
+            config.changeColourTopBar = settingsChangeColourTopBar.isChecked
             config.tabsChanged = true
         }
     }

@@ -68,6 +68,8 @@ import com.goodwy.smsmessenger.helpers.*
 import com.goodwy.smsmessenger.messaging.*
 import com.goodwy.smsmessenger.models.*
 import com.goodwy.smsmessenger.models.ThreadItem.*
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -116,6 +118,7 @@ class ThreadActivity : SimpleActivity() {
 
     private var isAttachmentPickerVisible = false
     private val REQUEST_CODE_SPEECH_INPUT = 1
+    private var isPlayServicesAvailable = false
 
     private val binding by viewBinding(ActivityThreadBinding::inflate)
 
@@ -141,6 +144,8 @@ class ThreadActivity : SimpleActivity() {
             finish()
             return
         }
+
+        isPlayServicesAvailable = if (config.useSpeechToText) isPlayServicesAvailable() else false
 
         threadId = intent.getLongExtra(THREAD_ID, 0L)
 //        intent.getStringExtra(THREAD_TITLE)?.let {
@@ -490,7 +495,7 @@ class ThreadActivity : SimpleActivity() {
                 itemClick = { handleItemClick(it) },
                 isRecycleBin = isRecycleBin,
                 isGroupChat = participants.size > 1,
-                deleteMessages = { messages, toRecycleBin, fromRecycleBin -> deleteMessages(messages, toRecycleBin, fromRecycleBin) }
+                deleteMessages = { messages, toRecycleBin, fromRecycleBin, isPopupMenu -> deleteMessages(messages, toRecycleBin, fromRecycleBin, isPopupMenu) }
             )
 
             binding.threadMessagesList.adapter = currAdapter
@@ -584,13 +589,13 @@ class ThreadActivity : SimpleActivity() {
         }
     }
 
-    private fun deleteMessages(messagesToRemove: List<Message>, toRecycleBin: Boolean, fromRecycleBin: Boolean) {
+    private fun deleteMessages(messagesToRemove: List<Message>, toRecycleBin: Boolean, fromRecycleBin: Boolean, isPopupMenu: Boolean = false) {
         val deletePosition = threadItems.indexOf(messagesToRemove.first())
         messages.removeAll(messagesToRemove.toSet())
         threadItems = getThreadItems()
 
         runOnUiThread {
-            if (messages.isEmpty()) {
+            if (messages.isEmpty() && !isPopupMenu) {
                 finish()
             } else {
                 getOrCreateThreadAdapter().apply {
@@ -723,12 +728,14 @@ class ThreadActivity : SimpleActivity() {
 //                sendMessage()
 //            }
 
-            threadSendMessageWrapper.setOnLongClickListener {
+            if (isPlayServicesAvailable) {
+                threadSendMessageWrapper.setOnLongClickListener {
 //                if (!isScheduledMessage) {
 //                    launchScheduleSendDialog()
 //                }
-                speechToText()
-                true
+                    speechToText()
+                    true
+                }
             }
 
             threadSendMessage.backgroundTintList = properPrimaryColor.getColorStateList()
@@ -1497,14 +1504,30 @@ class ThreadActivity : SimpleActivity() {
         updateSendButtonDrawable()
         binding.messageHolder.apply {
             if (threadTypeMessage.text!!.isNotEmpty() || (getAttachmentSelections().isNotEmpty() && !getAttachmentSelections().any { it.isPending })) {
-                threadSendMessageWrapper.contentDescription = getString(R.string.sending)
-                threadSendMessageWrapper.setOnClickListener {
-                    sendMessage()
+                threadSendMessageWrapper.apply {
+                    isEnabled = true
+                    isClickable = true
+                    alpha = 1f
+                    contentDescription = getString(R.string.sending)
+                    setOnClickListener {
+                        sendMessage()
+                    }
+                }
+            } else if (isPlayServicesAvailable) {
+                threadSendMessageWrapper.apply {
+                    isEnabled = true
+                    isClickable = true
+                    alpha = 1f
+                    contentDescription = getString(R.string.voice_input)
+                    setOnClickListener {
+                        speechToText()
+                    }
                 }
             } else {
-                threadSendMessageWrapper.contentDescription = getString(R.string.voice_input)
-                threadSendMessageWrapper.setOnClickListener {
-                    speechToText()
+                threadSendMessageWrapper.apply {
+                    isEnabled = false
+                    isClickable = false
+                    alpha = 0.4f
                 }
             }
         }
@@ -1873,11 +1896,23 @@ class ThreadActivity : SimpleActivity() {
         )
 
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
-        try {
-            startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
-        } catch (e: Exception) {
-            toast("SPEECH INPUT ERROR:" + e.message)
+
+        if (isPlayServicesAvailable()) {
+            try {
+                startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
+            } catch (e: Exception) {
+                toast("SPEECH INPUT ERROR:" + e.message)
+            }
         }
+    }
+
+    private fun isPlayServicesAvailable(): Boolean {
+        val googleAPI = GoogleApiAvailability.getInstance()
+        val result = googleAPI.isGooglePlayServicesAvailable(applicationContext)
+        if (result != ConnectionResult.SUCCESS) {
+            return false
+        }
+        return true
     }
 
     private fun setupScheduleSendUi() = binding.messageHolder.apply {
@@ -1932,8 +1967,10 @@ class ThreadActivity : SimpleActivity() {
             R.drawable.ic_schedule_send_vector
         } else if (binding.messageHolder.threadTypeMessage.text!!.isNotEmpty() || (getAttachmentSelections().isNotEmpty() && !getAttachmentSelections().any { it.isPending })) {
             R.drawable.ic_send_vector
-        } else {
+        } else if (isPlayServicesAvailable) {
             com.goodwy.commons.R.drawable.ic_microphone_vector
+        } else {
+            R.drawable.ic_send_vector
         }
         ResourcesCompat.getDrawable(resources, drawableResId, theme)?.apply {
             applyColorFilter(getProperPrimaryColor().getContrastColor()) //getProperTextColor()

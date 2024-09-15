@@ -60,7 +60,7 @@ class ThreadAdapter(
     itemClick: (Any) -> Unit,
     val isRecycleBin: Boolean,
     val isGroupChat: Boolean,
-    val deleteMessages: (messages: List<Message>, toRecycleBin: Boolean, fromRecycleBin: Boolean) -> Unit
+    val deleteMessages: (messages: List<Message>, toRecycleBin: Boolean, fromRecycleBin: Boolean, isPopupMenu: Boolean) -> Unit
 ) : MyRecyclerViewListAdapter<ThreadItem>(activity, recyclerView, ThreadItemDiffCallback(), itemClick) {
     private var fontSize = activity.getTextSize()
     private var fontSizeSmall = activity.getTextSizeSmall()
@@ -221,7 +221,7 @@ class ThreadAdapter(
                 val messagesToRemove = if (message != null) arrayListOf(message) else getSelectedItems()
                 if (messagesToRemove.isNotEmpty()) {
                     val toRecycleBin = !skipRecycleBin && activity.config.useRecycleBin && !isRecycleBin
-                    deleteMessages(messagesToRemove.filterIsInstance<Message>(), toRecycleBin, false)
+                    deleteMessages(messagesToRemove.filterIsInstance<Message>(), toRecycleBin, false, message != null)
                 }
             }
         }
@@ -245,7 +245,7 @@ class ThreadAdapter(
             ensureBackgroundThread {
                 val messagesToRestore = getSelectedItems()
                 if (messagesToRestore.isNotEmpty()) {
-                    deleteMessages(messagesToRestore.filterIsInstance<Message>(), false, true)
+                    deleteMessages(messagesToRestore.filterIsInstance<Message>(), false, true, false)
                 }
             }
         }
@@ -357,11 +357,11 @@ class ThreadAdapter(
         if (numbersList.isNotEmpty()) {
             numbersList.apply {
                 val size = numbersList.size
-                val range = if (size > 4) 0..4 else 0 until size
+                val range = if (size > 7) 0..7 else 0 until size
                 for (index in range) {
                     val item = this[index]
                     val menuName = activity.getString(com.goodwy.commons.R.string.copy) + " \"${item}\""
-                    popupMenu.menu.add(1, 4 + index, 4 + index, menuName).setIcon(com.goodwy.commons.R.drawable.ic_copy_vector)
+                    popupMenu.menu.add(1, 7 + index, 7 + index, menuName).setIcon(com.goodwy.commons.R.drawable.ic_copy_vector)
                 }
             }
         }
@@ -392,7 +392,7 @@ class ThreadAdapter(
                 6 -> activity.copyToClipboard(text)
 
                 else -> {
-                    if (numbersList.isNotEmpty()) activity.copyToClipboard(numbersList[item.itemId - 4])
+                    if (numbersList.isNotEmpty()) activity.copyToClipboard(numbersList[item.itemId - 7])
                 }
             }
             true

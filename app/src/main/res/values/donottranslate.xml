@@ -1,5 +1,4 @@
 <resources>
-
     <string name="package_name">com.goodwy.smsmessenger</string>
     <string name="app_name">Right Messages</string>
 
@@ -14,6 +13,11 @@
     <string name="message_details_sim">SIM</string>
 
     <!-- Release notes -->
+    <string name="release_521">
+        Added ‘Change top bar colour when scrolling’ option\n
+        Added ability to delete messages in notification\n
+        Fixed bugs, improved stability
+    </string>
     <string name="release_520">
         Improved interaction with TalkBack\n
         Added ‘Delete message after copying number from notification’ option\n

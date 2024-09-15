@@ -157,13 +157,13 @@ class NotificationHelper(private val context: Context) {
                 .setChannelId(NOTIFICATION_CHANNEL)
         }
 
-        if (isNoReplySms) {
+//        if (isNoReplySms) {
             builder.addAction(
                 com.goodwy.commons.R.drawable.ic_delete_outline,
                 context.getString(com.goodwy.commons.R.string.delete),
                 deleteSmsPendingIntent
             ).setChannelId(NOTIFICATION_CHANNEL)
-        }
+//        }
 
         notificationManager.notify(notificationId, builder.build())
     }

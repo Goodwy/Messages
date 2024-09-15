@@ -1011,7 +1011,17 @@
                             style="@style/SettingsSwitchStyle"
                             android:text="@string/hide_top_bar_when_scrolling"
                             app:switchPadding="@dimen/bigger_margin" />
+                    </RelativeLayout>
 
+                    <RelativeLayout
+                        android:id="@+id/settingsChangeColourTopBarHolder"
+                        style="@style/SettingsHolderSwitchStyle">
+
+                        <com.goodwy.commons.views.MySwitchCompat
+                            android:id="@+id/settingsChangeColourTopBar"
+                            style="@style/SettingsSwitchStyle"
+                            android:text="@string/change_top_bar_colour_when_scrolling"
+                            app:switchPadding="@dimen/bigger_margin" />
                     </RelativeLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
