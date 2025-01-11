@@ -4,4 +4,7 @@
     <string name="chat_title_style_g">סגנון כותרת צ\'אט</string>
     <string name="unread_at_top_g">לא נקרא תמיד בראש הדף</string>
     <string name="show_sim_selection_dialog">הצגת תיבת הדו-שיח לבחירת כרטיס SIM בעת שליחה</string>
+    <string name="voice_input">קלט קול</string>
+    <string name="delete_after_copy">מחיקת הודעה לאחר העתקת מספר מהודעה</string>
+    <string name="sound_on_out_going_messages">צליל בעת שליחת הודעה</string>
 </resources>

@@ -4,4 +4,7 @@
     <string name="chat_title_style_g">聊天標題樣式</string>
     <string name="unread_at_top_g">未读始终位于顶部</string>
     <string name="show_sim_selection_dialog">发送时显示 SIM 卡选择对话框</string>
+    <string name="voice_input">语音输入</string>
+    <string name="delete_after_copy">从通知中复制号码后删除邮件</string>
+    <string name="sound_on_out_going_messages">发送消息时发出声音</string>
 </resources>

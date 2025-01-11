@@ -11,6 +11,7 @@ import com.klinker.android.send_message.Utils
 import com.goodwy.commons.extensions.getLongValue
 import com.goodwy.commons.extensions.queryCursor
 import com.goodwy.commons.helpers.isRPlus
+import com.goodwy.smsmessenger.extensions.updateLastConversationMessage
 import com.goodwy.smsmessenger.models.MmsAddress
 import com.goodwy.smsmessenger.models.MmsBackup
 import com.goodwy.smsmessenger.models.MmsPart
@@ -19,12 +20,14 @@ import com.goodwy.smsmessenger.models.SmsBackup
 class MessagesWriter(private val context: Context) {
     private val INVALID_ID = -1L
     private val contentResolver = context.contentResolver
+    private val modifiedThreadIds = mutableSetOf<Long>()
 
     fun writeSmsMessage(smsBackup: SmsBackup) {
         val contentValues = smsBackup.toContentValues()
         val threadId = Utils.getOrCreateThreadId(context, smsBackup.address)
         contentValues.put(Sms.THREAD_ID, threadId)
         if (!smsExist(smsBackup)) {
+            modifiedThreadIds.add(threadId)
             contentResolver.insert(Sms.CONTENT_URI, contentValues)
         }
     }
@@ -33,7 +36,10 @@ class MessagesWriter(private val context: Context) {
         val uri = Sms.CONTENT_URI
         val projection = arrayOf(Sms._ID)
         val selection = "${Sms.DATE} = ? AND ${Sms.ADDRESS} = ? AND ${Sms.TYPE} = ?"
-        val selectionArgs = arrayOf(smsBackup.date.toString(), smsBackup.address, smsBackup.type.toString())
+        val selectionArgs = arrayOf(
+            smsBackup.date.toString(), smsBackup.address, smsBackup.type.toString()
+        )
+
         var exists = false
         context.queryCursor(uri, projection, selection, selectionArgs) {
             exists = it.count > 0
@@ -50,6 +56,7 @@ class MessagesWriter(private val context: Context) {
         if (threadId != INVALID_ID) {
             contentValues.put(Mms.THREAD_ID, threadId)
             if (!mmsExist(mmsBackup)) {
+                modifiedThreadIds.add(threadId)
                 contentResolver.insert(Mms.CONTENT_URI, contentValues)
             }
             val messageId = getMmsId(mmsBackup)
@@ -77,7 +84,12 @@ class MessagesWriter(private val context: Context) {
         val uri = Mms.CONTENT_URI
         val projection = arrayOf(Mms._ID)
         val selection = "${Mms.DATE} = ? AND ${Mms.DATE_SENT} = ? AND ${Mms.THREAD_ID} = ? AND ${Mms.MESSAGE_BOX} = ?"
-        val selectionArgs = arrayOf(mmsBackup.date.toString(), mmsBackup.dateSent.toString(), threadId.toString(), mmsBackup.messageBox.toString())
+        val selectionArgs = arrayOf(
+            mmsBackup.date.toString(),
+            mmsBackup.dateSent.toString(),
+            threadId.toString(),
+            mmsBackup.messageBox.toString()
+        )
         var id = INVALID_ID
         context.queryCursor(uri, projection, selection, selectionArgs) {
             id = it.getLongValue(Mms._ID)
@@ -92,10 +104,19 @@ class MessagesWriter(private val context: Context) {
 
     @SuppressLint("NewApi")
     private fun mmsAddressExist(mmsAddress: MmsAddress, messageId: Long): Boolean {
-        val addressUri = if (isRPlus()) Mms.Addr.getAddrUriForMessage(messageId.toString()) else Uri.parse("content://mms/$messageId/addr")
+        val addressUri = if (isRPlus()) {
+            Mms.Addr.getAddrUriForMessage(messageId.toString())
+        } else {
+            Uri.parse("content://mms/$messageId/addr")
+        }
+
         val projection = arrayOf(Mms.Addr._ID)
         val selection = "${Mms.Addr.TYPE} = ? AND ${Mms.Addr.ADDRESS} = ? AND ${Mms.Addr.MSG_ID} = ?"
-        val selectionArgs = arrayOf(mmsAddress.type.toString(), mmsAddress.address.toString(), messageId.toString())
+        val selectionArgs = arrayOf(
+            mmsAddress.type.toString(),
+            mmsAddress.address,
+            messageId.toString()
+        )
         var exists = false
         context.queryCursor(addressUri, projection, selection, selectionArgs) {
             exists = it.count > 0
@@ -145,11 +166,29 @@ class MessagesWriter(private val context: Context) {
         val uri = Uri.parse("content://mms/${messageId}/part")
         val projection = arrayOf(Mms.Part._ID)
         val selection = "${Mms.Part.CONTENT_LOCATION} = ? AND ${Mms.Part.CONTENT_TYPE} = ? AND ${Mms.Part.MSG_ID} = ? AND ${Mms.Part.CONTENT_ID} = ?"
-        val selectionArgs = arrayOf(mmsPart.contentLocation.toString(), mmsPart.contentType, messageId.toString(), mmsPart.contentId.toString())
+        val selectionArgs = arrayOf(
+            mmsPart.contentLocation.toString(),
+            mmsPart.contentType,
+            messageId.toString(),
+            mmsPart.contentId.toString()
+        )
+
         var exists = false
         context.queryCursor(uri, projection, selection, selectionArgs) {
             exists = it.count > 0
         }
         return exists
+    }
+
+    /** Fixes the timestamps of all conversations modified by previous writes. */
+    fun fixConversationDates() {
+        // This method should be called after messages are written, to set the correct conversation
+        // timestamps.
+        //
+        // It is necessary because when we insert a message, Android's Telephony provider sets the
+        // conversation date to the current time rather than the time of the message that was
+        // inserted. Source code reference:
+        // https://android.googlesource.com/platform/packages/providers/TelephonyProvider/+/android14-release/src/com/android/providers/telephony/MmsSmsDatabaseHelper.java#134
+        context.updateLastConversationMessage(modifiedThreadIds)
     }
 }

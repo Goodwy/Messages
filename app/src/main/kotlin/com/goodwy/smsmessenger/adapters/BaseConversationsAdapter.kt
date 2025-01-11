@@ -1,7 +1,6 @@
 package com.goodwy.smsmessenger.adapters
 
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
+import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.graphics.drawable.LayerDrawable
 import android.os.Parcelable
@@ -9,8 +8,6 @@ import android.text.format.DateUtils
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -28,8 +25,8 @@ import com.goodwy.smsmessenger.databinding.ItemConversationBinding
 import com.goodwy.smsmessenger.extensions.config
 import com.goodwy.smsmessenger.extensions.deleteSmsDraft
 import com.goodwy.smsmessenger.extensions.getAllDrafts
-import com.goodwy.smsmessenger.extensions.setHeightAndWidth
 import com.goodwy.smsmessenger.helpers.*
+import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import com.goodwy.smsmessenger.models.Conversation
 import me.thanel.swipeactionview.SwipeActionView
 import me.thanel.swipeactionview.SwipeDirection
@@ -40,12 +37,21 @@ import kotlin.time.Duration.Companion.minutes
 
 @Suppress("LeakingThis")
 abstract class BaseConversationsAdapter(
-    activity: SimpleActivity, recyclerView: MyRecyclerView, onRefresh: () -> Unit, itemClick: (Any) -> Unit,
+    activity: SimpleActivity,
+    recyclerView: MyRecyclerView,
+    onRefresh: () -> Unit,
+    itemClick: (Any) -> Unit,
     var isArchived: Boolean = false
-) : MyRecyclerViewListAdapter<Conversation>(activity, recyclerView, ConversationDiffCallback(), itemClick, onRefresh),
+) : MyRecyclerViewListAdapter<Conversation>(
+    activity = activity,
+    recyclerView = recyclerView,
+    diffUtil = ConversationDiffCallback(),
+    itemClick = itemClick,
+    onRefresh = onRefresh
+),
     RecyclerViewFastScroller.OnPopupTextUpdate {
     private var fontSize = activity.getTextSize()
-    private var drafts = HashMap<Long, String?>()
+    private var drafts = HashMap<Long, String>()
     private var showContactThumbnails = activity.config.showContactThumbnails
 
     private var recyclerViewState: Parcelable? = null
@@ -59,24 +65,32 @@ abstract class BaseConversationsAdapter(
 
         registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() = restoreRecyclerViewState()
-            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) = restoreRecyclerViewState()
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = restoreRecyclerViewState()
+            override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) =
+                restoreRecyclerViewState()
+
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) =
+                restoreRecyclerViewState()
         })
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateFontSize() {
         fontSize = activity.getTextSize()
         notifyDataSetChanged()
     }
 
-    fun updateConversations(newConversations: ArrayList<Conversation>, commitCallback: (() -> Unit)? = null) {
+    fun updateConversations(
+        newConversations: ArrayList<Conversation>,
+        commitCallback: (() -> Unit)? = null
+    ) {
         saveRecyclerViewState()
         submitList(newConversations.toList(), commitCallback)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateDrafts() {
         ensureBackgroundThread {
-            val newDrafts = HashMap<Long, String?>()
+            val newDrafts = HashMap<Long, String>()
             fetchDrafts(newDrafts)
             if (drafts.hashCode() != newDrafts.hashCode()) {
                 drafts = newDrafts
@@ -89,7 +103,8 @@ abstract class BaseConversationsAdapter(
 
     override fun getSelectableItemCount() = itemCount
 
-    protected fun getSelectedItems() = currentList.filter { selectedKeys.contains(it.hashCode()) } as ArrayList<Conversation>
+    protected fun getSelectedItems() =
+        currentList.filter { selectedKeys.contains(it.hashCode()) } as ArrayList<Conversation>
 
     override fun getIsItemSelectable(position: Int) = true
 
@@ -119,7 +134,11 @@ abstract class BaseConversationsAdapter(
         }
 
         val conversation = getItem(position)
-        holder.bindView(conversation, allowSingleClick = true, allowLongClick = true) { itemView, _ ->
+        holder.bindView(
+            conversation,
+            allowSingleClick = true,
+            allowLongClick = true
+        ) { itemView, _ ->
             setupView(itemView, conversation)
         }
         bindViewHolder(holder)
@@ -135,7 +154,7 @@ abstract class BaseConversationsAdapter(
         }
     }
 
-    private fun fetchDrafts(drafts: HashMap<Long, String?>) {
+    private fun fetchDrafts(drafts: HashMap<Long, String>) {
         drafts.clear()
         for ((threadId, draft) in activity.getAllDrafts()) {
             drafts[threadId] = draft
@@ -146,7 +165,7 @@ abstract class BaseConversationsAdapter(
         ItemConversationBinding.bind(view).apply {
             conversationFrameSelect.setupViewBackground(activity)
             val smsDraft = drafts[conversation.threadId]
-            draftIndicator.beVisibleIf(smsDraft != null)
+            draftIndicator.beVisibleIf(!smsDraft.isNullOrEmpty())
             draftIndicator.setTextColor(properPrimaryColor)
             conversationFrame.setBackgroundColor(backgroundColor)
 
@@ -154,8 +173,10 @@ abstract class BaseConversationsAdapter(
                 beVisibleIf(smsDraft != null)
                 setColorFilter(properPrimaryColor)
                 setOnClickListener {
-                    context.deleteSmsDraft(conversation.threadId)
-                    updateDrafts()
+                    ensureBackgroundThread {
+                        context.deleteSmsDraft(conversation.threadId)
+                        updateDrafts()
+                    }
                 }
             }
 
@@ -168,7 +189,11 @@ abstract class BaseConversationsAdapter(
             } else {
                 unreadIndicator.beGone()
                 unreadIndicatorEnd.beInvisibleIf(conversation.read)
-                unreadIndicatorEnd.setColorFilter(properPrimaryColor)
+                unreadIndicatorEnd.background.applyColorFilter(properPrimaryColor)
+                unreadIndicatorEnd.setTextColor(properPrimaryColor.getContrastColor())
+                val unreadCount = conversation.unreadCount
+                val unreadCountText = if (unreadCount == 0) "" else unreadCount.toString()
+                unreadIndicatorEnd.text = unreadCountText
                 pinIndicator.beVisibleIf(activity.config.pinnedConversations.contains(conversation.threadId.toString()) && conversation.read)
                 pinIndicator.applyColorFilter(properPrimaryColor)
 
@@ -202,7 +227,11 @@ abstract class BaseConversationsAdapter(
                         0,
                     )
                 } else {
-                    conversation.date.formatDateOrTime(context, true, false)
+                    (conversation.date * 1000L).formatDateOrTime(
+                        context = context,
+                        hideTimeOnOtherDays = true,
+                        showCurrentYear = false
+                    )
                 }
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize * 0.8f)
             }
@@ -234,7 +263,13 @@ abstract class BaseConversationsAdapter(
                 val size = (root.context.pixels(com.goodwy.commons.R.dimen.normal_icon_size) * contactThumbnailsSize).toInt()
                 conversationImage.setHeightAndWidth(size)
                 if (title == conversation.phoneNumber) {
-                    val drawable = ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, activity.theme)
+                    val drawable =
+                        if (isShortCodeWithLetters(conversation.phoneNumber)) ResourcesCompat.getDrawable(
+                            resources,
+                            R.drawable.placeholder_company,
+                            activity.theme
+                        )
+                        else ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, activity.theme)
                     if (baseConfig.useColoredContacts) {
                         val letterBackgroundColors = activity.getLetterBackgroundColors()
                         val color = letterBackgroundColors[abs(conversation.phoneNumber.hashCode()) % letterBackgroundColors.size].toInt()
@@ -242,7 +277,12 @@ abstract class BaseConversationsAdapter(
                     }
                     conversationImage.setImageDrawable(drawable)
                 } else {
-                    SimpleContactsHelper(activity).loadContactImage(conversation.photoUri, conversationImage, title, placeholder)
+                    SimpleContactsHelper(activity).loadContactImage(
+                        path = conversation.photoUri,
+                        imageView = conversationImage,
+                        placeholderName = title,
+                        placeholderImage = placeholder
+                    )
                 }
             }
 
@@ -256,18 +296,25 @@ abstract class BaseConversationsAdapter(
             swipeRightIcon.setImageResource(swipeActionImageResource(swipeRightAction))
             swipeRightIconHolder.setBackgroundColor(swipeActionColor(swipeRightAction))
 
-            swipeView.setRippleColor(SwipeDirection.Left, swipeActionColor(swipeLeftAction))
-            swipeView.setRippleColor(SwipeDirection.Right, swipeActionColor(swipeRightAction))
-
             if (isArchived) {
                 if (swipeLeftAction == SWIPE_ACTION_BLOCK) swipeView.setDirectionEnabled(SwipeDirection.Left, false)
                 if (swipeRightAction == SWIPE_ACTION_BLOCK) swipeView.setDirectionEnabled(SwipeDirection.Right, false)
+            }
+
+            if (!activity.config.useSwipeToAction) {
+                swipeView.setDirectionEnabled(SwipeDirection.Left, false)
+                swipeView.setDirectionEnabled(SwipeDirection.Right, false)
             }
 
             arrayOf(
                 swipeLeftIcon, swipeRightIcon
             ).forEach {
                 it.setColorFilter(properPrimaryColor.getContrastColor())
+            }
+
+            if (activity.config.swipeRipple) {
+                swipeView.setRippleColor(SwipeDirection.Left, swipeActionColor(swipeLeftAction))
+                swipeView.setRippleColor(SwipeDirection.Right, swipeActionColor(swipeRightAction))
             }
 
             swipeView.useHapticFeedback = activity.config.swipeVibration
@@ -347,7 +394,7 @@ abstract class BaseConversationsAdapter(
             SWIPE_ACTION_ARCHIVE -> if (isArchived) R.drawable.ic_unarchive_vector else R.drawable.ic_archive_vector
             SWIPE_ACTION_BLOCK -> com.goodwy.commons.R.drawable.ic_block_vector
             SWIPE_ACTION_CALL -> com.goodwy.commons.R.drawable.ic_phone_vector
-            SWIPE_ACTION_MESSAGE -> com.goodwy.commons.R.drawable.ic_messages
+            SWIPE_ACTION_MESSAGE -> R.drawable.ic_messages
             else -> R.drawable.ic_mark_read
         }
     }

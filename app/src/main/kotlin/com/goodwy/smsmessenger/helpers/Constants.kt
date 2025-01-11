@@ -26,6 +26,7 @@ const val SEND_GROUP_MESSAGE_MMS = "send_group_message_mms"
 const val MMS_FILE_SIZE_LIMIT = "mms_file_size_limit"
 const val PINNED_CONVERSATIONS = "pinned_conversations"
 const val BLOCKED_KEYWORDS = "blocked_keywords"
+const val LAST_BLOCKED_KEYWORD_EXPORT_PATH = "last_blocked_keyword_export_path"
 const val EXPORT_SMS = "export_sms"
 const val EXPORT_MMS = "export_mms"
 const val JSON_FILE_EXTENSION = ".json"
@@ -50,6 +51,8 @@ const val SHOW_SIM_SELECTION_DIALOG = "show_sim_selection_dialog"
 const val COPY_NUMBER_AND_DELETE_PREF = "copy_number_and_delete_pref"
 const val FONT_SIZE_MESSAGE = "font_size_message"
 const val USE_SPEECH_TO_TEXT = "use_speech_to_text"
+const val SOUND_ON_OUT_GOING_MESSAGE = "sound_on_out_going_messages"
+const val NOTIFY_TURN_ON_SCREEN = "notify_turns_on_screen"
 
 private const val PATH = "com.goodwy.smsmessenger.action."
 const val MARK_AS_READ = PATH + "mark_as_read"
@@ -93,6 +96,9 @@ const val CAPTURE_VIDEO_INTENT = 45
 const val CAPTURE_AUDIO_INTENT = 46
 const val PICK_DOCUMENT_INTENT = 47
 const val PICK_CONTACT_INTENT = 48
+
+const val BLOCKED_KEYWORDS_EXPORT_DELIMITER = ","
+const val BLOCKED_KEYWORDS_EXPORT_EXTENSION = ".txt"
 
 fun refreshMessages() {
     EventBus.getDefault().post(Events.RefreshMessages())
@@ -149,3 +155,4 @@ const val SWIPE_ACTION_SHARE = 8
 const val SWIPE_ACTION_OPEN = 9
 const val SWIPE_ACTION_RESTORE = 10
 const val SWIPE_VIBRATION = "swipe_vibration"
+const val SWIPE_RIPPLE = "swipe_ripple"

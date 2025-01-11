@@ -19,7 +19,7 @@
             style="@style/SettingsHolderSwitchStyle"
             android:background="@drawable/rounded_rectangle_ripple">
 
-            <com.goodwy.commons.views.MySwitchCompat
+            <com.goodwy.commons.views.MyMaterialSwitch
                 android:id="@+id/bubble_invert_color"
                 style="@style/SettingsSwitchStyle"
                 android:text="@string/invert_color"
@@ -32,7 +32,7 @@
             style="@style/SettingsHolderSwitchStyle"
             android:background="@drawable/rounded_rectangle_ripple">
 
-            <com.goodwy.commons.views.MySwitchCompat
+            <com.goodwy.commons.views.MyMaterialSwitch
                 android:id="@+id/bubbleUseContactColor"
                 style="@style/SettingsSwitchStyle"
                 android:text="@string/use_contact_colors"

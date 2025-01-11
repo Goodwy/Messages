@@ -1,10 +1,12 @@
 package com.goodwy.smsmessenger.receivers
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
 import android.provider.Telephony
 import com.goodwy.commons.extensions.baseConfig
 import com.goodwy.commons.extensions.getMyContactsCursor
@@ -19,6 +21,7 @@ import com.goodwy.smsmessenger.helpers.refreshMessages
 import com.goodwy.smsmessenger.models.Message
 
 class SmsReceiver : BroadcastReceiver() {
+    @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context, intent: Intent) {
         val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
         var address = ""
@@ -52,6 +55,16 @@ class SmsReceiver : BroadcastReceiver() {
             } else {
                 handleMessage(context, address, subject, body, date, read, threadId, type, subscriptionId, status)
             }
+        }
+
+        if (context.config.notifyTurnsOnScreen) {
+            val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+            @Suppress("DEPRECATION")
+            val wakelock = powerManager.newWakeLock(
+                PowerManager.SCREEN_DIM_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP or PowerManager.ON_AFTER_RELEASE,
+                "goodwy.messages:sms.receiver"
+            )
+            wakelock.acquire(3000)
         }
     }
 

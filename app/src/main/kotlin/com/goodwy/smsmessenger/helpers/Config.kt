@@ -2,7 +2,6 @@ package com.goodwy.smsmessenger.helpers
 
 import android.content.Context
 import com.goodwy.commons.helpers.BaseConfig
-import com.goodwy.commons.helpers.FONT_SIZE
 import com.goodwy.smsmessenger.extensions.getDefaultKeyboardHeight
 import com.goodwy.smsmessenger.models.Conversation
 
@@ -130,6 +129,11 @@ class Config(context: Context) : BaseConfig(context) {
         customNotifications = customNotifications.minus(threadId.toString())
     }
 
+    var lastBlockedKeywordExportPath: String
+        get() = prefs.getString(LAST_BLOCKED_KEYWORD_EXPORT_PATH, "")!!
+        set(lastBlockedNumbersExportPath) = prefs.edit()
+            .putString(LAST_BLOCKED_KEYWORD_EXPORT_PATH, lastBlockedNumbersExportPath).apply()
+
     //Goodwy
     var bubbleStyle: Int
         get() = prefs.getInt(BUBBLE_STYLE, BUBBLE_STYLE_IOS_NEW)
@@ -156,7 +160,7 @@ class Config(context: Context) : BaseConfig(context) {
         set(unreadAtTop) = prefs.edit().putBoolean(UNREAD_AT_TOP, unreadAtTop).apply()
 
     var unreadIndicatorPosition: Int
-        get() = prefs.getInt(UNREAD_INDICATOR_POSITION, UNREAD_INDICATOR_START)
+        get() = prefs.getInt(UNREAD_INDICATOR_POSITION, UNREAD_INDICATOR_END)
         set(unreadIndicatorPosition) = prefs.edit().putInt(UNREAD_INDICATOR_POSITION, unreadIndicatorPosition).apply()
 
     var showSimSelectionDialog: Boolean
@@ -175,6 +179,14 @@ class Config(context: Context) : BaseConfig(context) {
         get() = prefs.getBoolean(USE_SPEECH_TO_TEXT, true)
         set(useSpeechToText) = prefs.edit().putBoolean(USE_SPEECH_TO_TEXT, useSpeechToText).apply()
 
+    var soundOnOutGoingMessages: Boolean
+        get() = prefs.getBoolean(SOUND_ON_OUT_GOING_MESSAGE, false)
+        set(soundOnOutGoingMessages) = prefs.edit().putBoolean(SOUND_ON_OUT_GOING_MESSAGE, soundOnOutGoingMessages).apply()
+
+    var notifyTurnsOnScreen: Boolean
+        get() = prefs.getBoolean(NOTIFY_TURN_ON_SCREEN, false)
+        set(notifyTurnsOnScreen) = prefs.edit().putBoolean(NOTIFY_TURN_ON_SCREEN, notifyTurnsOnScreen).apply()
+
     //Swipe
     var swipeRightAction: Int
         get() = prefs.getInt(SWIPE_RIGHT_ACTION, SWIPE_ACTION_MARK_READ)
@@ -187,4 +199,8 @@ class Config(context: Context) : BaseConfig(context) {
     var swipeVibration: Boolean
         get() = prefs.getBoolean(SWIPE_VIBRATION, true)
         set(swipeVibration) = prefs.edit().putBoolean(SWIPE_VIBRATION, swipeVibration).apply()
+
+    var swipeRipple: Boolean
+        get() = prefs.getBoolean(SWIPE_RIPPLE, false)
+        set(swipeRipple) = prefs.edit().putBoolean(SWIPE_RIPPLE, swipeRipple).apply()
 }

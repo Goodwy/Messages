@@ -4,4 +4,7 @@
     <string name="chat_title_style_g">Stil des Chattitels</string>
     <string name="unread_at_top_g">Ungelesen immer ganz oben</string>
     <string name="show_sim_selection_dialog">SIM-Karten-Auswahldialog beim Senden anzeigen</string>
+    <string name="voice_input">Spracheingabe</string>
+    <string name="delete_after_copy">Nachricht nach dem Kopieren einer Nummer aus einer Benachrichtigung löschen</string>
+    <string name="sound_on_out_going_messages">Ton beim Senden einer Nachricht</string>
 </resources>

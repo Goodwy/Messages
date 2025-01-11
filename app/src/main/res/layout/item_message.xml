@@ -28,6 +28,7 @@
             android:layout_alignParentStart="true"
             android:layout_marginEnd="@dimen/medium_margin"
             android:visibility="gone"
+            tools:ignore="ContentDescription"
             tools:visibility="visible" />
 
         <LinearLayout
@@ -47,7 +48,8 @@
             android:layout_alignBottom="@+id/thread_message_attachments_holder"
             android:layout_margin="@dimen/medium_margin"
             android:src="@drawable/ic_play_outline_vector"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
 
         <LinearLayout
             android:id="@+id/threadMessageBodyWrapper"

@@ -9,11 +9,9 @@ import android.graphics.drawable.LayerDrawable
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.RingtoneManager
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.text.TextUtils
-import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -76,9 +74,7 @@ class ConversationDetailsActivity : SimpleActivity() {
                 setupTextViews()
                 setupParticipants()
                 updateButton()
-                if (isOreoPlus()) {
-                    setupCustomNotifications()
-                }
+                setupCustomNotifications()
             }
         }
     }
@@ -110,12 +106,16 @@ class ConversationDetailsActivity : SimpleActivity() {
         DrawableCompat.setTintMode(drawableMail, PorterDuff.Mode.SRC_IN)
         binding.fourButton.setCompoundDrawablesWithIntrinsicBounds(null, drawableMail, null, null)
 
-        binding.oneButton.setTextColor(primaryColor)
-//        twoButton.setTextColor(primaryColor)
-        binding.threeButton.setTextColor(primaryColor)
-        binding.fourButton.setTextColor(primaryColor)
-        binding.conversationNumber.setTextColor(primaryColor)
-        binding.conversationBirthdays.setTextColor(primaryColor)
+        arrayOf(
+            binding.oneButton,
+//            binding.twoButton,
+            binding.threeButton,
+            binding.fourButton,
+            binding.conversationNumber,
+            binding.conversationBirthdays
+        ).forEach {
+            it.setTextColor(primaryColor)
+        }
     }
 
     override fun onResume() {
@@ -158,7 +158,6 @@ class ConversationDetailsActivity : SimpleActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun setupCustomNotifications() = binding.apply {
         customNotificationsButtonChevron.setColorFilter(getProperTextColor())
         customNotifications.isChecked = config.customNotifications.contains(threadId.toString())
@@ -195,7 +194,6 @@ class ConversationDetailsActivity : SimpleActivity() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
         val name = conversation?.title
         val audioAttributes = AudioAttributes.Builder()
@@ -207,27 +205,35 @@ class ConversationDetailsActivity : SimpleActivity() {
         NotificationChannel(threadId.hashCode().toString(), name, NotificationManager.IMPORTANCE_HIGH).apply {
             setBypassDnd(false)
             enableLights(true)
-            setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes)
+            setSound(
+                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
+                audioAttributes
+            )
             enableVibration(true)
             notificationManager.createNotificationChannel(this)
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun removeNotificationChannel() {
         notificationManager.deleteNotificationChannel(threadId.hashCode().toString())
     }
 
     private fun setupTextViews() {
         binding.conversationName.apply {
-            ResourcesCompat.getDrawable(resources, com.goodwy.commons.R.drawable.ic_edit_vector, theme)?.apply {
+            ResourcesCompat.getDrawable(
+                resources,
+                com.goodwy.commons.R.drawable.ic_edit_vector, theme
+            )?.apply {
                 applyColorFilter(getProperTextColor())
                 setCompoundDrawablesWithIntrinsicBounds(null, null, this, null)
             }
 
             text = conversation?.title
             setOnClickListener {
-                RenameConversationDialog(this@ConversationDetailsActivity, conversation!!) { title ->
+                RenameConversationDialog(
+                    this@ConversationDetailsActivity,
+                    conversation!!
+                ) { title ->
                     text = title
                     ensureBackgroundThread {
                         conversation = renameConversation(conversation!!, newTitle = title)
@@ -264,7 +270,13 @@ class ConversationDetailsActivity : SimpleActivity() {
 
         if (conversation != null) {
             if (threadTitle == conversation!!.phoneNumber) {
-                val drawable = ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, theme)
+                val drawable =
+                    if (isShortCodeWithLetters(conversation!!.phoneNumber)) ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.placeholder_company,
+                        theme
+                    )
+                    else ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, theme)
                 if (baseConfig.useColoredContacts) {
                     val letterBackgroundColors = getLetterBackgroundColors()
                     val color = letterBackgroundColors[abs(conversation!!.phoneNumber.hashCode()) % letterBackgroundColors.size].toInt()

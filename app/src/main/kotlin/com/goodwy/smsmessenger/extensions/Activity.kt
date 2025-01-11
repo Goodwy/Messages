@@ -12,6 +12,7 @@ import androidx.core.content.res.ResourcesCompat
 import com.goodwy.commons.dialogs.NewAppDialog
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.*
+import com.goodwy.commons.models.FAQItem
 import com.goodwy.commons.models.SimpleContact
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
@@ -144,4 +145,45 @@ fun SimpleActivity.showSnackbar(view: View) {
     snackbar.setTextColor(getProperTextColor())
     snackbar.setActionTextColor(getProperPrimaryColor())
     snackbar.show()
+}
+
+fun SimpleActivity.launchAbout() {
+    val licenses = LICENSE_EVENT_BUS or LICENSE_SMS_MMS or LICENSE_INDICATOR_FAST_SCROLL
+
+    val faqItems = arrayListOf(
+        FAQItem(R.string.faq_2_title, R.string.faq_2_text),
+        FAQItem(R.string.faq_3_title, R.string.faq_3_text),
+        FAQItem(com.goodwy.commons.R.string.faq_9_title_commons, com.goodwy.commons.R.string.faq_9_text_commons)
+    )
+
+    if (!resources.getBoolean(com.goodwy.commons.R.bool.hide_google_relations)) {
+        faqItems.add(FAQItem(com.goodwy.commons.R.string.faq_2_title_commons, com.goodwy.strings.R.string.faq_2_text_commons_g))
+        faqItems.add(FAQItem(com.goodwy.commons.R.string.faq_6_title_commons, com.goodwy.strings.R.string.faq_6_text_commons_g))
+    }
+
+    val productIdX1 = BuildConfig.PRODUCT_ID_X1
+    val productIdX2 = BuildConfig.PRODUCT_ID_X2
+    val productIdX3 = BuildConfig.PRODUCT_ID_X3
+    val subscriptionIdX1 = BuildConfig.SUBSCRIPTION_ID_X1
+    val subscriptionIdX2 = BuildConfig.SUBSCRIPTION_ID_X2
+    val subscriptionIdX3 = BuildConfig.SUBSCRIPTION_ID_X3
+    val subscriptionYearIdX1 = BuildConfig.SUBSCRIPTION_YEAR_ID_X1
+    val subscriptionYearIdX2 = BuildConfig.SUBSCRIPTION_YEAR_ID_X2
+    val subscriptionYearIdX3 = BuildConfig.SUBSCRIPTION_YEAR_ID_X3
+
+    startAboutActivity(
+        appNameId = R.string.app_name_g,
+        licenseMask = licenses,
+        versionName = BuildConfig.VERSION_NAME,
+        faqItems = faqItems,
+        showFAQBeforeMail = true,
+        productIdList = arrayListOf(productIdX1, productIdX2, productIdX3),
+        productIdListRu = arrayListOf(productIdX1, productIdX2, productIdX3),
+        subscriptionIdList = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
+        subscriptionIdListRu = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
+        subscriptionYearIdList = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
+        subscriptionYearIdListRu = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
+        playStoreInstalled = isPlayStoreInstalled(),
+        ruStoreInstalled = isRuStoreInstalled()
+    )
 }

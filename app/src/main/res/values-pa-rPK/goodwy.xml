@@ -4,4 +4,7 @@
     <string name="chat_title_style_g">چیٹ ٹائٹل اسٹائل</string>
     <string name="unread_at_top_g">بغیر پڑھے ہوئے ہمیشہ سب سے اوپر</string>
     <string name="show_sim_selection_dialog">بھیجتے وقت سم کارڈ کے انتخاب کا ڈائیلاگ دکھائیں۔</string>
+    <string name="voice_input">وائس ان پٹ</string>
+    <string name="delete_after_copy">نوٹیفکیشن توں نمبر کاپی کرن دے بعد میسج ڈیلیٹ کر دیو</string>
+    <string name="sound_on_out_going_messages">سنیہا بھیجدے ویلے آواز</string>
 </resources>

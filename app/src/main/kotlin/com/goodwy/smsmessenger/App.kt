@@ -1,14 +1,15 @@
 package com.goodwy.smsmessenger
 
-import android.app.Application
-import com.goodwy.commons.extensions.checkUseEnglish
+import com.goodwy.commons.RightApp
+import com.goodwy.commons.extensions.isRuStoreInstalled
 import com.goodwy.commons.helpers.rustore.RuStoreModule
 
-class App : Application() {
+class App : RightApp() {
 
     override fun onCreate() {
         super.onCreate()
-        checkUseEnglish()
-        RuStoreModule.install(this, "685530047") //TODO rustore
+        if (isRuStoreInstalled()) RuStoreModule.install(this, "685530047") //TODO rustore
     }
+
+    override val isAppLockFeatureAvailable = true
 }

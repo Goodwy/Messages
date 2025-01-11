@@ -4,4 +4,7 @@
     <string name="chat_title_style_g">Chat title style</string>
     <string name="unread_at_top_g">Unread always at the top</string>
     <string name="show_sim_selection_dialog">Show SIM card selection dialog when sending</string>
+    <string name="voice_input">Mewnbwn llais</string>
+    <string name="delete_after_copy">Dileu neges ar ôl copïo rhif o hysbysiad</string>
+    <string name="sound_on_out_going_messages">Sain wrth anfon neges</string>
 </resources>

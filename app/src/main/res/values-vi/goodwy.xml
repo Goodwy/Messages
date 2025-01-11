@@ -4,4 +4,7 @@
     <string name="chat_title_style_g">Chat title style</string>
     <string name="unread_at_top_g">Chưa đọc luôn ở trên cùng</string>
     <string name="show_sim_selection_dialog">Hiển thị hộp thoại chọn thẻ SIM khi gửi</string>
+    <string name="voice_input">Nhập liệu bằng giọng nói</string>
+    <string name="delete_after_copy">Xóa tin nhắn sau khi sao chép số từ thông báo</string>
+    <string name="sound_on_out_going_messages">Âm thanh khi gửi tin nhắn</string>
 </resources>

@@ -4,4 +4,7 @@
     <string name="chat_title_style_g">चैट शीर्षक शैली</string>
     <string name="unread_at_top_g">अपठित हमेशा शीर्ष पर</string>
     <string name="show_sim_selection_dialog">भेजते समय SIM कार्ड चयन संवाद दिखाएँ</string>
+    <string name="voice_input">आवाज इनपुट</string>
+    <string name="delete_after_copy">सूचना से नंबर कॉपी करने के बाद मैसेज डिलीट करें</string>
+    <string name="sound_on_out_going_messages">संदेश भेजते समय ध्वनि</string>
 </resources>

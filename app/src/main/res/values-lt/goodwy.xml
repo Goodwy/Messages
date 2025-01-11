@@ -4,4 +4,7 @@
     <string name="chat_title_style_g">Pokalbio pavadinimo stilius</string>
     <string name="unread_at_top_g">Neskaityta visada viršuje</string>
     <string name="show_sim_selection_dialog">Siunčiant rodyti SIM kortelės pasirinkimo dialogo langą</string>
+    <string name="voice_input">Balso įvestis</string>
+    <string name="delete_after_copy">Pranešimo ištrynimas nukopijavus numerį iš pranešimo</string>
+    <string name="sound_on_out_going_messages">Garsas siunčiant pranešimą</string>
 </resources>

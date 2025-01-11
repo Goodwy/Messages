@@ -5,10 +5,15 @@ import android.util.Xml
 import com.goodwy.commons.extensions.showErrorToast
 import com.goodwy.commons.extensions.toast
 import com.goodwy.commons.helpers.ensureBackgroundThread
+import com.goodwy.commons.helpers.isUpsideDownCakePlus
 import com.goodwy.smsmessenger.activities.SimpleActivity
 import com.goodwy.smsmessenger.dialogs.ImportMessagesDialog
 import com.goodwy.smsmessenger.extensions.config
-import com.goodwy.smsmessenger.models.*
+import com.goodwy.smsmessenger.models.BackupType
+import com.goodwy.smsmessenger.models.ImportResult
+import com.goodwy.smsmessenger.models.MessagesBackup
+import com.goodwy.smsmessenger.models.MmsBackup
+import com.goodwy.smsmessenger.models.SmsBackup
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -26,7 +31,8 @@ class MessagesImporter(private val activity: SimpleActivity) {
     fun importMessages(uri: Uri) {
         try {
             val fileType = activity.contentResolver.getType(uri).orEmpty()
-            val isXml = isXmlMimeType(fileType) || (uri.path?.endsWith("txt") == true && isFileXml(uri))
+            val isXml =
+                isXmlMimeType(fileType) || (uri.path?.endsWith("txt") == true && isFileXml(uri))
             if (isXml) {
                 activity.toast(com.goodwy.commons.R.string.importing)
                 getInputStreamFromUri(uri)!!.importXml()
@@ -41,21 +47,28 @@ class MessagesImporter(private val activity: SimpleActivity) {
     @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
     private fun importJson(uri: Uri) {
         try {
-            val deserializedList = activity.contentResolver.openInputStream(uri)!!.buffered().use { inputStream ->
-                Json.decodeFromStream<List<MessagesBackup>>(inputStream)
-            }
+            val deserializedList =
+                activity.contentResolver.openInputStream(uri)!!.buffered().use { inputStream ->
+                    Json.decodeFromStream<List<MessagesBackup>>(inputStream)
+                }
 
             if (deserializedList.isEmpty()) {
                 activity.toast(com.goodwy.commons.R.string.no_entries_for_importing)
                 return
             }
-            val messages = deserializedList.map { message ->
-                // workaround for messages not being imported on Android 14 when the device has a different subscriptionId (see #191)
-                when (message) {
-                    is SmsBackup -> message.copy(subscriptionId = -1)
-                    is MmsBackup -> message.copy(subscriptionId = -1)
+
+            val messages = if (isUpsideDownCakePlus()) {
+                deserializedList.map { message ->
+                    // workaround for messages not being imported on Android 14 when the device has a different subscriptionId (see #191)
+                    when (message) {
+                        is SmsBackup -> message.copy(subscriptionId = -1)
+                        is MmsBackup -> message.copy(subscriptionId = -1)
+                    }
                 }
+            } else {
+                deserializedList
             }
+
             ImportMessagesDialog(activity, messages)
         } catch (e: SerializationException) {
             activity.toast(com.goodwy.commons.R.string.invalid_file_format)
@@ -83,6 +96,8 @@ class MessagesImporter(private val activity: SimpleActivity) {
                         messagesFailed++
                     }
                 }
+
+                messageWriter.fixConversationDates()
                 refreshMessages()
             } catch (e: Exception) {
                 activity.showErrorToast(e)
@@ -140,7 +155,10 @@ class MessagesImporter(private val activity: SimpleActivity) {
                 refreshMessages()
             }
             when {
-                messagesFailed > 0 && messagesImported > 0 -> activity.toast(com.goodwy.commons.R.string.importing_some_entries_failed)
+                messagesFailed > 0 && messagesImported > 0 -> {
+                    activity.toast(com.goodwy.commons.R.string.importing_some_entries_failed)
+                }
+
                 messagesFailed > 0 -> activity.toast(com.goodwy.commons.R.string.importing_failed)
                 else -> activity.toast(com.goodwy.commons.R.string.importing_successful)
             }
@@ -196,10 +214,9 @@ class MessagesImporter(private val activity: SimpleActivity) {
     }
 
     private fun isXmlMimeType(mimeType: String): Boolean {
-        return mimeType.equals("application/xml", ignoreCase = true) || mimeType.equals("text/xml", ignoreCase = true)
-    }
-
-    private fun isJsonMimeType(mimeType: String): Boolean {
-        return mimeType.equals("application/json", ignoreCase = true)
+        return mimeType.equals("application/xml", ignoreCase = true) || mimeType.equals(
+            other = "text/xml",
+            ignoreCase = true
+        )
     }
 }

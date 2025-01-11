@@ -12,7 +12,7 @@ class InvalidNumberDialog(val activity: BaseSimpleActivity, val text: String) {
         }
 
         activity.getAlertDialogBuilder()
-            .setPositiveButton(com.goodwy.commons.R.string.ok) { _, _ -> { } }
+            .setPositiveButton(com.goodwy.commons.R.string.ok) { _, _ -> }
             .apply {
                 activity.setupDialogStuff(binding.root, this)
             }

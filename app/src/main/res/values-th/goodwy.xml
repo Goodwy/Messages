@@ -4,4 +4,7 @@
     <string name="chat_title_style_g">สไตล์ชื่อแชท</string>
     <string name="unread_at_top_g">ยังไม่ได้อ่านเสมอที่ด้านบน</string>
     <string name="show_sim_selection_dialog">แสดงกล่องโต้ตอบการเลือกซิมการ์ดเมื่อส่ง</string>
+    <string name="voice_input">การป้อนข้อมูลด้วยเสียง</string>
+    <string name="delete_after_copy">ลบข้อความหลังจากคัดลอกหมายเลขจากการแจ้งเตือน</string>
+    <string name="sound_on_out_going_messages">เสียงเมื่อส่งข้อความ</string>
 </resources>

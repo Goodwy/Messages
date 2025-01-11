@@ -37,7 +37,7 @@ class MessageBubbleSettingDialog(
         setupColors()
         setupToggleBubbleStyle()
 
-        if (config.isUsingSystemTheme || activity.isBlackTheme()) {
+        if (activity.isDynamicTheme() || activity.isBlackTheme()) {
             val drawable = binding.root.resources.getColoredDrawableWithColor(R.drawable.rounded_rectangle_color, binding.root.context.getProperBackgroundColor())
             binding.styleOriginal.background = drawable
             binding.styleRounded.background = drawable
@@ -94,12 +94,12 @@ class MessageBubbleSettingDialog(
             }
 
         val bgDrawable = when {
-            config.isUsingSystemTheme -> ResourcesCompat.getDrawable(binding.root.resources, com.goodwy.commons.R.drawable.dialog_bg, null)
+            activity.isDynamicTheme() -> ResourcesCompat.getDrawable(binding.root.resources, com.goodwy.commons.R.drawable.dialog_bg, null)
             else -> ResourcesCompat.getDrawable(binding.root.resources, com.goodwy.commons.R.drawable.button_background_16dp, null)
         }
         snackbar.view.background = bgDrawable
         val properBackgroundColor = activity.getProperBackgroundColor()
-        val backgroundColor = if (properBackgroundColor == Color.BLACK || config.isUsingSystemTheme) properBackgroundColor else activity.getBottomNavigationBackgroundColor()
+        val backgroundColor = if (properBackgroundColor == Color.BLACK || activity.isDynamicTheme()) properBackgroundColor else activity.getBottomNavigationBackgroundColor()
         snackbar.setBackgroundTint(backgroundColor)
         snackbar.setTextColor(activity.getProperTextColor())
         snackbar.setActionTextColor(activity.getProperPrimaryColor())

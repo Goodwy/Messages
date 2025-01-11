@@ -1,13 +1,15 @@
 [versions]
 #jetbrains
-kotlin = "1.9.21"
+kotlin = "1.9.25"
 kotlinxSerializationJson = "1.6.0"
 #KSP
-ksp = "1.9.21-1.0.16"
+ksp = "1.9.25-1.0.20"
+#Detekt
+detekt = "1.23.3"
 #AndroidX
-androidx-constraintlayout = "2.1.4"
+androidx-constraintlayout = "2.2.0"
 androidx-swiperefreshlayout = "1.1.0"
-androidx-lifecycleprocess = "2.7.0"
+androidx-lifecycleprocess = "2.8.7"
 #Eventbus
 eventbus = "3.3.1"
 #Room
@@ -16,19 +18,18 @@ room = "2.6.1"
 android-smsmms = "c3e678befd"
 indicatorFastScroll = "e37b5b2ad6"
 #Goodwy
-right-commons = "8ee80b76bf"
-rustore = "5.1.1"
+right-commons = "7bffbc7100"
 behavioRule = "1.0.1"
 rxAnimation = "2.1.1"
 rxJava3 = "3.1.5"
 swipeToActionLayout = "bd1eb3c8a3"
 googleServices = "21.0.1"
 #Gradle
-gradlePlugins-agp = "8.2.2"
+gradlePlugins-agp = "8.7.3"
 #build
 app-build-compileSDKVersion = "34"
 app-build-targetSDK = "34"
-app-build-minimumSDK = "23"
+app-build-minimumSDK = "26"
 app-build-javaVersion = "VERSION_17"
 app-build-kotlinJVMTarget = "17"
 #Helpers
@@ -36,8 +37,8 @@ ez-vcard = "0.11.3"
 shortcut-badger = "1.1.22"
 #versioning
 app-version-appId = "com.goodwy.smsmessenger"
-app-version-versionCode = "521"
-app-version-versionName = "5.2.1"
+app-version-versionCode = "610"
+app-version-versionName = "6.1.0"
 [libraries]
 #AndroidX
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
@@ -59,7 +60,6 @@ shortcut-badger = { module = "me.leolin:ShortcutBadger", version.ref = "shortcut
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 #Goodwy
 goodwy-commons = { module = "com.github.Goodwy:Goodwy-Commons", version.ref = "right-commons" }
-rustore-client = { module = "ru.rustore.sdk:billingclient", version.ref = "rustore" }
 behavio-rule = { module = "com.github.Liverm0r:BehavioRule", version.ref = "behavioRule" }
 rx-animation = { module = "com.mikhaellopez:rxanimation", version.ref = "rxAnimation" }
 rx-java = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxJava3" }
@@ -82,3 +82,4 @@ android = { id = "com.android.application", version.ref = "gradlePlugins-agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

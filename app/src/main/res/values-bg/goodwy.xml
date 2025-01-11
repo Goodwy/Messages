@@ -4,4 +4,7 @@
     <string name="chat_title_style_g">Стил на заглавието на чата</string>
     <string name="unread_at_top_g">Непрочетено винаги на върха</string>
     <string name="show_sim_selection_dialog">Показване на диалоговия прозорец за избор на SIM карта при изпращане</string>
+    <string name="voice_input">Гласово въвеждане</string>
+    <string name="delete_after_copy">Изтриване на съобщение след копиране на номер от известие</string>
+    <string name="sound_on_out_going_messages">Звук при изпращане на съобщение</string>
 </resources>

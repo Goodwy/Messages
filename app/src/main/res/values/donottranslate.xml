@@ -13,6 +13,16 @@
     <string name="message_details_sim">SIM</string>
 
     <!-- Release notes -->
+    <string name="release_610">
+        Changed theme logic\n
+        Added ‘App icon color’ option\n
+        Added option to disable voice input\n
+        Added option ‘Turn on screen’ when notification is received\n
+        Added ‘Sound on out going messages’ option\n
+        Added number of unread messages\n
+        Fixed reflection of private contact name in notifications\n
+        Fixed bugs, improved stability
+    </string>
     <string name="release_521">
         Added ‘Change top bar colour when scrolling’ option\n
         Added ability to delete messages in notification\n

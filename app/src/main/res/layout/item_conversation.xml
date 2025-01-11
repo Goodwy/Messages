@@ -5,8 +5,6 @@
     android:id="@+id/swipeView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:sav_swipeLeftRippleColor="@color/activated_item_foreground"
-    app:sav_swipeRightRippleColor="@color/activated_item_foreground"
     android:clickable="true"
     android:focusable="true">
 
@@ -25,7 +23,8 @@
             android:layout_marginLeft='@dimen/big_margin'
             android:layout_alignParentLeft='true'
             android:layout_centerVertical='true'
-            android:src="@drawable/ic_mark_read"/>
+            android:src="@drawable/ic_mark_read"
+            android:contentDescription="@null"/>
     </RelativeLayout>
 
     <RelativeLayout
@@ -43,7 +42,8 @@
             android:layout_marginRight='@dimen/big_margin'
             android:layout_alignParentRight='true'
             android:layout_centerVertical='true'
-            android:src="@drawable/ic_delete_outline"/>
+            android:src="@drawable/ic_delete_outline"
+            android:contentDescription="@null"/>
     </RelativeLayout>
 
     <FrameLayout
@@ -66,6 +66,7 @@
                 android:layout_height="15dp"
                 android:layout_centerVertical="true"
                 android:src="@drawable/ic_oval"
+                android:contentDescription="@null"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/conversationImage"
                 app:layout_constraintBottom_toBottomOf="@+id/conversationImage" />
@@ -78,6 +79,7 @@
                 android:layout_marginStart="5dp"
                 android:layout_marginTop="@dimen/medium_margin"
                 android:layout_marginBottom="@dimen/medium_margin"
+                android:contentDescription="@null"
                 app:layout_goneMarginStart="@dimen/medium_margin"
                 app:layout_constraintStart_toEndOf="@+id/unreadIndicator"
                 app:layout_constraintTop_toTopOf="parent"
@@ -92,14 +94,15 @@
                 android:layout_marginStart="@dimen/normal_margin"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:paddingEnd="@dimen/activity_margin"
+                android:paddingEnd="@dimen/medium_margin"
                 android:textSize="@dimen/big_text_size"
                 android:textDirection="locale"
                 android:textAlignment="viewStart"
                 app:layout_constraintEnd_toStartOf="@+id/conversationDate"
                 app:layout_constraintStart_toEndOf="@+id/conversationImage"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="John" />
+                tools:text="John"
+                tools:ignore="RtlSymmetry" />
 
             <TextView
                 android:id="@+id/draftIndicator"
@@ -116,7 +119,8 @@
                 android:textStyle="italic"
                 app:layout_constraintTop_toBottomOf="@+id/conversationAddress"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/conversationImage" />
+                app:layout_constraintStart_toEndOf="@+id/conversationImage"
+                tools:ignore="RtlSymmetry" />
 
             <TextView
                 android:id="@+id/conversationBodyShort"
@@ -135,42 +139,57 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/draftClear"
                 app:layout_constraintStart_toEndOf="@+id/draftIndicator"
-                tools:text="Hey buddy!" />
+                tools:text="Hey buddy!"
+                tools:ignore="RtlSymmetry" />
 
             <ImageView
                 android:id="@+id/draftClear"
                 android:layout_width="@dimen/pin_icon_size"
                 android:layout_height="@dimen/pin_icon_size"
                 android:layout_marginBottom="-2dp"
-                android:layout_marginEnd="4dp"
+                android:layout_marginEnd="24dp"
                 android:src="@drawable/ic_cross_vector"
                 android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@null"
                 app:layout_constraintTop_toTopOf="@+id/conversationBodyShort"
                 app:layout_constraintBottom_toBottomOf="@+id/conversationBodyShort"
                 app:layout_constraintStart_toEndOf="@+id/conversationBodyShort"
-                app:layout_constraintEnd_toStartOf="@+id/pinIndicator" />
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <ImageView
                 android:id="@+id/pinIndicator"
                 android:layout_width="@dimen/pin_icon_size"
                 android:layout_height="@dimen/pin_icon_size"
                 android:layout_marginBottom="-2dp"
+                android:contentDescription="@null"
                 android:src="@drawable/ic_pin_angle_filled"
                 app:layout_constraintTop_toTopOf="@+id/conversationBodyShort"
                 app:layout_constraintBottom_toBottomOf="@+id/conversationBodyShort"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <ImageView
+            <TextView
                 android:id="@+id/unreadIndicatorEnd"
-                android:layout_width="@dimen/pin_icon_size"
-                android:layout_height="@dimen/pin_icon_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="19dp"
+                android:minHeight="19dp"
                 android:layout_marginBottom="-2dp"
-                android:src="@drawable/ic_oval"
+                android:gravity="center"
+                android:paddingVertical="@dimen/tiny_margin"
+                android:paddingHorizontal="@dimen/smaller_margin"
+                android:textSize="12dp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:background="@drawable/tab_background"
                 android:visibility="gone"
+                android:includeFontPadding="false"
                 app:layout_constraintTop_toTopOf="@+id/conversationBodyShort"
                 app:layout_constraintBottom_toBottomOf="@+id/conversationBodyShort"
                 app:layout_constraintEnd_toEndOf="parent"
-                tools:visibility="visible" />
+                tools:visibility="visible"
+                tools:backgroundTint="@color/primary"
+                tools:text="8"
+                tools:ignore="SpUsage" />
 
             <TextView
                 android:id="@+id/conversationDate"
@@ -178,7 +197,7 @@
                 android:layout_height="wrap_content"
                 android:alpha="0.4"
                 android:gravity="center_vertical"
-                android:paddingEnd="@dimen/medium_margin"
+                android:paddingHorizontal="@dimen/medium_margin"
                 android:textSize="@dimen/smaller_text_size"
                 app:layout_constraintTop_toTopOf="@+id/conversationAddress"
                 app:layout_constraintBottom_toBottomOf="@+id/conversationAddress"
@@ -192,6 +211,7 @@
                 android:gravity="center_vertical"
                 android:alpha="0.4"
                 android:src="@drawable/ic_chevron_right_vector"
+                android:contentDescription="@null"
                 app:layout_constraintTop_toTopOf="@+id/conversationAddress"
                 app:layout_constraintBottom_toBottomOf="@+id/conversationAddress"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -202,6 +222,7 @@
                 android:layout_height="1px"
                 android:background="@drawable/divider_settings"
                 android:alpha="0.2"
+                android:contentDescription="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/conversationAddress"
                 app:layout_constraintEnd_toEndOf="parent"/>

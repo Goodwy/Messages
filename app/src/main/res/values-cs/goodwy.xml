@@ -4,4 +4,7 @@
     <string name="chat_title_style_g">Styl nadpisu chatu</string>
     <string name="unread_at_top_g">Nepřečtené vždy nahoře</string>
     <string name="show_sim_selection_dialog">Zobrazit dialogové okno pro výběr SIM karty při odesílání</string>
+    <string name="voice_input">Hlasový vstup</string>
+    <string name="delete_after_copy">Smazat zprávu po zkopírování čísla z notifikace</string>
+    <string name="sound_on_out_going_messages">Zvuk při odesílání zprávy</string>
 </resources>

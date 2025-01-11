@@ -4,10 +4,11 @@ import android.content.Context
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
 import com.bumptech.glide.Glide
+import com.klinker.android.send_message.MmsReceivedReceiver
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.SimpleContactsHelper
-import com.klinker.android.send_message.MmsReceivedReceiver
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.extensions.*
@@ -40,6 +41,16 @@ class MmsReceiver : MmsReceivedReceiver() {
             } else {
                 handleMmsMessage(context, mms, size, address)
             }
+        }
+
+        if (context.config.notifyTurnsOnScreen) {
+            val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+            @Suppress("DEPRECATION")
+            val wakelock = powerManager.newWakeLock(
+                PowerManager.SCREEN_DIM_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP or PowerManager.ON_AFTER_RELEASE,
+                "goodwy.messages:mms.receiver"
+            )
+            wakelock.acquire(3000)
         }
     }
 

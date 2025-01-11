@@ -4,4 +4,7 @@
     <string name="chat_title_style_g">Sohbet başlığı stili</string>
     <string name="unread_at_top_g">Okunmamış, her zaman en üstte</string>
     <string name="show_sim_selection_dialog">Gönderirken SIM kart seçimi iletişim kutusunu göster</string>
+    <string name="voice_input">Ses girişi</string>
+    <string name="delete_after_copy">Bir bildirimden bir numara kopyaladıktan sonra mesajı sil</string>
+    <string name="sound_on_out_going_messages">Mesaj gönderirken ses</string>
 </resources>

@@ -4,4 +4,7 @@
     <string name="chat_title_style_g">Estilo de título de chat</string>
     <string name="unread_at_top_g">Lo no leído, siempre en la parte superior</string>
     <string name="show_sim_selection_dialog">Mostrar el cuadro de diálogo de selección de la tarjeta SIM al enviar</string>
+    <string name="voice_input">Entrada de voz</string>
+    <string name="delete_after_copy">Eliminar mensaje después de copiar un número de una notificación</string>
+    <string name="sound_on_out_going_messages">Sonido al enviar un mensaje</string>
 </resources>

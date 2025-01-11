@@ -15,6 +15,7 @@ import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
 import com.goodwy.smsmessenger.databinding.ItemSearchResultBinding
 import com.goodwy.smsmessenger.extensions.config
+import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import com.goodwy.smsmessenger.models.SearchResult
 import java.util.*
 import kotlin.math.abs
@@ -98,7 +99,13 @@ class SearchResultsAdapter(
             searchResultImage.beGoneIf(!activity.config.showContactThumbnails)
             //SimpleContactsHelper(activity).loadContactImage(searchResult.photoUri, searchResultImage, searchResult.title)
             if (searchResult.title == searchResult.phoneNumber) {
-                val drawable = ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, activity.theme)
+                val drawable =
+                    if (isShortCodeWithLetters(searchResult.phoneNumber)) ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.placeholder_company,
+                        activity.theme
+                    )
+                    else ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, activity.theme)
                 if (baseConfig.useColoredContacts) {
                     val letterBackgroundColors = activity.getLetterBackgroundColors()
                     val color = letterBackgroundColors[abs(searchResult.run { phoneNumber.hashCode() }) % letterBackgroundColors.size].toInt()

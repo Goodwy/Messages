@@ -6,4 +6,5 @@
     <string name="show_sim_selection_dialog">Показувати діалог вибору SIM-карти під час надсилання</string>
     <string name="voice_input">Голосове введення</string>
     <string name="delete_after_copy">Видаляти повідомлення після копіювання номера з повідомлення</string>
+    <string name="sound_on_out_going_messages">Звук під час надсилання повідомлення</string>
 </resources>

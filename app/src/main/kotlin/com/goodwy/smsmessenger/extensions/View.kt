@@ -21,13 +21,6 @@ fun View.showWithAnimation(duration: Long = 250L) {
     }
 }
 
-fun View.setHeightAndWidth(size: Int) {
-    val lp = layoutParams
-    lp.height = size
-    lp.width = size
-    layoutParams = lp
-}
-
 fun View.setPaddingBubble(activity: Activity, bubbleStyle: Int, isReceived: Boolean = true) {
     val isRtl = activity.isRTLLayout
     if (isReceived) {

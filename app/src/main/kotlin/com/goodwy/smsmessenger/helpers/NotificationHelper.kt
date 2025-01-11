@@ -17,8 +17,6 @@ import androidx.core.app.RemoteInput
 import com.goodwy.commons.extensions.getProperPrimaryColor
 import com.goodwy.commons.extensions.notificationManager
 import com.goodwy.commons.helpers.SimpleContactsHelper
-import com.goodwy.commons.helpers.isNougatPlus
-import com.goodwy.commons.helpers.isOreoPlus
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.ThreadActivity
 import com.goodwy.smsmessenger.extensions.config
@@ -48,10 +46,12 @@ class NotificationHelper(private val context: Context) {
         alertOnlyOnce: Boolean = false,
         subscriptionId: Int? = null
     ) {
-        val hasCustomNotifications = context.config.customNotifications.contains(threadId.toString())
-        val notificationChannelId = if (hasCustomNotifications) threadId.toString() else NOTIFICATION_CHANNEL
+        val hasCustomNotifications =
+            context.config.customNotifications.contains(threadId.toString())
+        val notificationChannelId =
+            if (hasCustomNotifications) threadId.toString() else NOTIFICATION_CHANNEL
         if (!hasCustomNotifications) {
-            maybeCreateChannel(notificationChannelId, context.getString(R.string.channel_received_sms))
+            createChannel(notificationChannelId, context.getString(R.string.channel_received_sms))
         }
 
         val notificationId = threadId.hashCode()
@@ -59,25 +59,40 @@ class NotificationHelper(private val context: Context) {
             putExtra(THREAD_ID, threadId)
         }
         val contentPendingIntent =
-            PendingIntent.getActivity(context, notificationId, contentIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+            PendingIntent.getActivity(
+                context,
+                notificationId,
+                contentIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            )
 
         val markAsReadIntent = Intent(context, MarkAsReadReceiver::class.java).apply {
             action = MARK_AS_READ
             putExtra(THREAD_ID, threadId)
         }
         val markAsReadPendingIntent =
-            PendingIntent.getBroadcast(context, notificationId, markAsReadIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+            PendingIntent.getBroadcast(
+                context,
+                notificationId,
+                markAsReadIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            )
 
         val deleteSmsIntent = Intent(context, DeleteSmsReceiver::class.java).apply {
             putExtra(THREAD_ID, threadId)
             putExtra(MESSAGE_ID, messageId)
         }
         val deleteSmsPendingIntent =
-            PendingIntent.getBroadcast(context, notificationId, deleteSmsIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+            PendingIntent.getBroadcast(
+                context,
+                notificationId,
+                deleteSmsIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            )
 
         var replyAction: NotificationCompat.Action? = null
         val isNoReplySms = isShortCodeWithLetters(address)
-        if (isNougatPlus() && !isNoReplySms) {
+        if (!isNoReplySms) {
             val replyLabel = context.getString(R.string.reply)
             val remoteInput = RemoteInput.Builder(REPLY)
                 .setLabel(replyLabel)
@@ -96,7 +111,11 @@ class NotificationHelper(private val context: Context) {
                     replyIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
                 )
-            replyAction = NotificationCompat.Action.Builder(R.drawable.ic_send_vector, replyLabel, replyPendingIntent)
+            replyAction = NotificationCompat.Action.Builder(
+                R.drawable.ic_send_vector,
+                replyLabel,
+                replyPendingIntent
+            )
                 .addRemoteInput(remoteInput)
                 .build()
         }
@@ -117,12 +136,14 @@ class NotificationHelper(private val context: Context) {
                     setContentTitle(sender)
                     setLargeIcon(largeIcon)
                     val summaryText = context.getString(R.string.new_message)
-                    setStyle(NotificationCompat.BigTextStyle().setSummaryText(summaryText).bigText(body))
+                    setStyle(
+                        NotificationCompat.BigTextStyle().setSummaryText(summaryText).bigText(body)
+                    )
                 }
             }
 
             color = context.getProperPrimaryColor()
-            setSmallIcon(com.goodwy.commons.R.drawable.ic_messages)
+            setSmallIcon(R.drawable.ic_messages)
             setContentIntent(contentPendingIntent)
             priority = NotificationCompat.PRIORITY_MAX
             setDefaults(Notification.DEFAULT_LIGHTS)
@@ -136,7 +157,11 @@ class NotificationHelper(private val context: Context) {
             builder.addAction(replyAction)
         }
 
-        builder.addAction(com.goodwy.commons.R.drawable.ic_check_vector, context.getString(R.string.mark_as_read), markAsReadPendingIntent)
+        builder.addAction(
+            com.goodwy.commons.R.drawable.ic_check_vector,
+            context.getString(R.string.mark_as_read),
+            markAsReadPendingIntent
+        )
             .setChannelId(notificationChannelId)
 
         val number = body.getNumbersFromText()
@@ -170,26 +195,33 @@ class NotificationHelper(private val context: Context) {
 
     @SuppressLint("NewApi")
     fun showSendingFailedNotification(recipientName: String, threadId: Long) {
-        //maybeCreateChannel(name = context.getString(R.string.message_not_sent_short))
-        val hasCustomNotifications = context.config.customNotifications.contains(threadId.toString())
-        val notificationChannelId = if (hasCustomNotifications) threadId.hashCode().toString() else NOTIFICATION_CHANNEL
+        val hasCustomNotifications =
+            context.config.customNotifications.contains(threadId.toString())
+        val notificationChannelId =
+            if (hasCustomNotifications) threadId.toString() else NOTIFICATION_CHANNEL
         if (!hasCustomNotifications) {
-            maybeCreateChannel(notificationChannelId, context.getString(R.string.message_not_sent_short))
+            createChannel(notificationChannelId, context.getString(R.string.message_not_sent_short))
         }
 
         val notificationId = generateRandomId().hashCode()
         val intent = Intent(context, ThreadActivity::class.java).apply {
             putExtra(THREAD_ID, threadId)
         }
-        val contentPendingIntent = PendingIntent.getActivity(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+        val contentPendingIntent = PendingIntent.getActivity(
+            context,
+            notificationId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+        )
 
-        val summaryText = String.format(context.getString(R.string.message_sending_error), recipientName)
+        val summaryText =
+            String.format(context.getString(R.string.message_sending_error), recipientName)
         val largeIcon = SimpleContactsHelper(context).getContactLetterIcon(recipientName)
         val builder = NotificationCompat.Builder(context, notificationChannelId)
             .setContentTitle(context.getString(R.string.message_not_sent_short))
             .setContentText(summaryText)
             .setColor(context.getProperPrimaryColor())
-            .setSmallIcon(com.goodwy.commons.R.drawable.ic_messages)
+            .setSmallIcon(R.drawable.ic_messages)
             .setLargeIcon(largeIcon)
             .setStyle(NotificationCompat.BigTextStyle().bigText(summaryText))
             .setContentIntent(contentPendingIntent)
@@ -202,26 +234,29 @@ class NotificationHelper(private val context: Context) {
         notificationManager.notify(notificationId, builder.build())
     }
 
-    private fun maybeCreateChannel(id: String, name: String) {
-        if (isOreoPlus()) {
-            val audioAttributes = AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setLegacyStreamType(AudioManager.STREAM_NOTIFICATION)
-                .build()
+    private fun createChannel(id: String, name: String) {
+        val audioAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .setLegacyStreamType(AudioManager.STREAM_NOTIFICATION)
+            .build()
 
-            val importance = IMPORTANCE_HIGH
-            NotificationChannel(id, name, importance).apply {
-                setBypassDnd(false)
-                enableLights(true)
-                setSound(soundUri, audioAttributes)
-                enableVibration(true)
-                notificationManager.createNotificationChannel(this)
-            }
+        val importance = IMPORTANCE_HIGH
+        NotificationChannel(id, name, importance).apply {
+            setBypassDnd(false)
+            enableLights(true)
+            setSound(soundUri, audioAttributes)
+            enableVibration(true)
+            notificationManager.createNotificationChannel(this)
         }
     }
 
-    private fun getMessagesStyle(address: String, body: String, notificationId: Int, name: String?): NotificationCompat.MessagingStyle {
+    private fun getMessagesStyle(
+        address: String,
+        body: String,
+        notificationId: Int,
+        name: String?
+    ): NotificationCompat.MessagingStyle {
         val sender = if (name != null) {
             Person.Builder()
                 .setName(name)
@@ -235,18 +270,20 @@ class NotificationHelper(private val context: Context) {
             getOldMessages(notificationId).forEach {
                 style.addMessage(it)
             }
-            val newMessage = NotificationCompat.MessagingStyle.Message(body, System.currentTimeMillis(), sender)
+            val newMessage =
+                NotificationCompat.MessagingStyle.Message(body, System.currentTimeMillis(), sender)
             style.addMessage(newMessage)
         }
     }
 
     private fun getOldMessages(notificationId: Int): List<NotificationCompat.MessagingStyle.Message> {
-        if (!isNougatPlus()) {
-            return emptyList()
-        }
-        val currentNotification = notificationManager.activeNotifications.find { it.id == notificationId }
+        val currentNotification =
+            notificationManager.activeNotifications.find { it.id == notificationId }
         return if (currentNotification != null) {
-            val activeStyle = NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(currentNotification.notification)
+            val activeStyle =
+                NotificationCompat.MessagingStyle.extractMessagingStyleFromNotification(
+                    currentNotification.notification
+                )
             activeStyle?.messages.orEmpty()
         } else {
             emptyList()

@@ -351,7 +351,7 @@ class ThreadAdapter(
         popupMenu.menu.add(1, 1, 1, com.goodwy.commons.R.string.delete).setIcon(com.goodwy.commons.R.drawable.ic_delete_outline)
         popupMenu.menu.add(1, 2, 2, com.goodwy.commons.R.string.share).setIcon(com.goodwy.commons.R.drawable.ic_ios_share)
         popupMenu.menu.add(1, 3, 3, com.goodwy.commons.R.string.properties).setIcon(com.goodwy.commons.R.drawable.ic_info_vector)
-        popupMenu.menu.add(1, 4, 4, R.string.forward_message).setIcon(com.goodwy.commons.R.drawable.ic_redo_vector)
+        popupMenu.menu.add(1, 4, 4, R.string.forward_message).setIcon(R.drawable.ic_redo_vector)
         popupMenu.menu.add(1, 5, 5, com.goodwy.commons.R.string.select_text).setIcon(R.drawable.ic_text_select)
         popupMenu.menu.add(1, 6, 6, com.goodwy.commons.R.string.copy).setIcon(com.goodwy.commons.R.drawable.ic_copy_vector)
         if (numbersList.isNotEmpty()) {
@@ -713,7 +713,11 @@ class ThreadAdapter(
     private fun setupDateTime(view: View, dateTime: ThreadDateTime) {
         ItemThreadDateTimeBinding.bind(view).apply {
             threadDateTime.apply {
-                text = dateTime.date.formatDateOrTime(context, hideTimeAtOtherDays = false, showYearEvenIfCurrent = false)
+                text = (dateTime.date * 1000L).formatDateOrTime(
+                    context = context,
+                    hideTimeOnOtherDays = false,
+                    showCurrentYear = false
+                )
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSizeSmall)
             }
             threadDateTime.setTextColor(textColor)

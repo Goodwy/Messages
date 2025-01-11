@@ -11,12 +11,13 @@ import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
 import android.provider.Telephony
 import android.text.TextUtils
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.res.ResourcesCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.goodwy.commons.dialogs.PermissionRequiredDialog
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.*
-import com.goodwy.commons.models.FAQItem
 import com.goodwy.commons.models.Release
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
@@ -45,7 +46,6 @@ class MainActivity : SimpleActivity() {
     private var storedFontSize = 0
     private var lastSearchedText = ""
     private var bus: EventBus? = null
-    private var wasProtectionHandled = false
 
     private val binding by viewBinding(ActivityMainBinding::inflate)
 
@@ -66,22 +66,15 @@ class MainActivity : SimpleActivity() {
         )
         if (config.changeColourTopBar) setupSearchMenuScrollListener(binding.conversationsList, binding.mainMenu)
 
-        if (savedInstanceState == null) {
-            checkAndDeleteOldRecycleBinMessages()
-            handleAppPasswordProtection {
-                wasProtectionHandled = it
-                if (it) {
-                    clearAllMessagesIfNeeded {
-                        loadMessages()
-                    }
-                } else {
-                    finish()
-                }
-            }
+        checkAndDeleteOldRecycleBinMessages()
+        clearAllMessagesIfNeeded {
+            loadMessages()
         }
+
         binding.mainMenu.updateTitle(getString(R.string.messages))
     }
 
+    @SuppressLint("UnsafeIntentLaunch")
     override fun onResume() {
         super.onResume()
 
@@ -140,6 +133,20 @@ class MainActivity : SimpleActivity() {
 //        search_bar.setCompoundDrawablesWithIntrinsicBounds(searchDrawable, null, null, null)
 //        search_bar.backgroundTintList = ColorStateList.valueOf(getBottomNavigationBackgroundColor())
 //        search_bar.setOnClickListener { launchSearch() }
+
+        binding.conversationsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                hideKeyboard()
+            }
+        })
+
+        binding.searchResultsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                hideKeyboard()
+            }
+        })
     }
 
     override fun onPause() {
@@ -157,30 +164,8 @@ class MainActivity : SimpleActivity() {
         if (binding.mainMenu.isSearchOpen) {
             binding.mainMenu.closeSearch()
         } else {
+            appLockManager.lock()
             super.onBackPressed()
-        }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(WAS_PROTECTION_HANDLED, wasProtectionHandled)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        wasProtectionHandled = savedInstanceState.getBoolean(WAS_PROTECTION_HANDLED, false)
-
-        if (!wasProtectionHandled) {
-            handleAppPasswordProtection {
-                wasProtectionHandled = it
-                if (it) {
-                    loadMessages()
-                } else {
-                    finish()
-                }
-            }
-        } else {
-            loadMessages()
         }
     }
 
@@ -312,7 +297,7 @@ class MainActivity : SimpleActivity() {
         checkWhatsNewDialog()
         storeStateVariables()
         getCachedConversations()
-
+        clearSystemDrafts()
         binding.noConversationsPlaceholder2.setOnClickListener {
             launchNewConversation()
         }
@@ -384,12 +369,13 @@ class MainActivity : SimpleActivity() {
 
             cachedConversations.forEach { cachedConv ->
                 val conv = conversations.find {
-                    it.threadId == cachedConv.threadId && !Conversation.areContentsTheSame(cachedConv, it)
+                    it.threadId == cachedConv.threadId && !Conversation.areContentsTheSame(
+                        old = cachedConv, new = it
+                    )
                 }
                 if (conv != null) {
-                    val lastModified = maxOf(cachedConv.date, conv.date)
-                    val conversation = conv.copy(date = lastModified)
-                    insertOrUpdateConversation(conversation)
+                    // FIXME: Scheduled message date is being reset here. Conversations with scheduled messages will have their original date.
+                    insertOrUpdateConversation(conv)
                 }
             }
 
@@ -400,7 +386,11 @@ class MainActivity : SimpleActivity() {
 
             if (config.appRunCount == 1) {
                 conversations.map { it.threadId }.forEach { threadId ->
-                    val messages = getMessages(threadId, getImageResolutions = false, includeScheduledMessages = false)
+                    val messages = getMessages(
+                        threadId = threadId,
+                        getImageResolutions = false,
+                        includeScheduledMessages = false
+                    )
                     messages.chunked(30).forEach { currentMessages ->
                         messagesDB.insertMessages(*currentMessages.toTypedArray())
                     }
@@ -428,7 +418,10 @@ class MainActivity : SimpleActivity() {
         return currAdapter as ConversationsAdapter
     }
 
-    private fun setupConversations(conversations: ArrayList<Conversation>, cached: Boolean = false) {
+    private fun setupConversations(
+        conversations: ArrayList<Conversation>,
+        cached: Boolean = false
+    ) {
         val sortedConversations = if (config.unreadAtTop) {
             conversations.sortedWith(
                 compareByDescending<Conversation> { config.pinnedConversations.contains(it.threadId.toString()) }
@@ -482,10 +475,13 @@ class MainActivity : SimpleActivity() {
     }
 
     private fun fadeOutSearch() {
-        binding.searchHolder.animate().alpha(0f).setDuration(SHORT_ANIMATION_DURATION).withEndAction {
-            binding.searchHolder.beGone()
-            searchTextChanged("", true)
-        }.start()
+        binding.searchHolder.animate()
+            .alpha(0f)
+            .setDuration(SHORT_ANIMATION_DURATION)
+            .withEndAction {
+                binding.searchHolder.beGone()
+                searchTextChanged("", true)
+            }.start()
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -498,7 +494,6 @@ class MainActivity : SimpleActivity() {
             val conversation = any as Conversation
             putExtra(THREAD_ID, conversation.threadId)
             putExtra(THREAD_TITLE, conversation.title)
-            putExtra(WAS_PROTECTION_HANDLED, wasProtectionHandled)
             startActivity(this)
         }
     }
@@ -512,24 +507,27 @@ class MainActivity : SimpleActivity() {
 
     @SuppressLint("NewApi")
     private fun checkShortcut() {
-        val appIconColor = config.appIconColor
-        if (isNougatMR1Plus() && config.lastHandledShortcutColor != appIconColor) {
-            val newConversation = getCreateNewContactShortcut(appIconColor)
+        val iconColor = getProperPrimaryColor()
+        if (isNougatMR1Plus() && config.lastHandledShortcutColor != iconColor) {
+            val newConversation = getCreateNewContactShortcut(iconColor)
 
             val manager = getSystemService(ShortcutManager::class.java)
             try {
                 manager.dynamicShortcuts = listOf(newConversation)
-                config.lastHandledShortcutColor = appIconColor
+                config.lastHandledShortcutColor = iconColor
             } catch (ignored: Exception) {
             }
         }
     }
 
     @SuppressLint("NewApi")
-    private fun getCreateNewContactShortcut(appIconColor: Int): ShortcutInfo {
+    private fun getCreateNewContactShortcut(iconColor: Int): ShortcutInfo {
         val newEvent = getString(R.string.new_conversation)
-        val drawable = ResourcesCompat.getDrawable(resources, com.goodwy.commons.R.drawable.shortcut_plus, theme)
-        (drawable as LayerDrawable).findDrawableByLayerId(com.goodwy.commons.R.id.shortcut_plus_background).applyColorFilter(appIconColor)
+        val drawable =
+            AppCompatResources.getDrawable(this, R.drawable.shortcut_plus)
+
+        (drawable as LayerDrawable).findDrawableByLayerId(R.id.shortcut_plus_background)
+            .applyColorFilter(iconColor)
         val bmp = drawable.convertToBitmap()
 
         val intent = Intent(this, NewConversationActivity::class.java)
@@ -565,11 +563,28 @@ class MainActivity : SimpleActivity() {
         binding.mainMenu.clearSearch()
     }
 
-    private fun showSearchResults(messages: List<Message>, conversations: List<Conversation>, searchedText: String) {
+    private fun showSearchResults(
+        messages: List<Message>,
+        conversations: List<Conversation>,
+        searchedText: String
+    ) {
         val searchResults = ArrayList<SearchResult>()
         conversations.forEach { conversation ->
-            val date = conversation.date.formatDateOrTime(this, hideTimeAtOtherDays = true, showYearEvenIfCurrent = true)
-            val searchResult = SearchResult(-1, conversation.title, conversation.phoneNumber, conversation.phoneNumber, date, conversation.threadId, conversation.photoUri)
+            val date = (conversation.date * 1000L).formatDateOrTime(
+                context = this,
+                hideTimeOnOtherDays = true,
+                showCurrentYear = true
+            )
+
+            val searchResult = SearchResult(
+                messageId = -1,
+                title = conversation.title,
+                phoneNumber = conversation.phoneNumber,
+                snippet = conversation.phoneNumber,
+                date = date,
+                threadId = conversation.threadId,
+                photoUri = conversation.photoUri
+            )
             searchResults.add(searchResult)
         }
 
@@ -580,9 +595,22 @@ class MainActivity : SimpleActivity() {
                 recipient = TextUtils.join(", ", participantNames)
             }
 
-            val date = message.date.formatDateOrTime(this, hideTimeAtOtherDays = true, showYearEvenIfCurrent = true)
             val phoneNumber = message.participants.firstOrNull()!!.phoneNumbers.firstOrNull()!!.normalizedNumber
-            val searchResult = SearchResult(message.id, recipient, phoneNumber, message.body, date, message.threadId, message.senderPhotoUri)
+            val date = (message.date * 1000L).formatDateOrTime(
+                context = this,
+                hideTimeOnOtherDays = true,
+                showCurrentYear = true
+            )
+
+            val searchResult = SearchResult(
+                messageId = message.id,
+                title = recipient,
+                phoneNumber = phoneNumber,
+                snippet = message.body,
+                date = date,
+                threadId = message.threadId,
+                photoUri = message.senderPhotoUri
+            )
             searchResults.add(searchResult)
         }
 
@@ -621,52 +649,7 @@ class MainActivity : SimpleActivity() {
 
     private fun launchSettings() {
         hideKeyboard()
-        //startActivity(Intent(applicationContext, SettingsActivity::class.java))
-        Intent(applicationContext, SettingsActivity::class.java).apply {
-            putExtra(WAS_PROTECTION_HANDLED, wasProtectionHandled)
-            startActivity(this)
-        }
-    }
-
-    private fun launchAbout() {
-        val licenses = LICENSE_EVENT_BUS or LICENSE_SMS_MMS or LICENSE_INDICATOR_FAST_SCROLL
-
-        val faqItems = arrayListOf(
-            FAQItem(R.string.faq_2_title, R.string.faq_2_text),
-            FAQItem(R.string.faq_3_title, R.string.faq_3_text),
-            FAQItem(com.goodwy.commons.R.string.faq_9_title_commons, com.goodwy.commons.R.string.faq_9_text_commons)
-        )
-
-        if (!resources.getBoolean(com.goodwy.commons.R.bool.hide_google_relations)) {
-            faqItems.add(FAQItem(com.goodwy.commons.R.string.faq_2_title_commons, com.goodwy.strings.R.string.faq_2_text_commons_g))
-            //faqItems.add(FAQItem(R.string.faq_6_title_commons, R.string.faq_6_text_commons))
-        }
-
-        val productIdX1 = BuildConfig.PRODUCT_ID_X1
-        val productIdX2 = BuildConfig.PRODUCT_ID_X2
-        val productIdX3 = BuildConfig.PRODUCT_ID_X3
-        val subscriptionIdX1 = BuildConfig.SUBSCRIPTION_ID_X1
-        val subscriptionIdX2 = BuildConfig.SUBSCRIPTION_ID_X2
-        val subscriptionIdX3 = BuildConfig.SUBSCRIPTION_ID_X3
-        val subscriptionYearIdX1 = BuildConfig.SUBSCRIPTION_YEAR_ID_X1
-        val subscriptionYearIdX2 = BuildConfig.SUBSCRIPTION_YEAR_ID_X2
-        val subscriptionYearIdX3 = BuildConfig.SUBSCRIPTION_YEAR_ID_X3
-
-        startAboutActivity(
-            appNameId = R.string.app_name_g,
-            licenseMask = licenses,
-            versionName = BuildConfig.VERSION_NAME,
-            faqItems = faqItems,
-            showFAQBeforeMail = true,
-            productIdList = arrayListOf(productIdX1, productIdX2, productIdX3),
-            productIdListRu = arrayListOf(productIdX1, productIdX2, productIdX3),
-            subscriptionIdList = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
-            subscriptionIdListRu = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
-            subscriptionYearIdList = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
-            subscriptionYearIdListRu = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
-            playStoreInstalled = isPlayStoreInstalled(),
-            ruStoreInstalled = isRuStoreInstalled()
-        )
+        startActivity(Intent(applicationContext, SettingsActivity::class.java))
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -689,6 +672,7 @@ class MainActivity : SimpleActivity() {
             add(Release(515, R.string.release_515))
             add(Release(520, R.string.release_520))
             add(Release(521, R.string.release_521))
+            add(Release(610, R.string.release_610))
             checkWhatsNew(this, BuildConfig.VERSION_CODE)
         }
     }

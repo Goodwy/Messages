@@ -6,4 +6,5 @@
     <string name="show_sim_selection_dialog">Паказаць дыялог выбару SIM-карты пры адпраўцы</string>
     <string name="voice_input">Галасавы ўвод</string>
     <string name="delete_after_copy">Выдаляць паведамленне пасля капіявання нумара з апавяшчэння</string>
+    <string name="sound_on_out_going_messages">Гук пры адпраўцы паведамлення</string>
 </resources>

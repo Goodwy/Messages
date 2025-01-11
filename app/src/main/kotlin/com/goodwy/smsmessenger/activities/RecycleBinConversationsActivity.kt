@@ -6,7 +6,6 @@ import android.os.Bundle
 import com.goodwy.commons.dialogs.ConfirmationDialog
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.NavigationIcon
-import com.goodwy.commons.helpers.WAS_PROTECTION_HANDLED
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.adapters.RecycleBinConversationsAdapter
@@ -40,7 +39,10 @@ class RecycleBinConversationsActivity : SimpleActivity() {
             useTransparentNavigation = true,
             useTopSearchMenu = false
         )
-        setupMaterialScrollListener(scrollingView = binding.conversationsList, toolbar = binding.recycleBinToolbar)
+        setupMaterialScrollListener(
+            scrollingView = binding.conversationsList,
+            toolbar = binding.recycleBinToolbar
+        )
 
         loadRecycleBinConversations()
     }
@@ -82,7 +84,8 @@ class RecycleBinConversationsActivity : SimpleActivity() {
     private fun loadRecycleBinConversations() {
         ensureBackgroundThread {
             val conversations = try {
-                conversationsDB.getAllWithMessagesInRecycleBin().toMutableList() as ArrayList<Conversation>
+                conversationsDB.getAllWithMessagesInRecycleBin()
+                    .toMutableList() as ArrayList<Conversation>
             } catch (e: Exception) {
                 ArrayList()
             }
@@ -166,7 +169,6 @@ class RecycleBinConversationsActivity : SimpleActivity() {
             val conversation = any as Conversation
             putExtra(THREAD_ID, conversation.threadId)
             putExtra(THREAD_TITLE, conversation.title)
-            putExtra(WAS_PROTECTION_HANDLED, true)
             putExtra(IS_RECYCLE_BIN, true)
             startActivity(this)
         }

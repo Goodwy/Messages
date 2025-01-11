@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
 import android.widget.RelativeLayout
+import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.reddit.indicatorfastscroll.FastScrollItemIndicator
 import com.goodwy.commons.dialogs.RadioGroupDialog
@@ -63,6 +64,13 @@ class NewConversationActivity : SimpleActivity() {
         binding.noContactsPlaceholder2.setTextColor(getProperPrimaryColor)
         binding.noContactsPlaceholder2.underlineText()
         binding.suggestionsLabel.setTextColor(getProperPrimaryColor)
+
+        binding.contactsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                hideKeyboard()
+            }
+        })
     }
 
     private fun initContacts() {
@@ -71,7 +79,7 @@ class NewConversationActivity : SimpleActivity() {
         }
 
         fetchContacts()
-        if (baseConfig.isUsingSystemTheme) {
+        if (isDynamicTheme()) {
             (binding.newConversationAddress.layoutParams as RelativeLayout.LayoutParams).apply {
                 topMargin=12
             }
@@ -127,9 +135,14 @@ class NewConversationActivity : SimpleActivity() {
     }
 
     private fun isThirdPartyIntent(): Boolean {
-        if ((intent.action == Intent.ACTION_SENDTO || intent.action == Intent.ACTION_SEND || intent.action == Intent.ACTION_VIEW) && intent.dataString != null) {
-            val number = intent.dataString!!.removePrefix("sms:").removePrefix("smsto:").removePrefix("mms").removePrefix("mmsto:").replace("+", "%2b").trim()
-            launchThreadActivity(URLDecoder.decode(number), "")
+        val result = SmsIntentParser.parse(intent)
+        if (result != null) {
+            val (body, recipients) = result
+            launchThreadActivity(
+                phoneNumber = URLDecoder.decode(recipients),
+                name = "",
+                body = body
+            )
             finish()
             return true
         }
@@ -157,7 +170,11 @@ class NewConversationActivity : SimpleActivity() {
         val hasContacts = contacts.isNotEmpty()
         binding.contactsList.beVisibleIf(hasContacts)
         binding.noContactsPlaceholder.beVisibleIf(!hasContacts)
-        binding.noContactsPlaceholder2.beVisibleIf(!hasContacts && !hasPermission(PERMISSION_READ_CONTACTS))
+        binding.noContactsPlaceholder2.beVisibleIf(
+            !hasContacts && !hasPermission(
+                PERMISSION_READ_CONTACTS
+            )
+        )
 
         if (!hasContacts) {
             val placeholderText = if (hasPermission(PERMISSION_READ_CONTACTS)) {
@@ -183,7 +200,13 @@ class NewConversationActivity : SimpleActivity() {
 //                        val items = ArrayList<RadioItem>()
 //                        phoneNumbers.forEachIndexed { index, phoneNumber ->
 //                            val type = getPhoneNumberTypeText(phoneNumber.type, phoneNumber.label)
-//                            items.add(RadioItem(index, "${phoneNumber.normalizedNumber} ($type)", phoneNumber.normalizedNumber))
+//                            items.add(
+//                                RadioItem(
+//                                    index,
+//                                    "${phoneNumber.normalizedNumber} ($type)",
+//                                    phoneNumber.normalizedNumber
+//                                )
+//                            )
 //                        }
 //
 //                        RadioGroupDialog(this, items) {
@@ -194,7 +217,12 @@ class NewConversationActivity : SimpleActivity() {
                     phoneNumbers.forEachIndexed { index, phoneNumber ->
                         val type = getPhoneNumberTypeText(phoneNumber.type, phoneNumber.label)
                         val favorite = if (phoneNumber.isPrimary) " ★" else ""
-                        items.add(RadioItem(index, "${phoneNumber.value} ($type) $favorite", phoneNumber.normalizedNumber))
+                        items.add(
+                            RadioItem(
+                                index,
+                                "${phoneNumber.value} ($type) $favorite",
+                                phoneNumber.normalizedNumber)
+                        )
                     }
 
                     RadioGroupDialog(this, items) {
@@ -237,10 +265,17 @@ class NewConversationActivity : SimpleActivity() {
                             suggestedContactName.setTextColor(getProperTextColor())
 
                             if (!isDestroyed) {
-                                SimpleContactsHelper(this@NewConversationActivity).loadContactImage(contact.photoUri, suggestedContactImage, contact.name)
+                                SimpleContactsHelper(this@NewConversationActivity).loadContactImage(
+                                    contact.photoUri,
+                                    suggestedContactImage,
+                                    contact.name
+                                )
                                 binding.suggestionsHolder.addView(root)
                                 root.setOnClickListener {
-                                    launchThreadActivity(contact.phoneNumbers.first().normalizedNumber, contact.name)
+                                    launchThreadActivity(
+                                        contact.phoneNumbers.first().normalizedNumber,
+                                        contact.name
+                                    )
                                 }
                             }
                         }
@@ -273,7 +308,9 @@ class NewConversationActivity : SimpleActivity() {
                 val name = contacts[position].name
                 val emoji = name.take(2)
                 val character = if (emoji.isEmoji()) emoji else if (name.isNotEmpty()) name.substring(0, 1) else ""
-                FastScrollItemIndicator.Text(character.uppercase(Locale.getDefault()).normalizeString())
+                FastScrollItemIndicator.Text(
+                    character.uppercase(Locale.getDefault()).normalizeString()
+                )
             } catch (e: Exception) {
                 FastScrollItemIndicator.Text("")
             }
@@ -288,7 +325,7 @@ class NewConversationActivity : SimpleActivity() {
         }
     }
 
-    private fun launchThreadActivity(phoneNumber: String, name: String) {
+    private fun launchThreadActivity(phoneNumber: String, name: String, body: String = "") {
         hideKeyboard()
         val text = intent.getStringExtra(Intent.EXTRA_TEXT) ?: intent.getStringExtra("sms_body") ?: ""
         val numbers = phoneNumber.split(";").toSet()
@@ -296,13 +333,16 @@ class NewConversationActivity : SimpleActivity() {
         Intent(this, ThreadActivity::class.java).apply {
             putExtra(THREAD_ID, getThreadId(numbers))
             putExtra(THREAD_TITLE, name)
-            putExtra(THREAD_TEXT, text)
+            putExtra(THREAD_TEXT, body.ifEmpty { intent.getStringExtra(Intent.EXTRA_TEXT) })
             putExtra(THREAD_NUMBER, number)
 
             if (intent.action == Intent.ACTION_SEND && intent.extras?.containsKey(Intent.EXTRA_STREAM) == true) {
                 val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
                 putExtra(THREAD_ATTACHMENT_URI, uri?.toString())
-            } else if (intent.action == Intent.ACTION_SEND_MULTIPLE && intent.extras?.containsKey(Intent.EXTRA_STREAM) == true) {
+            } else if (intent.action == Intent.ACTION_SEND_MULTIPLE && intent.extras?.containsKey(
+                    Intent.EXTRA_STREAM
+                ) == true
+            ) {
                 val uris = intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
                 putExtra(THREAD_ATTACHMENT_URIS, uris)
             }

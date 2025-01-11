@@ -86,4 +86,7 @@ interface MessagesDao {
 
     @Query("DELETE FROM messages")
     fun deleteAll()
+
+    @Query("SELECT COUNT(*) FROM messages WHERE thread_id = :threadId and read = 0")
+    fun getThreadUnreadMessages(threadId: Long): Int
 }

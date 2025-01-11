@@ -3,10 +3,10 @@ package com.goodwy.smsmessenger.adapters
 import android.content.Intent
 import android.text.TextUtils
 import android.view.Menu
-import com.goodwy.commons.dialogs.CallConfirmationDialog
 import com.goodwy.commons.dialogs.ConfirmationDialog
 import com.goodwy.commons.extensions.*
-import com.goodwy.commons.helpers.*
+import com.goodwy.commons.helpers.KEY_PHONE
+import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.views.MyRecyclerView
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
@@ -18,7 +18,10 @@ import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import com.goodwy.smsmessenger.models.Conversation
 
 class ConversationsAdapter(
-    activity: SimpleActivity, recyclerView: MyRecyclerView, onRefresh: () -> Unit, itemClick: (Any) -> Unit
+    activity: SimpleActivity,
+    recyclerView: MyRecyclerView,
+    onRefresh: () -> Unit,
+    itemClick: (Any) -> Unit
 ) : BaseConversationsAdapter(activity, recyclerView, onRefresh, itemClick) {
     override fun getActionMenuId() = R.menu.cab_conversations
 
@@ -31,9 +34,9 @@ class ConversationsAdapter(
 
         menu.apply {
             //findItem(R.id.cab_block_number).title = activity.addLockedLabelIfNeeded(com.goodwy.commons.R.string.block_number)
-            findItem(R.id.cab_block_number).isVisible = isNougatPlus()
             findItem(R.id.cab_add_number_to_contact).isVisible = isSingleSelection && !isGroupConversation
-            findItem(R.id.cab_dial_number).isVisible = isSingleSelection && !isGroupConversation && !isShortCodeWithLetters(selectedConversation.phoneNumber)
+            findItem(R.id.cab_dial_number).isVisible =
+                isSingleSelection && !isGroupConversation && !isShortCodeWithLetters(selectedConversation.phoneNumber)
             findItem(R.id.cab_copy_number).isVisible = isSingleSelection && !isGroupConversation
             findItem(R.id.cab_rename_conversation).isVisible = isSingleSelection && isGroupConversation
             findItem(R.id.cab_mark_as_read).isVisible = selectedItems.any { !it.read }
@@ -75,7 +78,10 @@ class ConversationsAdapter(
     private fun askConfirmBlock() {
         val numbers = getSelectedItems().distinctBy { it.phoneNumber }.map { it.phoneNumber }
         val numbersString = TextUtils.join(", ", numbers)
-        val question = String.format(resources.getString(com.goodwy.commons.R.string.block_confirmation), numbersString)
+        val question = String.format(
+            resources.getString(com.goodwy.commons.R.string.block_confirmation),
+            numbersString
+        )
 
         ConfirmationDialog(activity, question) {
             blockNumbers()
@@ -148,7 +154,8 @@ class ConversationsAdapter(
             return
         }
 
-        val conversationsToRemove = currentList.filter { selectedKeys.contains(it.hashCode()) } as ArrayList<Conversation>
+        val conversationsToRemove =
+            currentList.filter { selectedKeys.contains(it.hashCode()) } as ArrayList<Conversation>
         conversationsToRemove.forEach {
             activity.updateConversationArchivedStatus(it.threadId, true)
             activity.notificationManager.cancel(it.threadId.hashCode())
@@ -178,7 +185,8 @@ class ConversationsAdapter(
             return
         }
 
-        val conversationsToRemove = currentList.filter { selectedKeys.contains(it.hashCode()) } as ArrayList<Conversation>
+        val conversationsToRemove =
+            currentList.filter { selectedKeys.contains(it.hashCode()) } as ArrayList<Conversation>
         conversationsToRemove.forEach {
             activity.deleteConversation(it.threadId)
             activity.notificationManager.cancel(it.threadId.hashCode())
@@ -223,7 +231,8 @@ class ConversationsAdapter(
             return
         }
 
-        val conversationsMarkedAsRead = currentList.filter { selectedKeys.contains(it.hashCode()) } as ArrayList<Conversation>
+        val conversationsMarkedAsRead =
+            currentList.filter { selectedKeys.contains(it.hashCode()) } as ArrayList<Conversation>
         ensureBackgroundThread {
             conversationsMarkedAsRead.filter { conversation -> !conversation.read }.forEach {
                 activity.conversationsDB.markRead(it.threadId)
@@ -239,7 +248,8 @@ class ConversationsAdapter(
             return
         }
 
-        val conversationsMarkedAsUnread = currentList.filter { selectedKeys.contains(it.hashCode()) } as ArrayList<Conversation>
+        val conversationsMarkedAsUnread =
+            currentList.filter { selectedKeys.contains(it.hashCode()) } as ArrayList<Conversation>
         ensureBackgroundThread {
             conversationsMarkedAsUnread.filter { conversation -> conversation.read }.forEach {
                 activity.conversationsDB.markUnread(it.threadId)
@@ -281,8 +291,10 @@ class ConversationsAdapter(
     private fun checkPinBtnVisibility(menu: Menu) {
         val pinnedConversations = activity.config.pinnedConversations
         val selectedConversations = getSelectedItems()
-        menu.findItem(R.id.cab_pin_conversation).isVisible = selectedConversations.any { !pinnedConversations.contains(it.threadId.toString()) }
-        menu.findItem(R.id.cab_unpin_conversation).isVisible = selectedConversations.any { pinnedConversations.contains(it.threadId.toString()) }
+        menu.findItem(R.id.cab_pin_conversation).isVisible =
+            selectedConversations.any { !pinnedConversations.contains(it.threadId.toString()) }
+        menu.findItem(R.id.cab_unpin_conversation).isVisible =
+            selectedConversations.any { pinnedConversations.contains(it.threadId.toString()) }
     }
 
     private fun refreshConversations() {
@@ -408,7 +420,6 @@ class ConversationsAdapter(
     }
 
     private fun swipedBlock(conversation: Conversation) {
-        if (!isNougatPlus()) return
         selectedKeys.add(conversation.hashCode())
         askConfirmBlock()
     }
