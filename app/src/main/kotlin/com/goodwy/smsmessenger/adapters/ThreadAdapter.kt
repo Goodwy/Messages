@@ -495,11 +495,9 @@ class ThreadAdapter(
                 background.applyColorFilter(backgroundReceived)
             }
             threadMessageBody.apply {
-                if (!activity.config.bubbleInContactColor) {
-                    val contrastColorReceived = backgroundReceived.getContrastColor()
-                    setTextColor(contrastColorReceived)
-                    setLinkTextColor(contrastColorReceived)
-                }
+                val contrastColorReceived = backgroundReceived.getContrastColor()
+                setTextColor(contrastColorReceived)
+                setLinkTextColor(contrastColorReceived)
             }
 
             if (isGroupChat && message.body.isNotEmpty() && message.isReceivedMessage()) {
@@ -581,12 +579,9 @@ class ThreadAdapter(
                 background.applyColorFilter(backgroundReceived)
             }
             threadMessageBody.apply {
-
-                if (!activity.config.bubbleInContactColor) {
-                    val contrastColorReceived = backgroundReceived.getContrastColor()
-                    setTextColor(contrastColorReceived)
-                    setLinkTextColor(contrastColorReceived)
-                }
+                val contrastColorReceived = backgroundReceived.getContrastColor()
+                setTextColor(contrastColorReceived)
+                setLinkTextColor(contrastColorReceived)
 
                 if (message.isScheduled) {
                     typeface = Typeface.create(Typeface.DEFAULT, Typeface.ITALIC)

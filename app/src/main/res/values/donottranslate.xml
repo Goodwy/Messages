@@ -13,6 +13,9 @@
     <string name="message_details_sim">SIM</string>
 
     <!-- Release notes -->
+    <string name="release_611">
+        Fixed bugs, improved stability
+    </string>
     <string name="release_610">
         Changed theme logic\n
         Added ‘App icon color’ option\n
