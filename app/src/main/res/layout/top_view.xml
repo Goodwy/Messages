@@ -27,7 +27,6 @@
         android:paddingStart="6dp"
         android:paddingEnd="6dp"
         android:maxLines="2"
-        android:text="Name"
         android:gravity="start"
         android:textSize="@dimen/big_text_size"
         app:layout_goneMarginStart="62dp"

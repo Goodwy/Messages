@@ -14,8 +14,10 @@ import com.goodwy.smsmessenger.activities.SimpleActivity
 import com.goodwy.smsmessenger.dialogs.RenameConversationDialog
 import com.goodwy.smsmessenger.extensions.*
 import com.goodwy.smsmessenger.helpers.*
+import com.goodwy.smsmessenger.messaging.cancelScheduleSendPendingIntent
 import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import com.goodwy.smsmessenger.models.Conversation
+import com.goodwy.smsmessenger.models.Message
 
 class ConversationsAdapter(
     activity: SimpleActivity,
@@ -125,7 +127,11 @@ class ConversationsAdapter(
         val itemsCnt = selectedKeys.size
         val items = resources.getQuantityString(R.plurals.delete_conversations, itemsCnt, itemsCnt)
 
-        val baseString = com.goodwy.commons.R.string.deletion_confirmation
+        val baseString = if (activity.config.useRecycleBin) {
+            com.goodwy.commons.R.string.move_to_recycle_bin_confirmation
+        } else {
+            com.goodwy.commons.R.string.deletion_confirmation
+        }
         val question = String.format(resources.getString(baseString), items)
 
         ConfirmationDialog(activity, question) {
@@ -187,9 +193,16 @@ class ConversationsAdapter(
 
         val conversationsToRemove =
             currentList.filter { selectedKeys.contains(it.hashCode()) } as ArrayList<Conversation>
-        conversationsToRemove.forEach {
-            activity.deleteConversation(it.threadId)
-            activity.notificationManager.cancel(it.threadId.hashCode())
+        if (activity.config.useRecycleBin) {
+            conversationsToRemove.forEach {
+                deleteMessages(it, true)
+                activity.notificationManager.cancel(it.threadId.hashCode())
+            }
+        } else {
+            conversationsToRemove.forEach {
+                activity.deleteConversation(it.threadId)
+                activity.notificationManager.cancel(it.threadId.hashCode())
+            }
         }
 
         val newList = try {
@@ -372,7 +385,11 @@ class ConversationsAdapter(
             }
         } else {
             val item = conversation.title
-            val baseString = com.goodwy.commons.R.string.deletion_confirmation
+            val baseString = if (activity.config.useRecycleBin) {
+                com.goodwy.commons.R.string.move_to_recycle_bin_confirmation
+            } else {
+                com.goodwy.commons.R.string.deletion_confirmation
+            }
             val question = String.format(resources.getString(baseString), item)
 
             ConfirmationDialog(activity, question) {
@@ -386,9 +403,16 @@ class ConversationsAdapter(
     private fun swipedDeleteConversations(conversation: Conversation) {
         val conversationsToRemove = ArrayList<Conversation>()
         conversationsToRemove.add(conversation)
-        conversationsToRemove.forEach {
-            activity.deleteConversation(it.threadId)
-            activity.notificationManager.cancel(it.threadId.hashCode())
+        if (activity.config.useRecycleBin) {
+            conversationsToRemove.forEach {
+                deleteMessages(it, true)
+                activity.notificationManager.cancel(it.threadId.hashCode())
+            }
+        } else {
+            conversationsToRemove.forEach {
+                activity.deleteConversation(it.threadId)
+                activity.notificationManager.cancel(it.threadId.hashCode())
+            }
         }
 
         val newList = try {
@@ -402,6 +426,45 @@ class ConversationsAdapter(
             if (newList.isEmpty()) {
                 refreshMessages()
             }
+        }
+    }
+
+    private fun deleteMessages(
+        conversation: Conversation,
+        toRecycleBin: Boolean,
+    ) {
+        val threadId = conversation.threadId
+        val messagesToRemove = try {
+            if (activity.config.useRecycleBin) {
+                activity.messagesDB.getNonRecycledThreadMessages(threadId)
+            } else {
+                activity.messagesDB.getThreadMessages(threadId)
+            }.toMutableList() as ArrayList<Message>
+        } catch (e: Exception) {
+            ArrayList()
+        }
+
+        messagesToRemove.forEach { message ->
+            val messageId = message.id
+            if (message.isScheduled) {
+                activity.deleteScheduledMessage(messageId)
+                activity.cancelScheduleSendPendingIntent(messageId)
+            } else {
+                if (toRecycleBin) {
+                    activity.moveMessageToRecycleBin(messageId)
+                } else {
+                    activity.deleteMessage(messageId, message.isMMS)
+                }
+            }
+        }
+        activity.updateLastConversationMessage(threadId)
+
+        // move all scheduled messages to a temporary thread when there are no real messages left
+        if (messagesToRemove.isNotEmpty() && messagesToRemove.all { it.isScheduled }) {
+            val scheduledMessage = messagesToRemove.last()
+            val fakeThreadId = generateRandomId()
+            activity.createTemporaryThread(scheduledMessage, fakeThreadId, conversation)
+            activity.updateScheduledMessagesThreadId(messagesToRemove, fakeThreadId)
         }
     }
 

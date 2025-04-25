@@ -19,7 +19,8 @@ data class Conversation(
     @ColumnInfo(name = "uses_custom_title") var usesCustomTitle: Boolean = false,
     @ColumnInfo(name = "archived") var isArchived: Boolean = false,
     @ColumnInfo(name = "deleted") var isDeleted: Boolean = false, //An indication that all messages from this conversation are in the trash
-    @ColumnInfo(name = "unread_count") var unreadCount: Int = 0
+    @ColumnInfo(name = "unread_count") var unreadCount: Int = 0,
+    @ColumnInfo(name = "is_company") var isCompany: Boolean = false,
 ) {
 
     companion object {

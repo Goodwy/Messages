@@ -1,7 +1,15 @@
 package com.goodwy.smsmessenger.helpers
 
 import android.app.Activity
+import android.graphics.drawable.LayerDrawable
 import android.net.Uri
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toDrawable
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.bumptech.glide.request.RequestOptions
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.ensureBackgroundThread
@@ -11,6 +19,9 @@ import com.goodwy.smsmessenger.databinding.ItemAttachmentDocumentPreviewBinding
 import com.goodwy.smsmessenger.databinding.ItemAttachmentVcardBinding
 import com.goodwy.smsmessenger.databinding.ItemAttachmentVcardPreviewBinding
 import com.goodwy.smsmessenger.extensions.*
+import com.goodwy.smsmessenger.models.VCardPropertyWrapper
+import ezvcard.property.Organization
+import kotlin.math.abs
 
 fun ItemAttachmentDocumentPreviewBinding.setupDocumentPreview(
     uri: Uri,
@@ -128,18 +139,45 @@ fun ItemAttachmentVcardBinding.setupVCardPreview(
                 return@runOnUiThread
             }
 
+            val photo = vCards.firstOrNull()?.photos?.firstOrNull()
             val title = vCards.firstOrNull()?.parseNameFromVCard()
-            val imageIcon = if (title != null) {
-                SimpleContactsHelper(activity).getContactLetterIcon(title)
+            val isCompany = vCards.firstOrNull()?.isCompanyVCard(title ?: "") ?: false
+
+            val imageIcon = if (isCompany) {
+                val drawable = ResourcesCompat.getDrawable(
+                    activity.resources,
+                    R.drawable.placeholder_company,
+                    activity.theme
+                )
+                if (context.baseConfig.useColoredContacts) {
+                    val letterBackgroundColors = activity.getLetterBackgroundColors()
+                    val color = letterBackgroundColors[abs(title.hashCode()) % letterBackgroundColors.size].toInt()
+                    (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
+                }
+                drawable
+            } else if (title != null) {
+                SimpleContactsHelper(activity).getContactLetterIcon(title).toDrawable(activity.resources)
             } else {
                 null
             }
+
+            val roundingRadius = activity.resources.getDimensionPixelSize(com.goodwy.commons.R.dimen.big_margin)
+            val transformation = RoundedCorners(roundingRadius)
+            val options = RequestOptions()
+                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                .placeholder(imageIcon)
+                .transform(transformation)
+            Glide.with(activity)
+                .load(photo?.data ?: photo?.url)
+                .apply(options)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(vcardPhoto)
 
             arrayOf(vcardPhoto, vcardTitle).forEach {
                 it.beVisible()
             }
 
-            vcardPhoto.setImageBitmap(imageIcon)
+//            vcardPhoto.setImageBitmap(imageIcon)
             vcardTitle.text = title
 
             if (vCards.size > 1) {

@@ -55,6 +55,8 @@ import com.goodwy.smsmessenger.models.RecycleBinMessage
 import org.xmlpull.v1.XmlPullParserException
 import me.leolin.shortcutbadger.ShortcutBadger
 import java.io.FileNotFoundException
+import androidx.core.net.toUri
+import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 
 val Context.config: Config get() = Config.newInstance(applicationContext)
 
@@ -104,6 +106,15 @@ fun Context.getMessages(
     val blockStatus = HashMap<String, Boolean>()
     val blockedNumbers = getBlockedNumbers()
     var messages = ArrayList<Message>()
+
+    val privateCursor = getMyContactsCursor(false, true)
+    var contacts = ArrayList<SimpleContact>()
+    ensureBackgroundThread {
+        SimpleContactsHelper(this).getAvailableContacts(false) {
+            val privateContacts = MyContactsContentProvider.getSimpleContacts(this, privateCursor)
+            contacts = ArrayList(it + privateContacts)
+        }
+    }
     queryCursor(uri, projection, selection, selectionArgs, sortOrder, showErrors = true) { cursor ->
         val senderNumber = cursor.getStringValue(Sms.ADDRESS) ?: return@queryCursor
 
@@ -131,17 +142,48 @@ fun Context.getMessages(
         val subscriptionId = cursor.getIntValue(Sms.SUBSCRIPTION_ID)
         val status = cursor.getIntValue(Sms.STATUS)
         val participants = senderNumber.split(ADDRESS_SEPARATOR).map { number ->
-            val phoneNumber = PhoneNumber(number, 0, "", number)
-            val participantPhoto = getNameAndPhotoFromPhoneNumber(number)
-            SimpleContact(
-                rawId = 0,
-                contactId = 0,
-                name = participantPhoto.name,
-                photoUri = photoUri,
-                phoneNumbers = arrayListOf(phoneNumber),
-                birthdays = ArrayList(),
-                anniversaries = ArrayList()
-            )
+            if (contacts.isNotEmpty()) {
+                val contact = contacts.firstOrNull { it.doesHavePhoneNumber(number) }
+                if (contact != null) {
+                    val phoneNumber = PhoneNumber(number, 0, "", number)
+                    SimpleContact(
+                        rawId = 0,
+                        contactId = 0,
+                        name = contact.name,
+                        photoUri = contact.photoUri,
+                        phoneNumbers = arrayListOf(phoneNumber),
+                        birthdays = ArrayList(),
+                        anniversaries = ArrayList(),
+                        company = contact.company,
+                        jobPosition = contact.jobPosition
+                    )
+                }
+                else {
+                    val phoneNumber = PhoneNumber(number, 0, "", number)
+                    val participantPhoto = getNameAndPhotoFromPhoneNumber(number)
+                    SimpleContact(
+                        rawId = 0,
+                        contactId = 0,
+                        name = participantPhoto.name,
+                        photoUri = photoUri,
+                        phoneNumbers = arrayListOf(phoneNumber),
+                        birthdays = ArrayList(),
+                        anniversaries = ArrayList()
+                    )
+                }
+            } else {
+                val phoneNumber = PhoneNumber(number, 0, "", number)
+                val participantPhoto = getNameAndPhotoFromPhoneNumber(number)
+                SimpleContact(
+                    rawId = 0,
+                    contactId = 0,
+                    name = participantPhoto.name,
+                    photoUri = photoUri,
+                    phoneNumbers = arrayListOf(phoneNumber),
+                    birthdays = ArrayList(),
+                    anniversaries = ArrayList()
+                )
+            }
         }
         val isMMS = false
         val message =
@@ -278,7 +320,7 @@ fun Context.getMMS(
 }
 
 fun Context.getMMSSender(msgId: Long): String {
-    val uri = Uri.parse("${Mms.CONTENT_URI}/$msgId/addr")
+    val uri = "${Mms.CONTENT_URI}/$msgId/addr".toUri()
     val projection = arrayOf(
         Mms.Addr.ADDRESS
     )
@@ -302,7 +344,7 @@ fun Context.getConversations(
     val archiveAvailable = config.isArchiveAvailable
     val useRecycleBin = config.useRecycleBin
 
-    val uri = Uri.parse("${Threads.CONTENT_URI}?simple=true")
+    val uri = "${Threads.CONTENT_URI}?simple=true".toUri()
     val projection = mutableListOf(
         Threads._ID,
         Threads.SNIPPET,
@@ -328,71 +370,85 @@ fun Context.getConversations(
     val simpleContactHelper = SimpleContactsHelper(this)
     val blockedNumbers = getBlockedNumbers()
     try {
-        queryCursorUnsafe(
-            uri,
-            projection.toTypedArray(),
-            selection,
-            selectionArgs,
-            sortOrder
-        ) { cursor ->
-            val id = cursor.getLongValue(Threads._ID)
+        SimpleContactsHelper(this).getAvailableContacts(false) { contacts ->
+            queryCursorUnsafe(
+                uri,
+                projection.toTypedArray(),
+                selection,
+                selectionArgs,
+                sortOrder
+            ) { cursor ->
+                val id = cursor.getLongValue(Threads._ID)
 //            var snippet = cursor.getStringValue(Threads.SNIPPET) ?: ""
 //            if (snippet.isEmpty()) {
 //                snippet = getThreadSnippet(id)
 //            }
-            val snippet = getThreadSnippet(id)
+                val snippet = getThreadSnippet(id)
 
-            var date = cursor.getLongValue(Threads.DATE)
-            if (date.toString().length > 10) {
-                date /= 1000
+                var date = cursor.getLongValue(Threads.DATE)
+                if (date.toString().length > 10) {
+                    date /= 1000
+                }
+
+                // drafts are stored locally they take priority over the original date
+                val draft = draftsDB.getDraftById(id)
+                if (draft != null) {
+                    date = draft.date / 1000
+                }
+
+                val rawIds = cursor.getStringValue(Threads.RECIPIENT_IDS)
+                val recipientIds =
+                    rawIds.split(" ").filter { it.areDigitsOnly() }.map { it.toInt() }.toMutableList()
+                val phoneNumbers = getThreadPhoneNumbers(recipientIds)
+                if (phoneNumbers.isEmpty() || phoneNumbers.any {
+                        isNumberBlocked(
+                            it,
+                            blockedNumbers
+                        )
+                    }) {
+                    return@queryCursorUnsafe
+                }
+
+                val names = getThreadContactNames(phoneNumbers, privateContacts)
+                val title = TextUtils.join(", ", names.toTypedArray())
+                val photoUri =
+                    if (phoneNumbers.size == 1) simpleContactHelper.getPhotoUriFromPhoneNumber(
+                        phoneNumbers.first()
+                    ) else ""
+                val isGroupConversation = phoneNumbers.size > 1
+                val read = cursor.getIntValue(Threads.READ) == 1
+                val archived =
+                    if (archiveAvailable) cursor.getIntValue(Threads.ARCHIVED) == 1 else false
+                val deleted =
+                    if (useRecycleBin) messagesDB.getNonRecycledThreadMessages(id).isEmpty() else false
+                val unreadCount = messagesDB.getThreadUnreadMessages(id)
+
+                var contact =
+                    if (phoneNumbers.size == 1) contacts.firstOrNull { it.doesHavePhoneNumber(phoneNumbers.first()) }
+                else null
+                if (contact == null && phoneNumbers.size == 1) {
+                    contact = privateContacts.firstOrNull { it.doesHavePhoneNumber(phoneNumbers.first()) }
+                }
+                val isABusinessContact =
+                    if (phoneNumbers.size == 1) contact?.isABusinessContact() ?: isShortCodeWithLetters(phoneNumbers.first())
+                    else false
+
+                val conversation = Conversation(
+                    threadId = id,
+                    snippet = snippet,
+                    date = date.toInt(),
+                    read = read,
+                    title = title,
+                    photoUri = photoUri,
+                    isGroupConversation = isGroupConversation,
+                    phoneNumber = phoneNumbers.first(),
+                    isArchived = archived,
+                    isDeleted = deleted,
+                    unreadCount = unreadCount,
+                    isCompany = isABusinessContact
+                )
+                conversations.add(conversation)
             }
-
-            // drafts are stored locally they take priority over the original date
-            val draft = draftsDB.getDraftById(id)
-            if (draft != null) {
-                date = draft.date / 1000
-            }
-
-            val rawIds = cursor.getStringValue(Threads.RECIPIENT_IDS)
-            val recipientIds =
-                rawIds.split(" ").filter { it.areDigitsOnly() }.map { it.toInt() }.toMutableList()
-            val phoneNumbers = getThreadPhoneNumbers(recipientIds)
-            if (phoneNumbers.isEmpty() || phoneNumbers.any {
-                    isNumberBlocked(
-                        it,
-                        blockedNumbers
-                    )
-                }) {
-                return@queryCursorUnsafe
-            }
-
-            val names = getThreadContactNames(phoneNumbers, privateContacts)
-            val title = TextUtils.join(", ", names.toTypedArray())
-            val photoUri =
-                if (phoneNumbers.size == 1) simpleContactHelper.getPhotoUriFromPhoneNumber(
-                    phoneNumbers.first()
-                ) else ""
-            val isGroupConversation = phoneNumbers.size > 1
-            val read = cursor.getIntValue(Threads.READ) == 1
-            val archived =
-                if (archiveAvailable) cursor.getIntValue(Threads.ARCHIVED) == 1 else false
-            val deleted =
-                if (useRecycleBin) messagesDB.getNonRecycledThreadMessages(id).isEmpty() else false
-            val unreadCount = messagesDB.getThreadUnreadMessages(id)
-            val conversation = Conversation(
-                threadId = id,
-                snippet = snippet,
-                date = date.toInt(),
-                read = read,
-                title = title,
-                photoUri = photoUri,
-                isGroupConversation = isGroupConversation,
-                phoneNumber = phoneNumbers.first(),
-                isArchived = archived,
-                isDeleted = deleted,
-                unreadCount = unreadCount
-            )
-            conversations.add(conversation)
         }
     } catch (sqliteException: SQLiteException) {
         if (sqliteException.message?.contains("no such column: archived") == true && archiveAvailable) {
@@ -428,7 +484,7 @@ private fun Context.queryCursorUnsafe(
 }
 
 fun Context.getConversationIds(): List<Long> {
-    val uri = Uri.parse("${Threads.CONTENT_URI}?simple=true")
+    val uri = "${Threads.CONTENT_URI}?simple=true".toUri()
     val projection = arrayOf(Threads._ID)
     val selection = "${Threads.MESSAGE_COUNT} > 0"
     val sortOrder = "${Threads.DATE} ASC"
@@ -446,7 +502,7 @@ fun Context.getMmsAttachment(id: Long, getImageResolutions: Boolean): MessageAtt
     val uri = if (isQPlus()) {
         Mms.Part.CONTENT_URI
     } else {
-        Uri.parse("content://mms/part")
+        "content://mms/part".toUri()
     }
 
     val projection = arrayOf(
@@ -572,7 +628,7 @@ fun Context.getThreadParticipants(
     threadId: Long,
     contactsMap: HashMap<Int, SimpleContact>?
 ): ArrayList<SimpleContact> {
-    val uri = Uri.parse("${MmsSms.CONTENT_CONVERSATIONS_URI}?simple=true")
+    val uri = "${MmsSms.CONTENT_CONVERSATIONS_URI}?simple=true".toUri()
     val projection = arrayOf(
         ThreadsColumns.RECIPIENT_IDS
     )
@@ -680,6 +736,8 @@ fun Context.getSuggestedContacts(privateContacts: ArrayList<SimpleContact>): Arr
         val namePhoto = getNameAndPhotoFromPhoneNumber(senderNumber)
         var senderName = namePhoto.name
         var photoUri = namePhoto.photoUri ?: ""
+        var company = ""
+        var jobPosition = ""
         if (isNumberBlocked(senderNumber, blockedNumbers)) {
             return@queryCursor
         } else if (namePhoto.name == senderNumber) {
@@ -687,13 +745,26 @@ fun Context.getSuggestedContacts(privateContacts: ArrayList<SimpleContact>): Arr
                 val privateContact =
                     privateContacts.firstOrNull { it.phoneNumbers.first().normalizedNumber == senderNumber }
                 if (privateContact != null) {
-                    senderName = privateContact.name
-                    photoUri = privateContact.photoUri
+//                    senderName = privateContact.name
+//                    photoUri = privateContact.photoUri
+                    company = privateContact.company
+                    jobPosition = privateContact.jobPosition
                 } else {
                     return@queryCursor
                 }
             } else {
                 return@queryCursor
+            }
+        } else {
+            if (privateContacts.isNotEmpty()) {
+                val privateContact =
+                    privateContacts.firstOrNull { it.phoneNumbers.first().normalizedNumber == senderNumber }
+                if (privateContact != null) {
+//                    senderName = privateContact.name
+//                    photoUri = privateContact.photoUri
+                    company = privateContact.company
+                    jobPosition = privateContact.jobPosition
+                }
             }
         }
 
@@ -705,7 +776,9 @@ fun Context.getSuggestedContacts(privateContacts: ArrayList<SimpleContact>): Arr
             photoUri = photoUri,
             phoneNumbers = arrayListOf(phoneNumber),
             birthdays = ArrayList(),
-            anniversaries = ArrayList()
+            anniversaries = ArrayList(),
+            company = company,
+            jobPosition = jobPosition
         )
         if (!contacts.map { it.phoneNumbers.first().normalizedNumber.trimToComparableNumber() }
                 .contains(senderNumber.trimToComparableNumber())) {
@@ -979,20 +1052,40 @@ fun Context.showReceivedMessageNotification(
     ) {
     Handler(Looper.getMainLooper()).post {
     val privateCursor = getMyContactsCursor(favoritesOnly = false, withPhoneNumbersOnly = true)
-        ensureBackgroundThread {
-            val senderName = getNameFromAddress(address, privateCursor)
+        try {
+            getContactFromAddress(address) { simpleContact ->
+                val senderName = getNameFromAddress(address, privateCursor)
 
-            Handler(Looper.getMainLooper()).post {
-                notificationHelper.showMessageNotification(
-                    messageId = messageId,
-                    address = address,
-                    body = body,
-                    threadId = threadId,
-                    bitmap = bitmap,
-                    sender = senderName,
-                    subscriptionId = subscriptionId
-                )
+                Handler(Looper.getMainLooper()).post {
+                    notificationHelper.showMessageNotification(
+                        messageId = messageId,
+                        address = address,
+                        body = body,
+                        threadId = threadId,
+                        bitmap = bitmap,
+                        sender = senderName,
+                        subscriptionId = subscriptionId,
+                        contact = simpleContact
+                    )
+                }
             }
+        } catch (e: Exception) {
+            ensureBackgroundThread {
+                val senderName = getNameFromAddress(address, privateCursor)
+
+                Handler(Looper.getMainLooper()).post {
+                    notificationHelper.showMessageNotification(
+                        messageId = messageId,
+                        address = address,
+                        body = body,
+                        threadId = threadId,
+                        bitmap = bitmap,
+                        sender = senderName,
+                        subscriptionId = subscriptionId
+                    )
+                }
+            }
+
         }
     }
 }
@@ -1214,32 +1307,47 @@ fun Context.createTemporaryThread(
     cachedConv: Conversation?
 ) {
     val simpleContactHelper = SimpleContactsHelper(this)
-    val addresses = message.participants.getAddresses()
-    val photoUri =
-        if (addresses.size == 1) simpleContactHelper.getPhotoUriFromPhoneNumber(addresses.first()) else ""
-    val title = if (cachedConv != null && cachedConv.usesCustomTitle) {
-        cachedConv.title
-    } else {
-        message.participants.getThreadTitle()
-    }
+    val privateCursor = getMyContactsCursor(false, true)
+    simpleContactHelper.getAvailableContacts(false) { contacts ->
+        val addresses = message.participants.getAddresses()
+        val photoUri =
+            if (addresses.size == 1) simpleContactHelper.getPhotoUriFromPhoneNumber(addresses.first()) else ""
+        val title = if (cachedConv != null && cachedConv.usesCustomTitle) {
+            cachedConv.title
+        } else {
+            message.participants.getThreadTitle()
+        }
 
-    val conversation = Conversation(
-        threadId = threadId,
-        snippet = message.body,
-        date = message.date,
-        read = true,
-        title = title,
-        photoUri = photoUri,
-        isGroupConversation = addresses.size > 1,
-        phoneNumber = addresses.first(),
-        isScheduled = true,
-        usesCustomTitle = cachedConv?.usesCustomTitle == true,
-        isArchived = false
-    )
-    try {
-        conversationsDB.insertOrUpdate(conversation)
-    } catch (e: Exception) {
-        e.printStackTrace()
+        var contact =
+            if (addresses.size == 1) contacts.firstOrNull { it.doesHavePhoneNumber(addresses.first()) }
+            else null
+        if (contact == null && addresses.size == 1) {
+            val privateContacts = MyContactsContentProvider.getSimpleContacts(this, privateCursor)
+            contact = privateContacts.firstOrNull { it.doesHavePhoneNumber(addresses.first()) }
+        }
+        val isABusinessContact =
+            if (addresses.size == 1) contact?.isABusinessContact() ?: isShortCodeWithLetters(addresses.first())
+            else false
+
+        val conversation = Conversation(
+            threadId = threadId,
+            snippet = message.body,
+            date = message.date,
+            read = true,
+            title = title,
+            photoUri = photoUri,
+            isGroupConversation = addresses.size > 1,
+            phoneNumber = addresses.first(),
+            isScheduled = true,
+            usesCustomTitle = cachedConv?.usesCustomTitle == true,
+            isArchived = false,
+            isCompany = isABusinessContact
+        )
+        try {
+            conversationsDB.insertOrUpdate(conversation)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
 

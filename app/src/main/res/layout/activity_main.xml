@@ -78,10 +78,10 @@
                         android:id="@+id/conversations_list"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:paddingTop="@dimen/smaller_margin"
                         android:clipToPadding="false"
                         android:layoutAnimation="@anim/layout_animation"
                         android:overScrollMode="ifContentScrolls"
+                        android:paddingTop="@dimen/smaller_margin"
                         android:scrollbars="none"
                         app:layoutManager="com.goodwy.commons.views.MyLinearLayoutManager" />
 
@@ -146,6 +146,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/activity_margin"
+        android:contentDescription="@string/new_conversation"
         android:src="@drawable/ic_plus_vector" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

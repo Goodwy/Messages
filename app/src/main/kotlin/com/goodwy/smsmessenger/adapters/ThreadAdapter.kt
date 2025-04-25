@@ -53,6 +53,9 @@ import com.goodwy.smsmessenger.models.ThreadItem
 import com.goodwy.smsmessenger.models.ThreadItem.*
 import java.util.Locale
 import kotlin.math.abs
+import androidx.core.view.get
+import androidx.core.text.layoutDirection
+import androidx.core.graphics.drawable.toDrawable
 
 class ThreadAdapter(
     activity: SimpleActivity,
@@ -404,7 +407,7 @@ class ThreadAdapter(
         // icon coloring
         popupMenu.menu.apply {
             for (index in 0 until this.size()) {
-                val item = this.getItem(index)
+                val item = this[index]
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     item.icon!!.colorFilter = BlendModeColorFilter(
@@ -440,7 +443,7 @@ class ThreadAdapter(
         popupMenu.show()
         popupMenu.menu.apply {
             for (index in 0 until this.size()) {
-                val item = this.getItem(index)
+                val item = this[index]
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     item.icon!!.colorFilter = BlendModeColorFilter(
@@ -565,7 +568,7 @@ class ThreadAdapter(
                     addRule(RelativeLayout.ALIGN_PARENT_END)
                 }
 
-                val isRtl = TextUtils.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL
+                val isRtl = Locale.getDefault().layoutDirection == ViewCompat.LAYOUT_DIRECTION_RTL
                 val bubbleStyle = activity.config.bubbleStyle
 
                 val bubbleReceived = when (bubbleStyle) {
@@ -608,7 +611,7 @@ class ThreadAdapter(
         val imageView = ItemAttachmentImageBinding.inflate(layoutInflater)
         threadMessageAttachmentsHolder.addView(imageView.root)
 
-        val placeholderDrawable = ColorDrawable(Color.TRANSPARENT)
+        val placeholderDrawable = Color.TRANSPARENT.toDrawable()
         val isTallImage = attachment.height > attachment.width
         val transformation = if (isTallImage) CenterCrop() else FitCenter()
         val options = RequestOptions()

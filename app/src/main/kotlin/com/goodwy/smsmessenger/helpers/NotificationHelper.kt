@@ -8,15 +8,18 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.drawable.LayerDrawable
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.RingtoneManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.Person
 import androidx.core.app.RemoteInput
-import com.goodwy.commons.extensions.getProperPrimaryColor
-import com.goodwy.commons.extensions.notificationManager
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.IconCompat
+import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.SimpleContactsHelper
+import com.goodwy.commons.models.SimpleContact
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.ThreadActivity
 import com.goodwy.smsmessenger.extensions.config
@@ -26,6 +29,7 @@ import com.goodwy.smsmessenger.receivers.CopyNumberReceiver
 import com.goodwy.smsmessenger.receivers.DeleteSmsReceiver
 import com.goodwy.smsmessenger.receivers.DirectReplyReceiver
 import com.goodwy.smsmessenger.receivers.MarkAsReadReceiver
+import kotlin.math.abs
 
 class NotificationHelper(private val context: Context) {
 
@@ -33,6 +37,7 @@ class NotificationHelper(private val context: Context) {
     private val soundUri get() = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
     private val user = Person.Builder()
         .setName(context.getString(R.string.me))
+        .setIcon(IconCompat.createWithResource(context, R.drawable.placeholder_contact))
         .build()
 
     @SuppressLint("NewApi")
@@ -43,8 +48,10 @@ class NotificationHelper(private val context: Context) {
         threadId: Long,
         bitmap: Bitmap?,
         sender: String?,
+        senderCache: String? = null,
         alertOnlyOnce: Boolean = false,
-        subscriptionId: Int? = null
+        subscriptionId: Int? = null,
+        contact: SimpleContact? = null
     ) {
         val hasCustomNotifications =
             context.config.customNotifications.contains(threadId.toString())
@@ -102,6 +109,7 @@ class NotificationHelper(private val context: Context) {
                 putExtra(THREAD_ID, threadId)
                 putExtra(THREAD_NUMBER, address)
                 putExtra(SIM_TO_REPLY, subscriptionId)
+                putExtra(THREAD_TITLE, sender ?: senderCache)
             }
 
             val replyPendingIntent =
@@ -120,11 +128,37 @@ class NotificationHelper(private val context: Context) {
                 .build()
         }
 
-        val largeIcon = bitmap ?: if (sender != null) {
+        val title = sender ?: senderCache
+        val largeIcon = bitmap ?: if (contact != null && title != null) {
+            if (contact.isABusinessContact()) {
+                val drawable = ResourcesCompat.getDrawable(
+                    context.resources,
+                    R.drawable.placeholder_company,
+                    context.theme
+                )
+                if (context.baseConfig.useColoredContacts) {
+                    val letterBackgroundColors = context.getLetterBackgroundColors()
+                    val color = letterBackgroundColors[abs(title.hashCode()) % letterBackgroundColors.size].toInt()
+                    (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
+                }
+                drawable?.convertToBitmap()
+            } else {
+                SimpleContactsHelper(context).getContactLetterIcon(title)
+            }
+        } else if (title == address) {
+            val drawable = ResourcesCompat.getDrawable(context.resources, R.drawable.placeholder_contact, context.theme)
+            if (context.baseConfig.useColoredContacts) {
+                val letterBackgroundColors = context.getLetterBackgroundColors()
+                val color = letterBackgroundColors[abs(title.hashCode()) % letterBackgroundColors.size].toInt()
+                (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
+            }
+            drawable?.convertToBitmap()
+        } else if (sender != null) {
             SimpleContactsHelper(context).getContactLetterIcon(sender)
         } else {
             null
         }
+
         val builder = NotificationCompat.Builder(context, notificationChannelId).apply {
             when (context.config.lockScreenVisibilitySetting) {
                 LOCK_SCREEN_SENDER_MESSAGE -> {

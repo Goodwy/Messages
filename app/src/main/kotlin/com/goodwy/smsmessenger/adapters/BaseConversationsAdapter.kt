@@ -26,7 +26,6 @@ import com.goodwy.smsmessenger.extensions.config
 import com.goodwy.smsmessenger.extensions.deleteSmsDraft
 import com.goodwy.smsmessenger.extensions.getAllDrafts
 import com.goodwy.smsmessenger.helpers.*
-import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import com.goodwy.smsmessenger.models.Conversation
 import me.thanel.swipeactionview.SwipeActionView
 import me.thanel.swipeactionview.SwipeDirection
@@ -41,7 +40,8 @@ abstract class BaseConversationsAdapter(
     recyclerView: MyRecyclerView,
     onRefresh: () -> Unit,
     itemClick: (Any) -> Unit,
-    var isArchived: Boolean = false
+    var isArchived: Boolean = false,
+    var isRecycleBin: Boolean = false
 ) : MyRecyclerViewListAdapter<Conversation>(
     activity = activity,
     recyclerView = recyclerView,
@@ -262,9 +262,9 @@ abstract class BaseConversationsAdapter(
             if (showContactThumbnails) {
                 val size = (root.context.pixels(com.goodwy.commons.R.dimen.normal_icon_size) * contactThumbnailsSize).toInt()
                 conversationImage.setHeightAndWidth(size)
-                if (title == conversation.phoneNumber) {
+                if (title == conversation.phoneNumber || (conversation.isCompany && conversation.photoUri == "")) {
                     val drawable =
-                        if (isShortCodeWithLetters(conversation.phoneNumber)) ResourcesCompat.getDrawable(
+                        if (conversation.isCompany) ResourcesCompat.getDrawable(
                             resources,
                             R.drawable.placeholder_company,
                             activity.theme
@@ -272,7 +272,7 @@ abstract class BaseConversationsAdapter(
                         else ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, activity.theme)
                     if (baseConfig.useColoredContacts) {
                         val letterBackgroundColors = activity.getLetterBackgroundColors()
-                        val color = letterBackgroundColors[abs(conversation.phoneNumber.hashCode()) % letterBackgroundColors.size].toInt()
+                        val color = letterBackgroundColors[abs(conversation.title.hashCode()) % letterBackgroundColors.size].toInt()
                         (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
                     }
                     conversationImage.setImageDrawable(drawable)
@@ -288,33 +288,54 @@ abstract class BaseConversationsAdapter(
 
             //swipe
             val isRTL = activity.isRTLLayout
-            val swipeLeftAction = if (isRTL) activity.config.swipeRightAction else activity.config.swipeLeftAction
-            swipeLeftIcon.setImageResource(swipeActionImageResource(swipeLeftAction))
-            swipeLeftIconHolder.setBackgroundColor(swipeActionColor(swipeLeftAction))
+            if (isRecycleBin) {
+                val swipeLeftResource =
+                    if (isRTL) R.drawable.ic_delete_restore else com.goodwy.commons.R.drawable.ic_delete_outline
+                swipeLeftIcon.setImageResource(swipeLeftResource)
+                val swipeLeftColor =
+                    if (isRTL) resources.getColor(R.color.swipe_purple, activity.theme) else resources.getColor(R.color.red_call, activity.theme)
+                swipeLeftIconHolder.setBackgroundColor(swipeLeftColor)
 
-            val swipeRightAction = if (isRTL) activity.config.swipeLeftAction else activity.config.swipeRightAction
-            swipeRightIcon.setImageResource(swipeActionImageResource(swipeRightAction))
-            swipeRightIconHolder.setBackgroundColor(swipeActionColor(swipeRightAction))
+                val swipeRightResource =
+                    if (isRTL) com.goodwy.commons.R.drawable.ic_delete_outline else R.drawable.ic_delete_restore
+                swipeRightIcon.setImageResource(swipeRightResource)
+                val swipeRightColor =
+                    if (isRTL) resources.getColor(R.color.red_call, activity.theme) else resources.getColor(R.color.swipe_purple, activity.theme)
+                swipeRightIconHolder.setBackgroundColor(swipeRightColor)
 
-            if (isArchived) {
-                if (swipeLeftAction == SWIPE_ACTION_BLOCK) swipeView.setDirectionEnabled(SwipeDirection.Left, false)
-                if (swipeRightAction == SWIPE_ACTION_BLOCK) swipeView.setDirectionEnabled(SwipeDirection.Right, false)
-            }
+                if (activity.config.swipeRipple) {
+                    swipeView.setRippleColor(SwipeDirection.Left, swipeLeftColor)
+                    swipeView.setRippleColor(SwipeDirection.Right, swipeRightColor)
+                }
+            } else {
+                val swipeLeftAction = if (isRTL) activity.config.swipeRightAction else activity.config.swipeLeftAction
+                swipeLeftIcon.setImageResource(swipeActionImageResource(swipeLeftAction))
+                swipeLeftIconHolder.setBackgroundColor(swipeActionColor(swipeLeftAction))
 
-            if (!activity.config.useSwipeToAction) {
-                swipeView.setDirectionEnabled(SwipeDirection.Left, false)
-                swipeView.setDirectionEnabled(SwipeDirection.Right, false)
+                val swipeRightAction = if (isRTL) activity.config.swipeLeftAction else activity.config.swipeRightAction
+                swipeRightIcon.setImageResource(swipeActionImageResource(swipeRightAction))
+                swipeRightIconHolder.setBackgroundColor(swipeActionColor(swipeRightAction))
+
+                if (isArchived) {
+                    if (swipeLeftAction == SWIPE_ACTION_BLOCK) swipeView.setDirectionEnabled(SwipeDirection.Left, false)
+                    if (swipeRightAction == SWIPE_ACTION_BLOCK) swipeView.setDirectionEnabled(SwipeDirection.Right, false)
+                }
+
+                if (!activity.config.useSwipeToAction) {
+                    swipeView.setDirectionEnabled(SwipeDirection.Left, false)
+                    swipeView.setDirectionEnabled(SwipeDirection.Right, false)
+                }
+
+                if (activity.config.swipeRipple) {
+                    swipeView.setRippleColor(SwipeDirection.Left, swipeActionColor(swipeLeftAction))
+                    swipeView.setRippleColor(SwipeDirection.Right, swipeActionColor(swipeRightAction))
+                }
             }
 
             arrayOf(
                 swipeLeftIcon, swipeRightIcon
             ).forEach {
                 it.setColorFilter(properPrimaryColor.getContrastColor())
-            }
-
-            if (activity.config.swipeRipple) {
-                swipeView.setRippleColor(SwipeDirection.Left, swipeActionColor(swipeLeftAction))
-                swipeView.setRippleColor(SwipeDirection.Right, swipeActionColor(swipeRightAction))
             }
 
             swipeView.useHapticFeedback = activity.config.swipeVibration

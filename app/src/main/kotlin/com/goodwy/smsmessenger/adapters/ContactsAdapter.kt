@@ -1,10 +1,12 @@
 package com.goodwy.smsmessenger.adapters
 
+import android.graphics.drawable.LayerDrawable
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.goodwy.commons.adapters.MyRecyclerViewAdapter
 import com.goodwy.commons.databinding.ItemContactWithNumberBinding
@@ -12,8 +14,9 @@ import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.models.SimpleContact
 import com.goodwy.commons.views.MyRecyclerView
+import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
-import com.goodwy.smsmessenger.extensions.config
+import kotlin.math.abs
 
 class ContactsAdapter(
     activity: SimpleActivity, var contacts: ArrayList<SimpleContact>, recyclerView: MyRecyclerView, itemClick: (Any) -> Unit
@@ -65,7 +68,7 @@ class ContactsAdapter(
     private fun setupView(view: View, contact: SimpleContact) {
         ItemContactWithNumberBinding.bind(view).apply {
             divider.apply {
-                beInvisibleIf(getLastItem() == contact || !activity.config.useDividers)
+                beInvisibleIf(getLastItem() == contact || !baseConfig.useDividers)
                 setBackgroundColor(textColor)
             }
 
@@ -81,8 +84,18 @@ class ContactsAdapter(
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize * 0.8f)
             }
 
-            itemContactImage.beGoneIf(!activity.config.showContactThumbnails)
-            SimpleContactsHelper(activity).loadContactImage(contact.photoUri, itemContactImage, contact.name)
+            itemContactImage.beGoneIf(!baseConfig.showContactThumbnails)
+            if (contact.isABusinessContact() && contact.photoUri == "") {
+                val drawable = ResourcesCompat.getDrawable(resources, R.drawable.placeholder_company, activity.theme)
+                if (baseConfig.useColoredContacts) {
+                    val letterBackgroundColors = activity.getLetterBackgroundColors()
+                    val color = letterBackgroundColors[abs(contact.name.hashCode()) % letterBackgroundColors.size].toInt()
+                    (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
+                }
+                itemContactImage.setImageDrawable(drawable)
+            } else {
+                SimpleContactsHelper(activity).loadContactImage(contact.photoUri, itemContactImage, contact.name)
+            }
         }
     }
 

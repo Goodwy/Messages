@@ -28,6 +28,7 @@ import com.goodwy.smsmessenger.helpers.*
 import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import com.goodwy.smsmessenger.models.Conversation
 import kotlin.math.abs
+import androidx.core.graphics.drawable.toDrawable
 
 class ConversationDetailsActivity : SimpleActivity() {
 
@@ -137,7 +138,7 @@ class ConversationDetailsActivity : SimpleActivity() {
     private fun updateBackgroundColors() {
         if (baseConfig.backgroundColor == white) {
             val colorToWhite = 0xFFf2f2f6.toInt()
-            supportActionBar?.setBackgroundDrawable(ColorDrawable(colorToWhite))
+            supportActionBar?.setBackgroundDrawable(colorToWhite.toDrawable())
             window.decorView.setBackgroundColor(colorToWhite)
             window.statusBarColor = colorToWhite
             //window.navigationBarColor = colorToWhite
@@ -269,9 +270,9 @@ class ConversationDetailsActivity : SimpleActivity() {
         }
 
         if (conversation != null) {
-            if (threadTitle == conversation!!.phoneNumber) {
+            if (threadTitle == conversation!!.phoneNumber || (conversation!!.isCompany && conversation!!.photoUri == "")) {
                 val drawable =
-                    if (isShortCodeWithLetters(conversation!!.phoneNumber)) ResourcesCompat.getDrawable(
+                    if (conversation!!.isCompany) ResourcesCompat.getDrawable(
                         resources,
                         R.drawable.placeholder_company,
                         theme
@@ -279,7 +280,7 @@ class ConversationDetailsActivity : SimpleActivity() {
                     else ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, theme)
                 if (baseConfig.useColoredContacts) {
                     val letterBackgroundColors = getLetterBackgroundColors()
-                    val color = letterBackgroundColors[abs(conversation!!.phoneNumber.hashCode()) % letterBackgroundColors.size].toInt()
+                    val color = letterBackgroundColors[abs(conversation!!.title.hashCode()) % letterBackgroundColors.size].toInt()
                     (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
                 }
                 binding.topConversationDetails.conversationDetailsImage.setImageDrawable(drawable)
@@ -338,25 +339,25 @@ class ConversationDetailsActivity : SimpleActivity() {
 
                 getContactFromAddress(address) { simpleContact ->
                     if (simpleContact != null) {
-                        threeButton.alpha = 1f
-                        threeButton.isClickable = true
                         runOnUiThread {
+                            threeButton.alpha = 1f
+                            threeButton.isClickable = true
                             threeButton.setOnClickListener { startContactDetailsIntent(simpleContact) }
                             threeButton.setOnLongClickListener { toast(com.goodwy.commons.R.string.contact_details); true; }
                             topConversationDetails.conversationDetailsImage.setOnClickListener { startContactDetailsIntent(simpleContact) }
 
-
-                            if (simpleContact.phoneNumbers.firstOrNull { it.normalizedNumber == address } != null) {
+                            val phoneNumber = simpleContact.phoneNumbers.firstOrNull { it.normalizedNumber == address }
+                            if (phoneNumber != null) {
                                 conversationNumberTypeContainer.beVisible()
                                 conversationNumberType.apply {
                                     beVisible()
                                     //text = contact.phoneNumbers.filter { it.normalizedNumber == getCurrentPhoneNumber()}.toString()
-                                    val phoneNumberType = simpleContact.phoneNumbers.first { it.normalizedNumber == address }.type
-                                    val phoneNumberLabel = simpleContact.phoneNumbers.first { it.normalizedNumber == address }.label
+                                    val phoneNumberType = phoneNumber.type
+                                    val phoneNumberLabel = phoneNumber.label
                                     text = getPhoneNumberTypeText(phoneNumberType, phoneNumberLabel)
                                 }
                                 conversationFavoriteIcon.apply {
-                                    beVisibleIf(simpleContact.phoneNumbers.first { it.normalizedNumber == address }.isPrimary)
+                                    beVisibleIf(phoneNumber.isPrimary)
                                     applyColorFilter(getProperTextColor())
                                 }
                             }

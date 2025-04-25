@@ -1,8 +1,10 @@
 package com.goodwy.smsmessenger.adapters
 
+import android.graphics.drawable.LayerDrawable
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -19,6 +21,7 @@ import com.goodwy.smsmessenger.databinding.ItemVcardContactBinding
 import com.goodwy.smsmessenger.databinding.ItemVcardContactPropertyBinding
 import com.goodwy.smsmessenger.models.VCardPropertyWrapper
 import com.goodwy.smsmessenger.models.VCardWrapper
+import kotlin.math.abs
 
 private const val TYPE_VCARD_CONTACT = 1
 private const val TYPE_VCARD_CONTACT_PROPERTY = 2
@@ -31,6 +34,7 @@ class VCardViewerAdapter(
     private var textColor = activity.getProperTextColor()
     private val layoutInflater = activity.layoutInflater
     private val showContactThumbnails = activity.config.showContactThumbnails
+    private val activity = activity
 
     override fun getItemCount() = items.size
 
@@ -74,7 +78,19 @@ class VCardViewerAdapter(
                 itemContactImage.apply {
                     beGoneIf(!showContactThumbnails)
                     val photo = item.vCard.photos.firstOrNull()
-                    val placeholder = if (name != null) {
+                    val placeholder = if (item.isCompany) {
+                        val drawable = ResourcesCompat.getDrawable(
+                            resources,
+                            R.drawable.placeholder_company,
+                            activity.theme
+                        )
+                        if (context.baseConfig.useColoredContacts) {
+                            val letterBackgroundColors = activity.getLetterBackgroundColors()
+                            val color = letterBackgroundColors[abs(name.hashCode()) % letterBackgroundColors.size].toInt()
+                            (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
+                        }
+                        drawable
+                    } else if (name != null) {
                         SimpleContactsHelper(context).getContactLetterIcon(name).toDrawable(resources)
                     } else {
                         null

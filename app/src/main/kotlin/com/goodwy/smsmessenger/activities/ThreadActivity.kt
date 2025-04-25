@@ -53,6 +53,7 @@ import com.goodwy.commons.helpers.*
 import com.goodwy.commons.models.PhoneNumber
 import com.goodwy.commons.models.RadioItem
 import com.goodwy.commons.models.SimpleContact
+import com.goodwy.commons.models.contacts.Contact
 import com.goodwy.commons.views.MyRecyclerView
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
@@ -500,7 +501,7 @@ class ThreadActivity : SimpleActivity() {
                     override fun updateBottom() {}
 
                     override fun updateTop() {
-                        if (!isRecycleBin) fetchNextMessages()
+                        fetchNextMessages()
                     }
             }
         }
@@ -671,8 +672,18 @@ class ThreadActivity : SimpleActivity() {
         loadingOlderMessages = true
 
         ensureBackgroundThread {
-            val olderMessages = getMessages(threadId, true, oldestMessageDate)
-                .filter { message -> !messages.contains(message) }
+//            val olderMessages = getMessages(threadId, true, oldestMessageDate)
+//                .filter { message -> !messages.contains(message) }
+            val olderMessages = if (isRecycleBin) {
+                messagesDB.getThreadMessagesFromRecycleBin(threadId)
+                    .filter { message -> !messages.contains(message) }
+            } else if (config.useRecycleBin) {
+                messagesDB.getNonRecycledThreadMessages(threadId)
+                    .filter { message -> !messages.contains(message) }
+            } else {
+                messagesDB.getThreadMessages(threadId)
+                    .filter { message -> !messages.contains(message) }
+            }
 
             messages.addAll(0, olderMessages)
             allMessagesFetched = olderMessages.isEmpty()
@@ -1416,9 +1427,22 @@ class ThreadActivity : SimpleActivity() {
         )
 
         RadioGroupDialog(this@ThreadActivity, items) {
+            val privateCursor = getMyContactsCursor(favoritesOnly = false, withPhoneNumbersOnly = true)
             if (it == 1) {
-                ensureBackgroundThread {
-                    val contact = ContactsHelper(this).getContactFromUri(contactUri)
+                ContactsHelper(this).getContacts(showOnlyContactsWithNumbers = false) { contacts ->
+                    val contact = if (contactUri.pathSegments.last().startsWith("local_")) {
+                        val contactId = contactUri.path!!.substringAfter("local_").toInt()
+                        try {
+                            val privateContacts = MyContactsContentProvider.getContacts(this, privateCursor)
+                            privateContacts.firstOrNull { it.id == contactId }
+                        } catch (e: Exception) {
+                            null
+                        }
+                    } else {
+                        val contactId = getContactUriRawId(contactUri)
+                        contacts.firstOrNull { it.id == contactId }
+                    }
+
                     if (contact != null) {
                         val outputFile = File(getAttachmentsDir(), "${contact.contactId}.vcf")
                         val outputStream = outputFile.outputStream()
@@ -1443,8 +1467,20 @@ class ThreadActivity : SimpleActivity() {
                     }
                 }
             } else {
-                ensureBackgroundThread {
-                    val contact = ContactsHelper(this).getContactFromUri(contactUri)
+                ContactsHelper(this).getContacts(showOnlyContactsWithNumbers = false) { contacts ->
+                    val contact = if (contactUri.pathSegments.last().startsWith("local_")) {
+                        val contactId = contactUri.path!!.substringAfter("local_").toInt()
+                        try {
+                            val privateContacts = MyContactsContentProvider.getContacts(this, privateCursor)
+                            privateContacts.firstOrNull { it.id == contactId }
+                        } catch (e: Exception) {
+                            null
+                        }
+                    } else {
+                        val contactId = getContactUriRawId(contactUri)
+                        contacts.firstOrNull { it.id == contactId }
+                    }
+
                     if (contact != null) {
                         runOnUiThread {
                             binding.messageHolder.threadTypeMessage.setText(binding.messageHolder.threadTypeMessage.value + contact.getContactToText(this))
@@ -2277,21 +2313,23 @@ class ThreadActivity : SimpleActivity() {
         }
 
         val title = conversation?.title
-        val threadTitle = if (!title.isNullOrEmpty()) {
+        var threadTitle = if (!title.isNullOrEmpty()) {
             title
         } else {
             participants.getThreadTitle()
         }
+        if (threadTitle.isEmpty()) threadTitle = intent.getStringExtra(THREAD_TITLE) ?: ""
+
         val placeholder = if (participants.size > 1) {
             SimpleContactsHelper(this).getColoredGroupIcon(threadTitle)
         } else {
             null
         }
 
-        if (conversation != null) {
-            if (threadTitle == conversation!!.phoneNumber) {
+        if (conversation != null && (!isDestroyed || !isFinishing)) {
+            if (threadTitle == conversation!!.phoneNumber || (conversation!!.isCompany && conversation!!.photoUri == "")) {
                 val drawable =
-                    if (isShortCodeWithLetters(conversation!!.phoneNumber)) ResourcesCompat.getDrawable(
+                    if (conversation!!.isCompany) ResourcesCompat.getDrawable(
                         resources,
                         R.drawable.placeholder_company,
                         theme
@@ -2299,48 +2337,28 @@ class ThreadActivity : SimpleActivity() {
                     else ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, theme)
                 if (baseConfig.useColoredContacts) {
                     val letterBackgroundColors = getLetterBackgroundColors()
-                    val color = letterBackgroundColors[abs(conversation!!.phoneNumber.hashCode()) % letterBackgroundColors.size].toInt()
+                    val color = letterBackgroundColors[abs(conversation!!.title.hashCode()) % letterBackgroundColors.size].toInt()
                     (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
                 }
                 senderPhoto.setImageDrawable(drawable)
             } else {
-                if (!isDestroyed || !isFinishing) {
-                    SimpleContactsHelper(this).loadContactImage(conversation!!.photoUri, senderPhoto, threadTitle, placeholder)
-                }
+                SimpleContactsHelper(this).loadContactImage(conversation!!.photoUri, senderPhoto, threadTitle, placeholder)
             }
         } else {
             if (!isDestroyed || !isFinishing) {
-                SimpleContactsHelper(this).loadContactImage("", senderPhoto, threadTitle, placeholder)
+                val number = intent.getStringExtra(THREAD_NUMBER)
+                var namePhoto: NamePhoto? = null
+                if (number != null) {
+                    namePhoto = getNameAndPhotoFromPhoneNumber(number)
+                }
+                var threadUri = intent.getStringExtra(THREAD_URI) ?: ""
+                if (threadUri == "" && namePhoto != null) {
+                    threadUri = namePhoto.photoUri ?: ""
+                }
+                if (threadTitle.isEmpty() && namePhoto != null) threadTitle = namePhoto.name
+                SimpleContactsHelper(this).loadContactImage(threadUri, senderPhoto, threadTitle, placeholder)
             }
         }
-
-//        if (participants.firstOrNull() == null) {
-//            if (!isDestroyed || !isFinishing) {
-//                SimpleContactsHelper(this).loadContactImage("", senderPhoto, threadTitle, placeholder)
-//            }
-//        } else {
-//            val phoneNumber = participants.firstOrNull()?.phoneNumbers?.firstOrNull()?.normalizedNumber ?: return
-//            //Group icon
-//            if (participants.size > 1) {
-//                if (!isDestroyed || !isFinishing) {
-//                    SimpleContactsHelper(this).loadContactImage(participants.first().photoUri, senderPhoto, threadTitle, placeholder)
-//                }
-//            //Unknown contact icon
-//            } else if (participants.first().name == phoneNumber) {
-//                val drawable = ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, theme)
-//                if (baseConfig.useColoredContacts) {
-//                    val letterBackgroundColors = getLetterBackgroundColors()
-//                    val color = letterBackgroundColors[Math.abs(threadTitle.hashCode()) % letterBackgroundColors.size].toInt()
-//                    (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
-//                }
-//                senderPhoto.setImageDrawable(drawable)
-//            //Contact icon
-//            } else {
-//                if (!isDestroyed || !isFinishing) {
-//                    SimpleContactsHelper(this).loadContactImage(participants.first().photoUri, senderPhoto, threadTitle, placeholder)
-//                }
-//            }
-//        }
 
         val firstPhoneNumber = participants.firstOrNull()?.phoneNumbers?.firstOrNull()?.value
         if (participants.size == 1 && participants.firstOrNull()?.name != firstPhoneNumber) {

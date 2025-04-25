@@ -11,6 +11,7 @@ import android.provider.Telephony
 import com.goodwy.commons.extensions.baseConfig
 import com.goodwy.commons.extensions.getMyContactsCursor
 import com.goodwy.commons.extensions.isNumberBlocked
+import com.goodwy.commons.helpers.MyContactsContentProvider
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.models.PhoneNumber
@@ -90,48 +91,66 @@ class SmsReceiver : BroadcastReceiver() {
             if (!context.isNumberBlocked(address)) {
                 val privateCursor = context.getMyContactsCursor(favoritesOnly = false, withPhoneNumbersOnly = true)
                 ensureBackgroundThread {
-                    val newMessageId = context.insertNewSMS(address, subject, body, date, read, threadId, type, subscriptionId)
+                    SimpleContactsHelper(context).getAvailableContacts(false) {
+                        val privateContacts = MyContactsContentProvider.getSimpleContacts(context, privateCursor)
+                        val contacts = ArrayList(it + privateContacts)
 
-                    val conversation = context.getConversations(threadId).firstOrNull() ?: return@ensureBackgroundThread
-                    try {
-                        context.insertOrUpdateConversation(conversation)
-                    } catch (ignored: Exception) {
+                        val newMessageId = context.insertNewSMS(address, subject, body, date, read, threadId, type, subscriptionId)
+
+                        val conversation = context.getConversations(threadId).firstOrNull() ?: return@getAvailableContacts
+                        try {
+                            context.insertOrUpdateConversation(conversation)
+                        } catch (ignored: Exception) {
+                        }
+
+                        try {
+                            context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
+                        } catch (ignored: Exception) {
+                        }
+
+
+                        val senderName = context.getNameFromAddress(address, privateCursor)
+                        val participant = if (contacts.isNotEmpty()) {
+                            val contact = contacts.firstOrNull { it.doesHavePhoneNumber(address) }
+                            if (contact != null) {
+                                val phoneNumber = contact.phoneNumbers.firstOrNull { it.normalizedNumber == address } ?: PhoneNumber(address, 0, "", address)
+                                SimpleContact(0, 0, senderName, photoUri, arrayListOf(phoneNumber), ArrayList(), ArrayList(), contact.company, contact.jobPosition)
+                            } else {
+                                val phoneNumber = PhoneNumber(address, 0, "", address)
+                                SimpleContact(0, 0, senderName, photoUri, arrayListOf(phoneNumber), ArrayList(), ArrayList())
+                            }
+                        } else {
+                            val phoneNumber = PhoneNumber(address, 0, "", address)
+                            SimpleContact(0, 0, senderName, photoUri, arrayListOf(phoneNumber), ArrayList(), ArrayList())
+                        }
+
+                        val participants = arrayListOf(participant)
+                        val messageDate = (date / 1000).toInt()
+
+                        val message =
+                            Message(
+                                newMessageId,
+                                body,
+                                type,
+                                status,
+                                participants,
+                                messageDate,
+                                false,
+                                threadId,
+                                false,
+                                null,
+                                address,
+                                senderName,
+                                photoUri,
+                                subscriptionId
+                            )
+                        context.messagesDB.insertOrUpdate(message)
+                        if (context.config.isArchiveAvailable) {
+                            context.updateConversationArchivedStatus(threadId, false)
+                        }
+                        refreshMessages()
+                        context.showReceivedMessageNotification(newMessageId, address, body, threadId, bitmap, subscriptionId)
                     }
-
-                    try {
-                        context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
-                    } catch (ignored: Exception) {
-                    }
-
-                    val senderName = context.getNameFromAddress(address, privateCursor)
-                    val phoneNumber = PhoneNumber(address, 0, "", address)
-                    val participant = SimpleContact(0, 0, senderName, photoUri, arrayListOf(phoneNumber), ArrayList(), ArrayList())
-                    val participants = arrayListOf(participant)
-                    val messageDate = (date / 1000).toInt()
-
-                    val message =
-                        Message(
-                            newMessageId,
-                            body,
-                            type,
-                            status,
-                            participants,
-                            messageDate,
-                            false,
-                            threadId,
-                            false,
-                            null,
-                            address,
-                            senderName,
-                            photoUri,
-                            subscriptionId
-                        )
-                    context.messagesDB.insertOrUpdate(message)
-                    if (context.config.isArchiveAvailable) {
-                        context.updateConversationArchivedStatus(threadId, false)
-                    }
-                    refreshMessages()
-                    context.showReceivedMessageNotification(newMessageId, address, body, threadId, bitmap, subscriptionId)
                 }
             }
         }

@@ -3,11 +3,13 @@ package com.goodwy.smsmessenger.activities
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.graphics.drawable.LayerDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
 import android.widget.RelativeLayout
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.reddit.indicatorfastscroll.FastScrollItemIndicator
@@ -26,6 +28,7 @@ import com.goodwy.smsmessenger.helpers.*
 import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import java.net.URLDecoder
 import java.util.Locale
+import kotlin.math.abs
 
 class NewConversationActivity : SimpleActivity() {
     private var allContacts = ArrayList<SimpleContact>()
@@ -151,7 +154,7 @@ class NewConversationActivity : SimpleActivity() {
 
     private fun fetchContacts() {
         fillSuggestedContacts {
-            SimpleContactsHelper(this).getAvailableContacts(false) {
+//            SimpleContactsHelper(this).getAvailableContacts(false) {
                 allContacts = it
 
                 if (privateContacts.isNotEmpty()) {
@@ -162,7 +165,7 @@ class NewConversationActivity : SimpleActivity() {
                 runOnUiThread {
                     setupAdapter(allContacts)
                 }
-            }
+//            }
         }
     }
 
@@ -193,26 +196,6 @@ class NewConversationActivity : SimpleActivity() {
                 val contact = it as SimpleContact
                 val phoneNumbers = contact.phoneNumbers
                 if (phoneNumbers.size > 1) {
-//                    val primaryNumber = contact.phoneNumbers.find { it.isPrimary }
-//                    if (primaryNumber != null) {
-//                        launchThreadActivity(primaryNumber.value, contact.name)
-//                    } else {
-//                        val items = ArrayList<RadioItem>()
-//                        phoneNumbers.forEachIndexed { index, phoneNumber ->
-//                            val type = getPhoneNumberTypeText(phoneNumber.type, phoneNumber.label)
-//                            items.add(
-//                                RadioItem(
-//                                    index,
-//                                    "${phoneNumber.normalizedNumber} ($type)",
-//                                    phoneNumber.normalizedNumber
-//                                )
-//                            )
-//                        }
-//
-//                        RadioGroupDialog(this, items) {
-//                            launchThreadActivity(it as String, contact.name)
-//                        }
-//                    }
                     val items = ArrayList<RadioItem>()
                     phoneNumbers.forEachIndexed { index, phoneNumber ->
                         val type = getPhoneNumberTypeText(phoneNumber.type, phoneNumber.label)
@@ -226,10 +209,10 @@ class NewConversationActivity : SimpleActivity() {
                     }
 
                     RadioGroupDialog(this, items) {
-                        launchThreadActivity(it as String, contact.name)
+                        launchThreadActivity(it as String, contact.name, photoUri = contact.photoUri)
                     }
                 } else {
-                    launchThreadActivity(phoneNumbers.first().normalizedNumber, contact.name)
+                    launchThreadActivity(phoneNumbers.first().normalizedNumber, contact.name, photoUri = contact.photoUri)
                 }
             }.apply {
                 binding.contactsList.adapter = this
@@ -245,43 +228,55 @@ class NewConversationActivity : SimpleActivity() {
         setupLetterFastscroller(contacts)
     }
 
-    private fun fillSuggestedContacts(callback: () -> Unit) {
+    private fun fillSuggestedContacts(callback: (ArrayList<SimpleContact>) -> Unit) {
         val privateCursor = getMyContactsCursor(false, true)
         ensureBackgroundThread {
-            privateContacts = MyContactsContentProvider.getSimpleContacts(this, privateCursor)
-            val suggestions = getSuggestedContacts(privateContacts)
-            runOnUiThread {
-                binding.suggestionsHolder.removeAllViews()
-                if (suggestions.isEmpty()) {
-                    binding.suggestionsLabel.beGone()
-                    binding.suggestionsScrollview.beGone()
-                } else {
-                    //binding.suggestionsLabel.beVisible()
-                    binding.suggestionsScrollview.beVisible()
-                    suggestions.forEach {
-                        val contact = it
-                        ItemSuggestedContactBinding.inflate(layoutInflater).apply {
-                            suggestedContactName.text = contact.name
-                            suggestedContactName.setTextColor(getProperTextColor())
+            SimpleContactsHelper(this).getAvailableContacts(false) {
+                privateContacts = MyContactsContentProvider.getSimpleContacts(this, privateCursor)
+                val contacts =  ArrayList(it + privateContacts)
+                val suggestions = getSuggestedContacts(contacts)
+                runOnUiThread {
+                    binding.suggestionsHolder.removeAllViews()
+                    if (suggestions.isEmpty()) {
+                        binding.suggestionsLabel.beGone()
+                        binding.suggestionsScrollview.beGone()
+                    } else {
+                        //binding.suggestionsLabel.beVisible()
+                        binding.suggestionsScrollview.beVisible()
+                        suggestions.forEach { contact ->
+                            ItemSuggestedContactBinding.inflate(layoutInflater).apply {
+                                suggestedContactName.text = contact.name
+                                suggestedContactName.setTextColor(getProperTextColor())
 
-                            if (!isDestroyed) {
-                                SimpleContactsHelper(this@NewConversationActivity).loadContactImage(
-                                    contact.photoUri,
-                                    suggestedContactImage,
-                                    contact.name
-                                )
-                                binding.suggestionsHolder.addView(root)
-                                root.setOnClickListener {
-                                    launchThreadActivity(
-                                        contact.phoneNumbers.first().normalizedNumber,
-                                        contact.name
-                                    )
+                                if (!isDestroyed) {
+                                    if (contact.isABusinessContact() && contact.photoUri == "") {
+                                        val drawable = ResourcesCompat.getDrawable(resources, R.drawable.placeholder_company, theme)
+                                        if (baseConfig.useColoredContacts) {
+                                            val letterBackgroundColors = getLetterBackgroundColors()
+                                            val color = letterBackgroundColors[abs(contact.name.hashCode()) % letterBackgroundColors.size].toInt()
+                                            (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
+                                        }
+                                        suggestedContactImage.setImageDrawable(drawable)
+                                    } else {
+                                        SimpleContactsHelper(this@NewConversationActivity).loadContactImage(
+                                            contact.photoUri,
+                                            suggestedContactImage,
+                                            contact.name
+                                        )
+                                    }
+                                    binding.suggestionsHolder.addView(root)
+                                    root.setOnClickListener {
+                                        launchThreadActivity(
+                                            contact.phoneNumbers.first().normalizedNumber,
+                                            contact.name
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
+                    callback(it)
                 }
-                callback()
             }
         }
     }
@@ -289,7 +284,8 @@ class NewConversationActivity : SimpleActivity() {
     private fun setupLetterFastscroller(contacts: ArrayList<SimpleContact>) {
         try {
             //Decrease the font size based on the number of letters in the letter scroller
-            val all = contacts.map { it.name.substring(0, 1) }
+            val allNotEmpty = contacts.filter { it.name.isNotEmpty() }
+            val all = allNotEmpty.map { it.name.substring(0, 1) }
             val unique: Set<String> = HashSet(all)
             val sizeUnique = unique.size
             if (isHighScreenSize()) {
@@ -325,9 +321,9 @@ class NewConversationActivity : SimpleActivity() {
         }
     }
 
-    private fun launchThreadActivity(phoneNumber: String, name: String, body: String = "") {
+    private fun launchThreadActivity(phoneNumber: String, name: String, body: String = "", photoUri: String = "") {
         hideKeyboard()
-        val text = intent.getStringExtra(Intent.EXTRA_TEXT) ?: intent.getStringExtra("sms_body") ?: ""
+//        val text = intent.getStringExtra(Intent.EXTRA_TEXT) ?: intent.getStringExtra("sms_body") ?: ""
         val numbers = phoneNumber.split(";").toSet()
         val number = if (numbers.size == 1) phoneNumber else Gson().toJson(numbers)
         Intent(this, ThreadActivity::class.java).apply {
@@ -335,6 +331,7 @@ class NewConversationActivity : SimpleActivity() {
             putExtra(THREAD_TITLE, name)
             putExtra(THREAD_TEXT, body.ifEmpty { intent.getStringExtra(Intent.EXTRA_TEXT) })
             putExtra(THREAD_NUMBER, number)
+            putExtra(THREAD_URI, photoUri)
 
             if (intent.action == Intent.ACTION_SEND && intent.extras?.containsKey(Intent.EXTRA_STREAM) == true) {
                 val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)

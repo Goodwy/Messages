@@ -1,10 +1,11 @@
 package com.goodwy.smsmessenger.models
 
 import android.content.Context
+import com.goodwy.commons.extensions.copyToClipboard
 import com.goodwy.commons.extensions.normalizePhoneNumber
-import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.extensions.config
 import com.goodwy.smsmessenger.extensions.format
+import com.goodwy.smsmessenger.helpers.isCompanyVCard
 import com.goodwy.smsmessenger.helpers.parseNameFromVCard
 import ezvcard.VCard
 import ezvcard.property.*
@@ -13,7 +14,7 @@ private val displayedPropertyClasses = arrayOf(
     Telephone::class.java, Email::class.java, Organization::class.java, Birthday::class.java, Anniversary::class.java, Note::class.java
 )
 
-data class VCardWrapper(val vCard: VCard, val fullName: String?, val properties: List<VCardPropertyWrapper>, var expanded: Boolean = false) {
+data class VCardWrapper(val vCard: VCard, val fullName: String?, val properties: List<VCardPropertyWrapper>, var expanded: Boolean = false, var isCompany: Boolean = false) {
 
     companion object {
 
@@ -23,8 +24,9 @@ data class VCardWrapper(val vCard: VCard, val fullName: String?, val properties:
                 .map { VCardPropertyWrapper.from(context, it) }
                 .distinctBy { it.value }
             val fullName = vCard.parseNameFromVCard()
+            val isCompany = vCard.isCompanyVCard(fullName ?: "")
 
-            return VCardWrapper(vCard, fullName, properties)
+            return VCardWrapper(vCard, fullName, properties, isCompany = isCompany)
         }
     }
 }

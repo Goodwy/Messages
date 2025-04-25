@@ -13,6 +13,13 @@
     <string name="message_details_sim">SIM</string>
 
     <!-- Release notes -->
+    <string name="release_618">
+        Changed behavior of the search bar\n
+        Added avatar display for companies\n
+        Fixed avatar display in some cases\n
+        Fixed ability to attach private contacts\n
+        Fixed bugs, improved stability
+    </string>
     <string name="release_611">
         Fixed bugs, improved stability
     </string>

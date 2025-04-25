@@ -583,7 +583,8 @@ class MainActivity : SimpleActivity() {
                 snippet = conversation.phoneNumber,
                 date = date,
                 threadId = conversation.threadId,
-                photoUri = conversation.photoUri
+                photoUri = conversation.photoUri,
+                isCompany = conversation.isCompany
             )
             searchResults.add(searchResult)
         }
@@ -601,6 +602,8 @@ class MainActivity : SimpleActivity() {
                 hideTimeOnOtherDays = true,
                 showCurrentYear = true
             )
+            val isCompany =
+                if (message.participants.size == 1) message.participants.first().isABusinessContact() else false
 
             val searchResult = SearchResult(
                 messageId = message.id,
@@ -609,7 +612,8 @@ class MainActivity : SimpleActivity() {
                 snippet = message.body,
                 date = date,
                 threadId = message.threadId,
-                photoUri = message.senderPhotoUri
+                photoUri = message.senderPhotoUri,
+                isCompany = isCompany
             )
             searchResults.add(searchResult)
         }
@@ -674,6 +678,7 @@ class MainActivity : SimpleActivity() {
             add(Release(521, R.string.release_521))
             add(Release(610, R.string.release_610))
             add(Release(611, R.string.release_611))
+            add(Release(618, R.string.release_618))
             checkWhatsNew(this, BuildConfig.VERSION_CODE)
         }
     }
