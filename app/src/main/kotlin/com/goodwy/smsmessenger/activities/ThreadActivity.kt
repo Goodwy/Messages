@@ -83,6 +83,7 @@ import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 import kotlin.collections.set
 import kotlin.math.abs
+import androidx.core.net.toUri
 
 class ThreadActivity : SimpleActivity() {
     private val MIN_DATE_TIME_DIFF_SECS = 300
@@ -839,8 +840,8 @@ class ThreadActivity : SimpleActivity() {
             }
 
             if (intent.extras?.containsKey(THREAD_ATTACHMENT_URI) == true) {
-                val uri = Uri.parse(intent.getStringExtra(THREAD_ATTACHMENT_URI))
-                addAttachment(uri)
+                val uri = intent.getStringExtra(THREAD_ATTACHMENT_URI)?.toUri()
+                if (uri != null) addAttachment(uri)
             } else if (intent.extras?.containsKey(THREAD_ATTACHMENT_URIS) == true) {
                 (intent.getSerializableExtra(THREAD_ATTACHMENT_URIS) as? ArrayList<Uri>)?.forEach {
                     addAttachment(it)
@@ -1558,9 +1559,9 @@ class ThreadActivity : SimpleActivity() {
         var inputStream: InputStream? = null
         var outputStream: OutputStream? = null
         try {
-            inputStream = contentResolver.openInputStream(Uri.parse(lastAttachmentUri))
+            inputStream = lastAttachmentUri?.let { contentResolver.openInputStream(it.toUri()) }
             outputStream =
-                contentResolver.openOutputStream(Uri.parse(resultData.dataString!!), "rwt")
+                contentResolver.openOutputStream(resultData.dataString!!.toUri(), "rwt")
             inputStream!!.copyTo(outputStream!!)
             outputStream.flush()
             toast(com.goodwy.commons.R.string.file_saved)

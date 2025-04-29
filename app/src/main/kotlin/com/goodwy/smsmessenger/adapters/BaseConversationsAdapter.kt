@@ -92,9 +92,9 @@ abstract class BaseConversationsAdapter(
         ensureBackgroundThread {
             val newDrafts = HashMap<Long, String>()
             fetchDrafts(newDrafts)
-            if (drafts.hashCode() != newDrafts.hashCode()) {
-                drafts = newDrafts
-                activity.runOnUiThread {
+            activity.runOnUiThread {
+                if (drafts.hashCode() != newDrafts.hashCode()) {
+                    drafts = newDrafts
                     notifyDataSetChanged()
                 }
             }

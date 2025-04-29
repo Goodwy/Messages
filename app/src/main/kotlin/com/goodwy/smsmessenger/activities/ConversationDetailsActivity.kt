@@ -366,7 +366,7 @@ class ConversationDetailsActivity : SimpleActivity() {
                                 val monthName = getDateFormatFromDateString(this@ConversationDetailsActivity, simpleContact.birthdays.first(), "yyyy-MM-dd")
                                 conversationBirthdaysContainer.beVisible()
                                 conversationBirthdaysPress.setOnClickListener {
-                                    copyToClipboard(monthName!!)
+                                    if (monthName != null) copyToClipboard(monthName)
                                 }
                                 conversationBirthdaysTitle.apply {
                                     setTextColor(getProperTextColor())

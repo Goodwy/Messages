@@ -13,7 +13,7 @@
     <string name="message_details_sim">SIM</string>
 
     <!-- Release notes -->
-    <string name="release_618">
+    <string name="release_620">
         Changed behavior of the search bar\n
         Added avatar display for companies\n
         Fixed avatar display in some cases\n
