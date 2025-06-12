@@ -48,15 +48,17 @@ fun String.isPlainTextMimeType(): Boolean {
     return lowercase() == "text/plain"
 }
 
+// Trying to get the code from the SMS to offer to copy in the notification
 fun String.getNumbersFromText(): String? {
-    val numbers = Regex("[+0-9]+").findAll(this)
+    val numbers = Regex("(?=.*\\d)[\\d.,]+").findAll(this)
         .map(MatchResult::value)
         .toList()
-    return numbers.firstOrNull {it.count() in 4..6}
+    return numbers.firstOrNull { it.count() in 4..6 && "." !in it && "," !in it }
 }
 
+// Trying to get numbers, dates, amounts from SMS to offer to copy
 fun String.getListNumbersFromText(): List<String> {
-    val numbers = Regex("[+0-9]+").findAll(this)
+    val numbers = Regex("(?=.*\\d)[\\d.,]+").findAll(this)
         .map(MatchResult::value)
         .toList()
     return numbers.filter { it.count() in 4..30 }

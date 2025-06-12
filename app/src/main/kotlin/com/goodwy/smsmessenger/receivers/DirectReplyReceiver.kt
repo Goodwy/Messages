@@ -8,7 +8,6 @@ import android.os.Handler
 import android.os.Looper
 import androidx.core.app.RemoteInput
 import com.goodwy.commons.extensions.showErrorToast
-import com.goodwy.commons.extensions.toast
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.smsmessenger.extensions.*
