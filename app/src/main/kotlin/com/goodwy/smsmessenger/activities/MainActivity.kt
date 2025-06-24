@@ -13,7 +13,6 @@ import android.provider.Telephony
 import android.text.TextUtils
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.goodwy.commons.dialogs.PermissionRequiredDialog
 import com.goodwy.commons.extensions.*
@@ -193,6 +192,7 @@ class MainActivity : SimpleActivity() {
             when (menuItem.itemId) {
                 R.id.show_recycle_bin -> launchRecycleBin()
                 R.id.show_archived -> launchArchivedConversations()
+                R.id.show_blocked_numbers -> showBlockedNumbers()
                 R.id.settings -> launchSettings()
                 R.id.about -> launchAbout()
                 else -> return@setOnMenuItemClickListener false
@@ -207,7 +207,21 @@ class MainActivity : SimpleActivity() {
         binding.mainMenu.getToolbar().menu.apply {
             findItem(R.id.show_recycle_bin).isVisible = config.useRecycleBin
             findItem(R.id.show_archived).isVisible = config.isArchiveAvailable
+            findItem(R.id.show_blocked_numbers).title =
+                if (config.showBlockedNumbers) getString(com.goodwy.strings.R.string.hide_blocked_numbers)
+                else getString(com.goodwy.strings.R.string.show_blocked_numbers)
         }
+    }
+
+    private fun showBlockedNumbers() {
+        config.showBlockedNumbers = !config.showBlockedNumbers
+        binding.mainMenu.getToolbar().menu.findItem(R.id.show_blocked_numbers).title =
+            if (config.showBlockedNumbers) getString(com.goodwy.strings.R.string.hide_blocked_numbers)
+            else getString(com.goodwy.strings.R.string.show_blocked_numbers)
+//        runOnUiThread {
+//            getRecentsFragment()?.refreshItems()
+//        }
+        initMessenger()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
@@ -584,7 +598,8 @@ class MainActivity : SimpleActivity() {
                 date = date,
                 threadId = conversation.threadId,
                 photoUri = conversation.photoUri,
-                isCompany = conversation.isCompany
+                isCompany = conversation.isCompany,
+                isBlocked = conversation.isBlocked
             )
             searchResults.add(searchResult)
         }
@@ -680,6 +695,7 @@ class MainActivity : SimpleActivity() {
             add(Release(611, R.string.release_611))
             add(Release(620, R.string.release_620))
             add(Release(630, R.string.release_630))
+            add(Release(631, R.string.release_631))
             checkWhatsNew(this, BuildConfig.VERSION_CODE)
         }
     }

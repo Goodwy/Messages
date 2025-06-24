@@ -2328,7 +2328,7 @@ class ThreadActivity : SimpleActivity() {
         }
 
         if (conversation != null && (!isDestroyed || !isFinishing)) {
-            if (threadTitle == conversation!!.phoneNumber || (conversation!!.isCompany && conversation!!.photoUri == "")) {
+            if ((threadTitle == conversation!!.phoneNumber || conversation!!.isCompany) && conversation!!.photoUri == "") {
                 val drawable =
                     if (conversation!!.isCompany) ResourcesCompat.getDrawable(
                         resources,

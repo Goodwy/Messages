@@ -1,12 +1,15 @@
 package com.goodwy.smsmessenger.adapters
 
 import android.content.Intent
+import android.os.Build
 import android.text.TextUtils
 import android.view.Menu
+import androidx.annotation.RequiresApi
 import com.goodwy.commons.dialogs.ConfirmationDialog
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.KEY_PHONE
 import com.goodwy.commons.helpers.ensureBackgroundThread
+import com.goodwy.commons.helpers.isNougatPlus
 import com.goodwy.commons.views.MyRecyclerView
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
@@ -25,6 +28,9 @@ class ConversationsAdapter(
     onRefresh: () -> Unit,
     itemClick: (Any) -> Unit
 ) : BaseConversationsAdapter(activity, recyclerView, onRefresh, itemClick) {
+
+    private var getBlockedNumbers = activity.getBlockedNumbers()
+
     override fun getActionMenuId() = R.menu.cab_conversations
 
     override fun prepareActionMode(menu: Menu) {
@@ -33,9 +39,13 @@ class ConversationsAdapter(
         val selectedConversation = selectedItems.firstOrNull() ?: return
         val isGroupConversation = selectedConversation.isGroupConversation
         val archiveAvailable = activity.config.isArchiveAvailable
+        val isAllBlockedNumbers = isAllBlockedNumbers()
+        val isAllUnblockedNumbers = isAllUnblockedNumbers()
 
         menu.apply {
             //findItem(R.id.cab_block_number).title = activity.addLockedLabelIfNeeded(com.goodwy.commons.R.string.block_number)
+            findItem(R.id.cab_block_number).isVisible = isAllUnblockedNumbers && !isAllBlockedNumbers
+            findItem(R.id.cab_unblock_number).isVisible = isAllBlockedNumbers && !isAllUnblockedNumbers
             findItem(R.id.cab_add_number_to_contact).isVisible = isSingleSelection && !isGroupConversation
             findItem(R.id.cab_dial_number).isVisible =
                 isSingleSelection && !isGroupConversation && !isShortCodeWithLetters(selectedConversation.phoneNumber)
@@ -48,6 +58,20 @@ class ConversationsAdapter(
         }
     }
 
+    private fun isAllBlockedNumbers(): Boolean {
+        getSelectedItems().map { it.phoneNumber }.forEach { number ->
+            if (activity.isNumberBlocked(number, getBlockedNumbers)) return true
+        }
+        return false
+    }
+
+    private fun isAllUnblockedNumbers(): Boolean {
+        getSelectedItems().map { it.phoneNumber }.forEach { number ->
+            if (!activity.isNumberBlocked(number, getBlockedNumbers)) return true
+        }
+        return false
+    }
+
     override fun actionItemPressed(id: Int) {
         if (selectedKeys.isEmpty()) {
             return
@@ -56,6 +80,7 @@ class ConversationsAdapter(
         when (id) {
             R.id.cab_add_number_to_contact -> addNumberToContact()
             R.id.cab_block_number -> askConfirmBlock()
+            R.id.cab_unblock_number -> askConfirmBlock()
             R.id.cab_dial_number -> dialNumber()
             R.id.cab_copy_number -> copyNumberToClipboard()
             R.id.cab_delete -> askConfirmDelete()
@@ -80,33 +105,55 @@ class ConversationsAdapter(
     private fun askConfirmBlock() {
         val numbers = getSelectedItems().distinctBy { it.phoneNumber }.map { it.phoneNumber }
         val numbersString = TextUtils.join(", ", numbers)
-        val question = String.format(
-            resources.getString(com.goodwy.commons.R.string.block_confirmation),
-            numbersString
-        )
+        val isBlockNumbers = numbers.any { activity.isNumberBlocked(it, activity.getBlockedNumbers()) }
+        val baseString = if (isBlockNumbers) com.goodwy.strings.R.string.unblock_confirmation else com.goodwy.commons.R.string.block_confirmation
+        val question = String.format(resources.getString(baseString), numbersString)
 
         ConfirmationDialog(activity, question) {
-            blockNumbers()
+            blockNumbers(isBlockNumbers)
         }
     }
 
-    private fun blockNumbers() {
+    private fun blockNumbers(unblock: Boolean) {
         if (selectedKeys.isEmpty()) {
             return
         }
 
         val numbersToBlock = getSelectedItems()
-        val newList = currentList.toMutableList().apply { removeAll(numbersToBlock) }
+        if (unblock) {
+            ensureBackgroundThread {
+                numbersToBlock.map { it.phoneNumber }.forEach { number ->
+                    activity.deleteBlockedNumber(number)
+                }
 
-        ensureBackgroundThread {
-            numbersToBlock.map { it.phoneNumber }.forEach { number ->
-                activity.addBlockedNumber(number)
+                activity.runOnUiThread {
+                    selectedKeys.clear()
+                    finishActMode()
+                    refreshMessages()
+                    getBlockedNumbers = activity.getBlockedNumbers()
+                }
             }
+        } else {
+            val newList = currentList.toMutableList().apply { removeAll(numbersToBlock) }
+            ensureBackgroundThread {
+                //mark read
+                numbersToBlock.filter { conversation -> !conversation.read }.forEach {
+                    activity.conversationsDB.markRead(it.threadId)
+                    activity.markThreadMessagesRead(it.threadId)
+                }
 
-            activity.runOnUiThread {
-                submitList(newList)
-                selectedKeys.clear()
-                finishActMode()
+                //block
+                numbersToBlock.map { it.phoneNumber }.forEach { number ->
+                    activity.addBlockedNumber(number)
+                }
+
+                activity.runOnUiThread {
+                    if (!activity.config.showBlockedNumbers) submitList(newList)
+                    selectedKeys.clear()
+                    finishActMode()
+                    refreshMessages()
+                    getBlockedNumbers = activity.getBlockedNumbers()
+                }
             }
         }
     }
@@ -492,7 +539,7 @@ class ConversationsAdapter(
     }
 
     private fun swipedCall(conversation: Conversation) {
-        if (conversation.isGroupConversation) activity.toast(com.goodwy.commons.R.string.no_phone_number_found)
+        if (conversation.isGroupConversation || isShortCodeWithLetters(conversation.phoneNumber)) activity.toast(com.goodwy.commons.R.string.no_phone_number_found)
         else {
             activity.launchCallIntent(conversation.phoneNumber, key = BuildConfig.RIGHT_APP_KEY)
             finishActMode()

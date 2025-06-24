@@ -126,7 +126,7 @@ fun Context.getMessages(
             isBlocked
         }
 
-        if (isNumberBlocked) {
+        if (isNumberBlocked && !config.showBlockedNumbers) {
             return@queryCursor
         }
 
@@ -400,18 +400,14 @@ fun Context.getConversations(
                 val recipientIds =
                     rawIds.split(" ").filter { it.areDigitsOnly() }.map { it.toInt() }.toMutableList()
                 val phoneNumbers = getThreadPhoneNumbers(recipientIds)
-                if (phoneNumbers.isEmpty() || phoneNumbers.any {
-                        isNumberBlocked(
-                            it,
-                            blockedNumbers
-                        )
-                    }) {
+                val isBlocked = phoneNumbers.any { isNumberBlocked(it, blockedNumbers) }
+                if (phoneNumbers.isEmpty() || (isBlocked && !config.showBlockedNumbers)) {
                     return@queryCursorUnsafe
                 }
 
                 val names = getThreadContactNames(phoneNumbers, privateContacts)
                 val title = TextUtils.join(", ", names.toTypedArray())
-                val photoUri =
+                var photoUri =
                     if (phoneNumbers.size == 1) simpleContactHelper.getPhotoUriFromPhoneNumber(
                         phoneNumbers.first()
                     ) else ""
@@ -425,10 +421,16 @@ fun Context.getConversations(
 
                 var contact =
                     if (phoneNumbers.size == 1) contacts.firstOrNull { it.doesHavePhoneNumber(phoneNumbers.first()) }
-                else null
+                    else null
                 if (contact == null && phoneNumbers.size == 1) {
                     contact = privateContacts.firstOrNull { it.doesHavePhoneNumber(phoneNumbers.first()) }
+
+                    if (contact == null) {
+                        contact = contacts.firstOrNull { it.phoneNumbers.map { it.value }.any { it == phoneNumbers.first() } }
+                    }
                 }
+                if (photoUri == "" && contact != null) photoUri = contact.photoUri
+
                 val isABusinessContact =
                     if (phoneNumbers.size == 1) contact?.isABusinessContact() ?: isShortCodeWithLetters(phoneNumbers.first())
                     else false
@@ -445,7 +447,8 @@ fun Context.getConversations(
                     isArchived = archived,
                     isDeleted = deleted,
                     unreadCount = unreadCount,
-                    isCompany = isABusinessContact
+                    isCompany = isABusinessContact,
+                    isBlocked = isBlocked
                 )
                 conversations.add(conversation)
             }
@@ -734,11 +737,11 @@ fun Context.getSuggestedContacts(privateContacts: ArrayList<SimpleContact>): Arr
     queryCursor(uri, projection, null, null, sortOrder, showErrors = true) { cursor ->
         val senderNumber = cursor.getStringValue(Sms.ADDRESS) ?: return@queryCursor
         val namePhoto = getNameAndPhotoFromPhoneNumber(senderNumber)
-        var senderName = namePhoto.name
-        var photoUri = namePhoto.photoUri ?: ""
+        val senderName = namePhoto.name
+        val photoUri = namePhoto.photoUri ?: ""
         var company = ""
         var jobPosition = ""
-        if (isNumberBlocked(senderNumber, blockedNumbers)) {
+        if (isNumberBlocked(senderNumber, blockedNumbers) && !config.showBlockedNumbers) {
             return@queryCursor
         } else if (namePhoto.name == senderNumber) {
             if (privateContacts.isNotEmpty()) {
@@ -1102,14 +1105,16 @@ fun Context.getNameFromAddress(address: String, privateCursor: Cursor?): String 
 fun Context.getContactFromAddress(address: String, callback: ((contact: SimpleContact?) -> Unit)) {
     val privateCursor = getMyContactsCursor(false, true)
     SimpleContactsHelper(this).getAvailableContacts(false) {
-        val contact = it.firstOrNull { it.doesHavePhoneNumber(address) }
+        var contact = it.firstOrNull { it.doesHavePhoneNumber(address) }
         if (contact == null) {
             val privateContacts = MyContactsContentProvider.getSimpleContacts(this, privateCursor)
             val privateContact = privateContacts.firstOrNull { it.doesHavePhoneNumber(address) }
-            callback(privateContact)
-        } else {
-            callback(contact)
+            contact = privateContact
         }
+        if (contact == null) {
+            contact = it.firstOrNull { it.phoneNumbers.map { it.value }.any { it == address } }
+        }
+        callback(contact)
     }
 }
 
@@ -1310,7 +1315,7 @@ fun Context.createTemporaryThread(
     val privateCursor = getMyContactsCursor(false, true)
     simpleContactHelper.getAvailableContacts(false) { contacts ->
         val addresses = message.participants.getAddresses()
-        val photoUri =
+        var photoUri =
             if (addresses.size == 1) simpleContactHelper.getPhotoUriFromPhoneNumber(addresses.first()) else ""
         val title = if (cachedConv != null && cachedConv.usesCustomTitle) {
             cachedConv.title
@@ -1324,7 +1329,13 @@ fun Context.createTemporaryThread(
         if (contact == null && addresses.size == 1) {
             val privateContacts = MyContactsContentProvider.getSimpleContacts(this, privateCursor)
             contact = privateContacts.firstOrNull { it.doesHavePhoneNumber(addresses.first()) }
+
+            if (contact == null) {
+                contact = contacts.firstOrNull { it.phoneNumbers.map { it.value }.any { it == addresses.first() } }
+            }
         }
+        if (photoUri == "" && contact != null) photoUri = contact.photoUri
+
         val isABusinessContact =
             if (addresses.size == 1) contact?.isABusinessContact() ?: isShortCodeWithLetters(addresses.first())
             else false
@@ -1341,7 +1352,8 @@ fun Context.createTemporaryThread(
             isScheduled = true,
             usesCustomTitle = cachedConv?.usesCustomTitle == true,
             isArchived = false,
-            isCompany = isABusinessContact
+            isCompany = isABusinessContact,
+            isBlocked = false
         )
         try {
             conversationsDB.insertOrUpdate(conversation)

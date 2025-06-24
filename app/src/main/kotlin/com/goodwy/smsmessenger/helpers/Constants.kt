@@ -145,6 +145,7 @@ const val UNREAD_INDICATOR_END = 2
 // swiped left action
 const val SWIPE_RIGHT_ACTION = "swipe_right_action"
 const val SWIPE_LEFT_ACTION = "swipe_left_action"
+const val SWIPE_ACTION_NONE = 0
 const val SWIPE_ACTION_MARK_READ = 1
 const val SWIPE_ACTION_DELETE = 2
 const val SWIPE_ACTION_ARCHIVE = 3

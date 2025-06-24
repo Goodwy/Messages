@@ -56,4 +56,10 @@ interface ConversationsDao {
 
     @Query("DELETE FROM conversations WHERE thread_id = :threadId")
     fun deleteThreadId(threadId: Long)
+
+    @Query("UPDATE conversations SET is_blocked = 0 WHERE thread_id = :threadId")
+    fun isUnblock(threadId: Long)
+
+    @Query("UPDATE conversations SET is_blocked = 1 WHERE thread_id = :threadId")
+    fun isBlock(threadId: Long)
 }

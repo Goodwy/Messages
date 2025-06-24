@@ -199,8 +199,6 @@ abstract class BaseConversationsAdapter(
 
             }
 
-            conversationChevron.applyColorFilter(textColor)
-            divider.setBackgroundColor(textColor)
             if (currentList.last() == conversation || !activity.config.useDividers) divider.beInvisible() else divider.beVisible()
 
             swipeView.isSelected = selectedKeys.contains(conversation.hashCode())
@@ -247,9 +245,20 @@ abstract class BaseConversationsAdapter(
             conversationAddress.setTypeface(null, style)
             conversationBodyShort.setTypeface(null, style)
 
-            arrayListOf(conversationAddress, conversationBodyShort, conversationDate).forEach {
-                it.setTextColor(textColor)
+
+            if (conversation.isBlocked) {
+                val colorRed = resources.getColor(R.color.red_call, activity.theme)
+                conversationChevron.applyColorFilter(colorRed)
+                arrayListOf(conversationAddress, conversationBodyShort, conversationDate).forEach {
+                    it.setTextColor(colorRed)
+                }
+            } else {
+                conversationChevron.applyColorFilter(textColor)
+                arrayListOf(conversationAddress, conversationBodyShort, conversationDate).forEach {
+                    it.setTextColor(textColor)
+                }
             }
+            divider.setBackgroundColor(textColor)
 
             // at group conversations we use an icon as the placeholder, not any letter
             val placeholder = if (conversation.isGroupConversation) {
@@ -262,7 +271,7 @@ abstract class BaseConversationsAdapter(
             if (showContactThumbnails) {
                 val size = (root.context.pixels(com.goodwy.commons.R.dimen.normal_icon_size) * contactThumbnailsSize).toInt()
                 conversationImage.setHeightAndWidth(size)
-                if (title == conversation.phoneNumber || (conversation.isCompany && conversation.photoUri == "")) {
+                if ((title == conversation.phoneNumber || conversation.isCompany) && conversation.photoUri == "") {
                     val drawable =
                         if (conversation.isCompany) ResourcesCompat.getDrawable(
                             resources,
@@ -316,14 +325,21 @@ abstract class BaseConversationsAdapter(
                 swipeRightIcon.setImageResource(swipeActionImageResource(swipeRightAction))
                 swipeRightIconHolder.setBackgroundColor(swipeActionColor(swipeRightAction))
 
-                if (isArchived) {
-                    if (swipeLeftAction == SWIPE_ACTION_BLOCK) swipeView.setDirectionEnabled(SwipeDirection.Left, false)
-                    if (swipeRightAction == SWIPE_ACTION_BLOCK) swipeView.setDirectionEnabled(SwipeDirection.Right, false)
-                }
-
                 if (!activity.config.useSwipeToAction) {
                     swipeView.setDirectionEnabled(SwipeDirection.Left, false)
                     swipeView.setDirectionEnabled(SwipeDirection.Right, false)
+                } else if (isArchived) {
+                    if (swipeLeftAction == SWIPE_ACTION_BLOCK || swipeLeftAction == SWIPE_ACTION_NONE) swipeView.setDirectionEnabled(
+                        SwipeDirection.Left,
+                        false
+                    )
+                    if (swipeRightAction == SWIPE_ACTION_BLOCK || swipeRightAction == SWIPE_ACTION_NONE) swipeView.setDirectionEnabled(
+                        SwipeDirection.Right,
+                        false
+                    )
+                } else {
+                    if (swipeLeftAction == SWIPE_ACTION_NONE) swipeView.setDirectionEnabled(SwipeDirection.Left, false)
+                    if (swipeRightAction == SWIPE_ACTION_NONE) swipeView.setDirectionEnabled(SwipeDirection.Right, false)
                 }
 
                 if (activity.config.swipeRipple) {

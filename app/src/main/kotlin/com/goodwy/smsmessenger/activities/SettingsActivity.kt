@@ -760,6 +760,7 @@ class SettingsActivity : SimpleActivity() {
                 RadioItem(SWIPE_ACTION_BLOCK, getString(com.goodwy.commons.R.string.block_number), icon = com.goodwy.commons.R.drawable.ic_block_vector),
                 RadioItem(SWIPE_ACTION_CALL, getString(com.goodwy.commons.R.string.call), icon = com.goodwy.commons.R.drawable.ic_phone_vector),
                 RadioItem(SWIPE_ACTION_MESSAGE, getString(com.goodwy.commons.R.string.send_sms), icon = R.drawable.ic_messages),
+                RadioItem(SWIPE_ACTION_NONE, getString(com.goodwy.commons.R.string.nothing)),
             )
 
             val title =
@@ -790,6 +791,7 @@ class SettingsActivity : SimpleActivity() {
                     RadioItem(SWIPE_ACTION_BLOCK, getString(com.goodwy.commons.R.string.block_number), icon = com.goodwy.commons.R.drawable.ic_block_vector),
                     RadioItem(SWIPE_ACTION_CALL, getString(com.goodwy.commons.R.string.call), icon = com.goodwy.commons.R.drawable.ic_phone_vector),
                     RadioItem(SWIPE_ACTION_MESSAGE, getString(com.goodwy.commons.R.string.send_sms), icon = R.drawable.ic_messages),
+                    RadioItem(SWIPE_ACTION_NONE, getString(com.goodwy.commons.R.string.nothing)),
                 )
 
                 val title =
@@ -817,12 +819,13 @@ class SettingsActivity : SimpleActivity() {
 
     private fun getSwipeActionText(left: Boolean) = getString(
         when (if (left) config.swipeLeftAction else config.swipeRightAction) {
+            SWIPE_ACTION_MARK_READ -> R.string.mark_as_read
             SWIPE_ACTION_DELETE -> com.goodwy.commons.R.string.delete
             SWIPE_ACTION_ARCHIVE -> R.string.archive
             SWIPE_ACTION_BLOCK -> com.goodwy.commons.R.string.block_number
             SWIPE_ACTION_CALL -> com.goodwy.commons.R.string.call
             SWIPE_ACTION_MESSAGE -> com.goodwy.commons.R.string.send_sms
-            else -> R.string.mark_as_read
+            else -> com.goodwy.commons.R.string.nothing
         }
     )
 

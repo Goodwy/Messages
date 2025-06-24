@@ -21,6 +21,7 @@ data class Conversation(
     @ColumnInfo(name = "deleted") var isDeleted: Boolean = false, //An indication that all messages from this conversation are in the trash
     @ColumnInfo(name = "unread_count") var unreadCount: Int = 0,
     @ColumnInfo(name = "is_company") var isCompany: Boolean = false,
+    @ColumnInfo(name = "is_blocked") var isBlocked: Boolean = false,
 ) {
 
     companion object {
@@ -36,7 +37,13 @@ data class Conversation(
                 old.photoUri == new.photoUri &&
                 old.isGroupConversation == new.isGroupConversation &&
                 old.phoneNumber == new.phoneNumber &&
-                old.unreadCount == new.unreadCount
+                old.isScheduled == new.isScheduled &&
+                old.usesCustomTitle == new.usesCustomTitle &&
+                old.isArchived == new.isArchived &&
+                old.isDeleted == new.isDeleted &&
+                old.unreadCount == new.unreadCount &&
+                old.isCompany == new.isCompany &&
+                old.isBlocked == new.isBlocked
         }
     }
 }

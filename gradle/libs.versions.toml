@@ -18,7 +18,7 @@ room = "2.6.1"
 android-smsmms = "c3e678befd"
 indicatorFastScroll = "e37b5b2ad6"
 #Goodwy
-right-commons = "4141ed0727"
+right-commons = "3615f69131"
 behavioRule = "1.0.1"
 rxAnimation = "2.1.1"
 rxJava3 = "3.1.5"
@@ -37,8 +37,8 @@ ez-vcard = "0.11.3"
 shortcut-badger = "1.1.22"
 #versioning
 app-version-appId = "com.goodwy.smsmessenger"
-app-version-versionCode = "630"
-app-version-versionName = "6.3.0"
+app-version-versionCode = "631"
+app-version-versionName = "6.3.1"
 [libraries]
 #AndroidX
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }

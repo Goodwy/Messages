@@ -67,7 +67,6 @@
                 android:id="@+id/threadMessageSenderName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:autoLink="email|web|map"
                 android:textSize="@dimen/normal_text_size"
                 android:maxLines="1"
                 android:visibility="gone"
@@ -78,7 +77,6 @@
                 android:id="@+id/threadMessageBody"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:autoLink="email|web|map"
                 android:textSize="@dimen/normal_text_size"
                 tools:text="Received message" />
         </LinearLayout>

@@ -11,6 +11,7 @@ import android.provider.Telephony
 import com.goodwy.commons.extensions.baseConfig
 import com.goodwy.commons.extensions.getMyContactsCursor
 import com.goodwy.commons.extensions.isNumberBlocked
+import com.goodwy.commons.extensions.toast
 import com.goodwy.commons.helpers.MyContactsContentProvider
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.ensureBackgroundThread
@@ -85,8 +86,8 @@ class SmsReceiver : BroadcastReceiver() {
             return
         }
 
-        val photoUri = SimpleContactsHelper(context).getPhotoUriFromPhoneNumber(address)
-        val bitmap = context.getNotificationBitmap(photoUri)
+        var photoUri = SimpleContactsHelper(context).getPhotoUriFromPhoneNumber(address)
+        var bitmap = context.getNotificationBitmap(photoUri)
         Handler(Looper.getMainLooper()).post {
             if (!context.isNumberBlocked(address)) {
                 val privateCursor = context.getMyContactsCursor(favoritesOnly = false, withPhoneNumbersOnly = true)
@@ -108,12 +109,13 @@ class SmsReceiver : BroadcastReceiver() {
                         } catch (ignored: Exception) {
                         }
 
-
                         val senderName = context.getNameFromAddress(address, privateCursor)
                         val participant = if (contacts.isNotEmpty()) {
-                            val contact = contacts.firstOrNull { it.doesHavePhoneNumber(address) }
+                            val contact = contacts.firstOrNull { it.doesHavePhoneNumber(address) } ?: contacts.firstOrNull { it.phoneNumbers.map { it.value }.any { it == address } }
                             if (contact != null) {
                                 val phoneNumber = contact.phoneNumbers.firstOrNull { it.normalizedNumber == address } ?: PhoneNumber(address, 0, "", address)
+                                if (photoUri.isEmpty()) photoUri = contact.photoUri
+                                if (bitmap == null ) bitmap = context.getNotificationBitmap(photoUri)
                                 SimpleContact(0, 0, senderName, photoUri, arrayListOf(phoneNumber), ArrayList(), ArrayList(), contact.company, contact.jobPosition)
                             } else {
                                 val phoneNumber = PhoneNumber(address, 0, "", address)

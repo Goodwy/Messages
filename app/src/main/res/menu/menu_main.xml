@@ -14,6 +14,10 @@
         android:title="@string/show_archived_conversations"
         app:showAsAction="never" />
     <item
+        android:id="@+id/show_blocked_numbers"
+        android:title="@string/show_blocked_numbers"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/settings"
         android:icon="@drawable/ic_more_horiz"
         android:title="@string/settings"

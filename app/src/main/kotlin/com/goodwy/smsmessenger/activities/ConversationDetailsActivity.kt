@@ -4,7 +4,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
 import android.graphics.PorterDuff
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
 import android.media.AudioAttributes
 import android.media.AudioManager
@@ -270,7 +269,7 @@ class ConversationDetailsActivity : SimpleActivity() {
         }
 
         if (conversation != null) {
-            if (threadTitle == conversation!!.phoneNumber || (conversation!!.isCompany && conversation!!.photoUri == "")) {
+            if ((threadTitle == conversation!!.phoneNumber || conversation!!.isCompany) && conversation!!.photoUri == "") {
                 val drawable =
                     if (conversation!!.isCompany) ResourcesCompat.getDrawable(
                         resources,

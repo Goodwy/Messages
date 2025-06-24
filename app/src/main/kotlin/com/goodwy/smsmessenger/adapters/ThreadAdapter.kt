@@ -4,10 +4,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.*
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.text.TextUtils
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.method.LinkMovementMethod
+import android.text.style.ForegroundColorSpan
+import android.text.style.URLSpan
+import android.text.util.Linkify
 import android.util.Size
 import android.util.TypedValue
 import android.view.*
@@ -33,7 +37,6 @@ import com.bumptech.glide.request.target.Target
 import com.goodwy.commons.adapters.MyRecyclerViewListAdapter
 import com.goodwy.commons.dialogs.ConfirmationDialog
 import com.goodwy.commons.extensions.*
-import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.views.MyRecyclerView
 import com.goodwy.smsmessenger.R
@@ -56,6 +59,8 @@ import kotlin.math.abs
 import androidx.core.view.get
 import androidx.core.text.layoutDirection
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.net.toUri
+import androidx.core.view.size
 
 class ThreadAdapter(
     activity: SimpleActivity,
@@ -282,12 +287,78 @@ class ThreadAdapter(
         }
     }
 
+    private fun getActionTitleAndIcon(url: String): Pair<Int, Int> {
+        return when {
+            url.startsWith("tel") -> Pair(com.goodwy.commons.R.string.call, com.goodwy.commons.R.drawable.ic_phone_vector)
+            url.startsWith("mailto") -> Pair(com.goodwy.commons.R.string.send_email, com.goodwy.commons.R.drawable.ic_mail_vector)
+            url.startsWith("geo") -> Pair(com.goodwy.strings.R.string.open_in_maps, R.drawable.ic_place_vector)
+            else -> Pair(com.goodwy.strings.R.string.open, R.drawable.ic_launch)
+        }
+    }
+
+    private fun showLinkPopupMenu(context: Context, url: String, view: View) {
+        val wrapper: Context = ContextThemeWrapper(activity, activity.getPopupMenuTheme())
+        val popupMenu = PopupMenu(wrapper, view, Gravity.END)
+        val text = url.toUri().schemeSpecificPart
+        val (title, icon) = getActionTitleAndIcon(url)
+
+        popupMenu.menu.add(1, 0, 0, text).setIcon(R.drawable.ic_empty)
+        popupMenu.menu.add(1, 1, 1, title).setIcon(icon)
+        if (title == com.goodwy.commons.R.string.call) popupMenu.menu.add(1, 2, 2, com.goodwy.strings.R.string.message).setIcon(R.drawable.ic_messages)
+        popupMenu.menu.add(1, 3, 3, com.goodwy.strings.R.string.search_the_web).setIcon(R.drawable.ic_internet)
+        popupMenu.menu.add(1, 4, 4, com.goodwy.commons.R.string.share).setIcon(com.goodwy.commons.R.drawable.ic_ios_share)
+        popupMenu.menu.add(1, 5, 5, com.goodwy.commons.R.string.copy).setIcon(com.goodwy.commons.R.drawable.ic_copy_vector)
+
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                0 -> activity.copyToClipboard(text)
+
+                2 -> activity.launchSendSMSIntent(text)
+
+                3 -> activity.launchInternetSearch(text)
+
+                4 -> activity.shareTextIntent(text)
+
+                5 -> activity.copyToClipboard(text)
+
+                else -> {
+                    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+                    context.startActivity(intent)
+                }
+            }
+            true
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            popupMenu.setForceShowIcon(true)
+        }
+        popupMenu.show()
+        // icon coloring
+        popupMenu.menu.apply {
+            for (index in 0 until this.size) {
+                val item = this[index]
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    item.icon!!.colorFilter = BlendModeColorFilter(
+                        textColor, BlendMode.SRC_IN
+                    )
+                } else {
+                    item.icon!!.setColorFilter(textColor, PorterDuff.Mode.SRC_IN)
+                }
+            }
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupView(holder: ViewHolder, view: View, message: Message) {
         ItemMessageBinding.bind(view).apply {
             threadMessageHolder.isSelected = selectedKeys.contains(message.hashCode())
             threadMessageBodyWrapper.beVisibleIf(message.body.isNotEmpty())
             threadMessageBody.apply {
-                text = message.body
+                val spannable = SpannableString(message.body)
+                Linkify.addLinks(spannable, Linkify.ALL)
+                text = spannable
+                movementMethod = LinkMovementMethod.getInstance()
+
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSizeMessage)
                 setOnLongClickListener {
                     holder.viewLongClicked()
@@ -317,6 +388,25 @@ class ThreadAdapter(
                             else -> return@setOnClickListener
                         }
                     }
+                }
+
+                setOnTouchListener { v, event ->
+                    val action = event.action
+                    if (action == MotionEvent.ACTION_UP) {
+                        val x = event.x
+                        val y = event.y
+
+                        val offset = this.getOffsetForPosition(x, y)
+                        if (offset != -1) {
+                            val links = spannable.getSpans(offset, offset, URLSpan::class.java)
+                            if (links.isNotEmpty()) {
+                                val url = links[0].url
+                                showLinkPopupMenu(v.context, url, v)
+                                return@setOnTouchListener true
+                            }
+                        }
+                    }
+                    false
                 }
             }
 
@@ -352,11 +442,13 @@ class ThreadAdapter(
         val text = message.body
         val numbersList = text.getListNumbersFromText()
         popupMenu.menu.add(1, 1, 1, com.goodwy.commons.R.string.delete).setIcon(com.goodwy.commons.R.drawable.ic_delete_outline)
-        popupMenu.menu.add(1, 2, 2, com.goodwy.commons.R.string.share).setIcon(com.goodwy.commons.R.drawable.ic_ios_share)
-        popupMenu.menu.add(1, 3, 3, com.goodwy.commons.R.string.properties).setIcon(com.goodwy.commons.R.drawable.ic_info_vector)
-        popupMenu.menu.add(1, 4, 4, R.string.forward_message).setIcon(R.drawable.ic_redo_vector)
-        popupMenu.menu.add(1, 5, 5, com.goodwy.commons.R.string.select_text).setIcon(R.drawable.ic_text_select)
-        popupMenu.menu.add(1, 6, 6, com.goodwy.commons.R.string.copy).setIcon(com.goodwy.commons.R.drawable.ic_copy_vector)
+        popupMenu.menu.add(1, 2, 2, com.goodwy.strings.R.string.search_the_web).setIcon(R.drawable.ic_internet)
+        popupMenu.menu.add(1, 3, 3, com.goodwy.commons.R.string.share).setIcon(com.goodwy.commons.R.drawable.ic_ios_share)
+        popupMenu.menu.add(1, 4, 4, com.goodwy.commons.R.string.properties).setIcon(com.goodwy.commons.R.drawable.ic_info_vector)
+        popupMenu.menu.add(1, 5, 5, R.string.forward_message).setIcon(R.drawable.ic_redo_vector)
+        popupMenu.menu.add(1, 6, 6, com.goodwy.commons.R.string.select_text).setIcon(R.drawable.ic_text_select)
+        popupMenu.menu.add(1, 7, 7, com.goodwy.commons.R.string.copy).setIcon(com.goodwy.commons.R.drawable.ic_copy_vector)
+        val staticItem = 8
         if (numbersList.isNotEmpty()) {
             numbersList.apply {
                 val size = numbersList.size
@@ -364,7 +456,7 @@ class ThreadAdapter(
                 for (index in range) {
                     val item = this[index]
                     val menuName = activity.getString(com.goodwy.commons.R.string.copy) + " \"${item}\""
-                    popupMenu.menu.add(1, 7 + index, 7 + index, menuName).setIcon(com.goodwy.commons.R.drawable.ic_copy_vector)
+                    popupMenu.menu.add(1, staticItem + index, staticItem + index, menuName).setIcon(com.goodwy.commons.R.drawable.ic_copy_vector)
                 }
             }
         }
@@ -372,11 +464,13 @@ class ThreadAdapter(
             when (item.itemId) {
                 1 -> askConfirmDelete(message)
 
-                2 -> activity.shareTextIntent(text)
+                2 -> activity.launchInternetSearch(text)
 
-                3 -> MessageDetailsDialog(activity, message)
+                3 -> activity.shareTextIntent(text)
 
-                4 -> {
+                4 -> MessageDetailsDialog(activity, message)
+
+                5 -> {
                     val attachment = message.attachment?.attachments?.firstOrNull()
                     Intent(activity, NewConversationActivity::class.java).apply {
                         action = Intent.ACTION_SEND
@@ -390,12 +484,12 @@ class ThreadAdapter(
                     }
                 }
 
-                5 -> SelectTextDialog(activity, text)
+                6 -> SelectTextDialog(activity, text)
 
-                6 -> activity.copyToClipboard(text)
+                7 -> activity.copyToClipboard(text)
 
                 else -> {
-                    if (numbersList.isNotEmpty()) activity.copyToClipboard(numbersList[item.itemId - 7])
+                    if (numbersList.isNotEmpty()) activity.copyToClipboard(numbersList[item.itemId - staticItem])
                 }
             }
             true
@@ -406,15 +500,31 @@ class ThreadAdapter(
         popupMenu.show()
         // icon coloring
         popupMenu.menu.apply {
-            for (index in 0 until this.size()) {
+            for (index in 0 until this.size) {
                 val item = this[index]
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    item.icon!!.colorFilter = BlendModeColorFilter(
-                        textColor, BlendMode.SRC_IN
-                    )
+                if (index == 0) {
+                    val colorRed = resources.getColor(R.color.red_call, activity.theme)
+                    val coloredText = SpannableString(item.title).apply {
+                        setSpan(ForegroundColorSpan(colorRed), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    }
+                    item.title = coloredText
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        item.icon!!.colorFilter = BlendModeColorFilter(
+                            colorRed, BlendMode.SRC_IN
+                        )
+                    } else {
+                        item.icon!!.setColorFilter(colorRed, PorterDuff.Mode.SRC_IN)
+                    }
                 } else {
-                    item.icon!!.setColorFilter(textColor, PorterDuff.Mode.SRC_IN)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        item.icon!!.colorFilter = BlendModeColorFilter(
+                            textColor, BlendMode.SRC_IN
+                        )
+                    } else {
+                        item.icon!!.setColorFilter(textColor, PorterDuff.Mode.SRC_IN)
+                    }
                 }
             }
         }
@@ -442,7 +552,7 @@ class ThreadAdapter(
         }
         popupMenu.show()
         popupMenu.menu.apply {
-            for (index in 0 until this.size()) {
+            for (index in 0 until this.size) {
                 val item = this[index]
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

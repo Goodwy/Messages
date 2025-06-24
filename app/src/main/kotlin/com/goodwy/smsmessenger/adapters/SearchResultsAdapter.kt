@@ -96,7 +96,7 @@ class SearchResultsAdapter(
             }
 
             searchResultImage.beGoneIf(!activity.config.showContactThumbnails)
-            if (searchResult.title == searchResult.phoneNumber || (searchResult.isCompany && searchResult.photoUri == "")) {
+            if ((searchResult.title == searchResult.phoneNumber || searchResult.isCompany) && searchResult.photoUri == "") {
                 val drawable =
                     if (searchResult.isCompany) ResourcesCompat.getDrawable(
                         resources,

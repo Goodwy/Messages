@@ -8,5 +8,6 @@ data class SearchResult(
     val date: String,
     val threadId: Long,
     var photoUri: String,
-    val isCompany: Boolean = false
+    val isCompany: Boolean = false,
+    val isBlocked: Boolean = false
 )

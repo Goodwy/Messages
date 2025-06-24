@@ -11,6 +11,7 @@ import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
 import com.goodwy.smsmessenger.extensions.*
 import com.goodwy.smsmessenger.helpers.*
+import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import com.goodwy.smsmessenger.models.Conversation
 
 class ArchivedConversationsAdapter(
@@ -202,7 +203,7 @@ class ArchivedConversationsAdapter(
     }
 
     private fun swipedCall(conversation: Conversation) {
-        if (conversation.isGroupConversation) activity.toast(com.goodwy.commons.R.string.no_phone_number_found)
+        if (conversation.isGroupConversation || isShortCodeWithLetters(conversation.phoneNumber)) activity.toast(com.goodwy.commons.R.string.no_phone_number_found)
         else {
             activity.launchCallIntent(conversation.phoneNumber, key = BuildConfig.RIGHT_APP_KEY)
             finishActMode()

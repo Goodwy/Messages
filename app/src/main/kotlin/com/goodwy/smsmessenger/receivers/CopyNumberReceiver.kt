@@ -15,6 +15,7 @@ class CopyNumberReceiver : BroadcastReceiver() {
             COPY_NUMBER -> {
                 val body = intent.getStringExtra(THREAD_TEXT)
                 val threadId = intent.getLongExtra(THREAD_ID, 0L)
+                context.notificationManager.cancel(threadId.hashCode())
                 ensureBackgroundThread {
                     context.copyToClipboard(body!!)
                     context.markThreadMessagesRead(threadId)
@@ -27,6 +28,7 @@ class CopyNumberReceiver : BroadcastReceiver() {
                 val body = intent.getStringExtra(THREAD_TEXT)
                 val threadId = intent.getLongExtra(THREAD_ID, 0L)
                 val messageId = intent.getLongExtra(MESSAGE_ID, 0L)
+                context.notificationManager.cancel(threadId.hashCode())
                 ensureBackgroundThread {
                     context.copyToClipboard(body!!)
                     context.markThreadMessagesRead(threadId)
