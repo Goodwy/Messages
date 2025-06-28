@@ -213,7 +213,7 @@ class NotificationHelper(private val context: Context) {
             val copyNumber =
                 PendingIntent.getBroadcast(context, threadId.hashCode(), copyNumberIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
             builder.addAction(com.goodwy.commons.R.drawable.ic_copy_vector, textCopyNumber, copyNumber)
-                .setChannelId(NOTIFICATION_CHANNEL)
+                .setChannelId(notificationChannelId)
         }
 
 //        if (isNoReplySms) {
@@ -221,7 +221,7 @@ class NotificationHelper(private val context: Context) {
                 com.goodwy.commons.R.drawable.ic_delete_outline,
                 context.getString(com.goodwy.commons.R.string.delete),
                 deleteSmsPendingIntent
-            ).setChannelId(NOTIFICATION_CHANNEL)
+            ).setChannelId(notificationChannelId)
 //        }
 
         notificationManager.notify(notificationId, builder.build())

@@ -13,6 +13,10 @@
     <string name="message_details_sim">SIM</string>
 
     <!-- Release notes -->
+    <string name="release_632">
+        Fixed notification sound\n
+        Fixed bugs, improved stability
+    </string>
     <string name="release_631">
         When a number is blocked, its messages are marked as read\n
         You can disable one of the swipe gestures\n
