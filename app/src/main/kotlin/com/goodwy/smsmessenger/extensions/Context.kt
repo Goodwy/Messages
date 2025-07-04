@@ -416,7 +416,9 @@ fun Context.getConversations(
                 val archived =
                     if (archiveAvailable) cursor.getIntValue(Threads.ARCHIVED) == 1 else false
                 val deleted =
-                    if (useRecycleBin) messagesDB.getNonRecycledThreadMessages(id).isEmpty() else false
+                    if (useRecycleBin) messagesDB.getNonRecycledThreadMessages(id).isEmpty()
+                        && messagesDB.getThreadMessagesFromRecycleBin(id).isNotEmpty()
+                    else false
                 val unreadCount = messagesDB.getThreadUnreadMessages(id)
 
                 var contact =

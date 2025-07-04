@@ -697,6 +697,7 @@ class MainActivity : SimpleActivity() {
             add(Release(630, R.string.release_630))
             add(Release(631, R.string.release_631))
             add(Release(632, R.string.release_632))
+            add(Release(633, R.string.release_633))
             checkWhatsNew(this, BuildConfig.VERSION_CODE)
         }
     }
