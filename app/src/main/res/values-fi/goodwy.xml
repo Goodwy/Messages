@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Chatin otsikkotyyli</string>
     <string name="unread_at_top_g">Lukematon aina huipulla</string>
     <string name="show_sim_selection_dialog">Näytä SIM-kortin valintaikkuna lähetettäessä</string>
-    <string name="voice_input">Äänisyöttö</string>
     <string name="delete_after_copy">Viestin poistaminen numeron kopioimisen jälkeen ilmoituksesta</string>
     <string name="sound_on_out_going_messages">Ääni viestiä lähetettäessä</string>
+    <string name="delivered">Toimitettu</string>
+    <string name="failed">Epäonnistui</string>
+    <string name="pending">Odottaa</string>
+    <string name="message_type">Viestin tyyppi</string>
 </resources>

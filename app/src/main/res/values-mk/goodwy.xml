@@ -4,4 +4,10 @@
     <string name="chat_title_style_g">Стил на наслов на разговор</string>
     <string name="unread_at_top_g">Непрочитано секогаш на врвот</string>
     <string name="show_sim_selection_dialog">Прикажи дијалог за избор на SIM картичка при испраќање</string>
+    <string name="sound_on_out_going_messages">Звучи на пораките што излегуваат</string>
+    <string name="delivered">Доставено</string>
+    <string name="failed">Неуспешно</string>
+    <string name="pending">Во очекување</string>
+    <string name="message_type">Тип на порака</string>
+    <string name="delete_after_copy">Избришете ја пораката откако ќе го копирате бројот од известувањето</string>
 </resources>

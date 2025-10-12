@@ -1,7 +1,6 @@
 package com.goodwy.smsmessenger.models
 
 import android.content.Context
-import com.goodwy.commons.extensions.copyToClipboard
 import com.goodwy.commons.extensions.normalizePhoneNumber
 import com.goodwy.smsmessenger.extensions.config
 import com.goodwy.smsmessenger.extensions.format

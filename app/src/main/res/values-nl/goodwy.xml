@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Chattitels stijl</string>
     <string name="unread_at_top_g">Ongelezen altijd bovenaan</string>
     <string name="show_sim_selection_dialog">Dialoogvenster voor SIM-kaartselectie weergeven tijdens verzending</string>
-    <string name="voice_input">Spraakinvoer</string>
     <string name="delete_after_copy">Bericht verwijderen na het kopiëren van een nummer uit een melding</string>
     <string name="sound_on_out_going_messages">Geluid bij het verzenden van een bericht</string>
+    <string name="delivered">Afgeleverd</string>
+    <string name="failed">Mislukt</string>
+    <string name="pending">In behandeling</string>
+    <string name="message_type">Berichttype</string>
 </resources>

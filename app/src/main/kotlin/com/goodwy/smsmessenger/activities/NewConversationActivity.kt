@@ -13,10 +13,8 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.reddit.indicatorfastscroll.FastScrollItemIndicator
-import com.goodwy.commons.dialogs.RadioGroupDialog
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.*
-import com.goodwy.commons.models.RadioItem
 import com.goodwy.commons.models.SimpleContact
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.adapters.ContactsAdapter
@@ -194,25 +192,8 @@ class NewConversationActivity : SimpleActivity() {
             ContactsAdapter(this, contacts, binding.contactsList) {
                 hideKeyboard()
                 val contact = it as SimpleContact
-                val phoneNumbers = contact.phoneNumbers
-                if (phoneNumbers.size > 1) {
-                    val items = ArrayList<RadioItem>()
-                    phoneNumbers.forEachIndexed { index, phoneNumber ->
-                        val type = getPhoneNumberTypeText(phoneNumber.type, phoneNumber.label)
-                        val favorite = if (phoneNumber.isPrimary) " ★" else ""
-                        items.add(
-                            RadioItem(
-                                index,
-                                "${phoneNumber.value} ($type) $favorite",
-                                phoneNumber.normalizedNumber)
-                        )
-                    }
-
-                    RadioGroupDialog(this, items) {
-                        launchThreadActivity(it as String, contact.name, photoUri = contact.photoUri)
-                    }
-                } else {
-                    launchThreadActivity(phoneNumbers.first().normalizedNumber, contact.name, photoUri = contact.photoUri)
+                maybeShowNumberPickerDialog(contact.phoneNumbers) { number ->
+                    launchThreadActivity(number.normalizedNumber, contact.name, photoUri = contact.photoUri)
                 }
             }.apply {
                 binding.contactsList.adapter = this

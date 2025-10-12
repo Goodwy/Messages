@@ -4,7 +4,6 @@ import android.view.Menu
 import com.goodwy.commons.dialogs.ConfirmationDialog
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.ensureBackgroundThread
-import com.goodwy.commons.helpers.isNougatPlus
 import com.goodwy.commons.views.MyRecyclerView
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R

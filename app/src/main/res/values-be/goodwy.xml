@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Стыль загалоўка чата</string>
     <string name="unread_at_top_g">Непрачытанае заўсёды ўверсе</string>
     <string name="show_sim_selection_dialog">Паказаць дыялог выбару SIM-карты пры адпраўцы</string>
-    <string name="voice_input">Галасавы ўвод</string>
     <string name="delete_after_copy">Выдаляць паведамленне пасля капіявання нумара з апавяшчэння</string>
     <string name="sound_on_out_going_messages">Гук пры адпраўцы паведамлення</string>
+    <string name="delivered">Дастаўлены</string>
+    <string name="failed">Не атрымалася</string>
+    <string name="pending">У чаканні</string>
+    <string name="message_type">Тып паведамлення</string>
 </resources>

@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Gaya judul obrolan</string>
     <string name="unread_at_top_g">Belum dibaca selalu di atas</string>
     <string name="show_sim_selection_dialog">Tampilkan dialog pemilihan kartu SIM saat mengirim</string>
-    <string name="voice_input">Masukan suara</string>
     <string name="delete_after_copy">Hapus pesan setelah menyalin nomor dari notifikasi</string>
     <string name="sound_on_out_going_messages">Suara saat mengirim pesan</string>
+    <string name="delivered">Terkirim</string>
+    <string name="failed">Gagal</string>
+    <string name="pending">Tertunda</string>
+    <string name="message_type">Jenis pesan</string>
 </resources>

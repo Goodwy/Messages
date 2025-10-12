@@ -4,4 +4,10 @@
     <string name="chat_title_style_g">Chat title style</string>
     <string name="unread_at_top_g">Unread always at the top</string>
     <string name="show_sim_selection_dialog">Show SIM card selection dialog when sending</string>
+    <string name="sound_on_out_going_messages">বার্তা আউট যাচ্ছে শব্দ</string>
+    <string name="delivered">বিতরণ করা হয়েছে</string>
+    <string name="failed">ব্যর্থ হয়েছে</string>
+    <string name="pending">মুলতুবি</string>
+    <string name="message_type">বার্তার ধরন</string>
+    <string name="delete_after_copy">বিজ্ঞপ্তি থেকে নম্বর কপি করার পরে বার্তা মুছুন</string>
 </resources>

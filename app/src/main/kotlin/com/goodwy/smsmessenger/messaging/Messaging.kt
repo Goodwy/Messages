@@ -7,9 +7,12 @@ import android.widget.Toast.LENGTH_LONG
 import com.klinker.android.send_message.Settings
 import com.goodwy.commons.extensions.showErrorToast
 import com.goodwy.commons.extensions.toast
+import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.extensions.config
+import com.goodwy.smsmessenger.extensions.getThreadId
 import com.goodwy.smsmessenger.extensions.messagingUtils
+import com.goodwy.smsmessenger.extensions.shortcutHelper
 import com.goodwy.smsmessenger.messaging.SmsException.Companion.EMPTY_DESTINATION_ADDRESS
 import com.goodwy.smsmessenger.messaging.SmsException.Companion.ERROR_PERSISTING_MESSAGE
 import com.goodwy.smsmessenger.messaging.SmsException.Companion.ERROR_SENDING_MESSAGE
@@ -93,6 +96,10 @@ fun Context.sendMessageCompat(
         } catch (e: Exception) {
             showErrorToast(e)
         }
+    }
+    ensureBackgroundThread {
+        val threadId = getThreadId(addresses.toSet())
+        shortcutHelper.reportSendMessageUsage(threadId)
     }
 }
 

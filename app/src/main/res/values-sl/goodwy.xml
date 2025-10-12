@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Slog naslova klepeta</string>
     <string name="unread_at_top_g">Neprebrano vedno na vrhu</string>
     <string name="show_sim_selection_dialog">Pokaži pogovorno okno za izbiro kartice SIM pri pošiljanju</string>
-    <string name="voice_input">Glasovni vnos</string>
     <string name="delete_after_copy">Brisanje sporočila po kopiranju številke iz obvestila</string>
     <string name="sound_on_out_going_messages">Zvok pri pošiljanju sporočila</string>
+    <string name="delivered">Dostavljeno</string>
+    <string name="failed">Ni uspelo</string>
+    <string name="pending">V teku</string>
+    <string name="message_type">Vrsta sporočila</string>
 </resources>

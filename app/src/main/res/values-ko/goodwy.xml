@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Chat title style</string>
     <string name="unread_at_top_g">Unread always at the top</string>
     <string name="show_sim_selection_dialog">Show SIM card selection dialog when sending</string>
-    <string name="voice_input">음성 입력</string>
     <string name="delete_after_copy">알림에서 번호를 복사한 후 메시지 삭제</string>
     <string name="sound_on_out_going_messages">메시지를 보낼 때 소리가 납니다.</string>
+    <string name="delivered">배달됨</string>
+    <string name="failed">실패한</string>
+    <string name="pending">보류 중</string>
+    <string name="message_type">메시지 유형</string>
 </resources>

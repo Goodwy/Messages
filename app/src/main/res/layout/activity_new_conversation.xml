@@ -143,12 +143,13 @@
 
         <com.reddit.indicatorfastscroll.FastScrollerView
             android:id="@+id/contactsLetterFastscroller"
-            android:layout_width="32dp"
-            android:layout_height="wrap_content"
+            android:layout_width="26dp"
+            android:layout_height="match_parent"
             android:layout_alignTop="@+id/contacts_list"
             android:layout_alignParentEnd="true"
-            android:paddingTop="@dimen/big_margin"
-            android:paddingBottom="@dimen/big_margin" />
+            android:layout_centerVertical="true"
+            android:paddingStart="@dimen/normal_margin"
+            android:textAppearance="@style/LetterFastscrollerStyleSmall" />
 
         <com.reddit.indicatorfastscroll.FastScrollerThumbView
             android:id="@+id/contacts_letter_fastscroller_thumb"

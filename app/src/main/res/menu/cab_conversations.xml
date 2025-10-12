@@ -22,6 +22,16 @@
         android:title="@string/dial_number"
         app:showAsAction="always" />
     <item
+        android:id="@+id/cab_conversation_details"
+        android:showAsAction="never"
+        android:title="@string/conversation_details"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_rename_conversation"
+        android:icon="@drawable/ic_edit_vector"
+        android:title="@string/rename_conversation"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/cab_add_number_to_contact"
         android:icon="@drawable/ic_add_person_vector"
         android:showAsAction="ifRoom"
@@ -42,11 +52,6 @@
         android:showAsAction="never"
         android:title="@string/copy_number_to_clipboard"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/cab_rename_conversation"
-        android:icon="@drawable/ic_edit_vector"
-        android:title="@string/rename_conversation"
-        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/cab_mark_as_read"
         android:showAsAction="never"

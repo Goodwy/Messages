@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">نمط عنوان الدردشة</string>
     <string name="unread_at_top_g">غير مقروء دائما في الأعلى</string>
     <string name="show_sim_selection_dialog">إظهار مربع حوار تحديد بطاقة SIM عند الإرسال</string>
-    <string name="voice_input">الإدخال الصوتي</string>
     <string name="delete_after_copy">حذف رسالة بعد نسخ رقم من إعلام</string>
     <string name="sound_on_out_going_messages">الصوت عند إرسال رسالة</string>
+    <string name="delivered">تم التوصيل</string>
+    <string name="failed">فشل</string>
+    <string name="pending">قيد الانتظار</string>
+    <string name="message_type">نوع الرسالة</string>
 </resources>

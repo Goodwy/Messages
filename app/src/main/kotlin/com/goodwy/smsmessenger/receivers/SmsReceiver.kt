@@ -11,7 +11,6 @@ import android.provider.Telephony
 import com.goodwy.commons.extensions.baseConfig
 import com.goodwy.commons.extensions.getMyContactsCursor
 import com.goodwy.commons.extensions.isNumberBlocked
-import com.goodwy.commons.extensions.toast
 import com.goodwy.commons.helpers.MyContactsContentProvider
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.ensureBackgroundThread
@@ -36,7 +35,7 @@ class SmsReceiver : BroadcastReceiver() {
         val read = 0
         val subscriptionId = intent.getIntExtra("subscription", -1)
 
-        val privateCursor = context.getMyContactsCursor(false, true)
+        val privateCursor = context.getMyContactsCursor(favoritesOnly = false, withPhoneNumbersOnly = true)
         ensureBackgroundThread {
             messages.forEach {
                 address = it.originatingAddress ?: ""
@@ -101,12 +100,7 @@ class SmsReceiver : BroadcastReceiver() {
                         val conversation = context.getConversations(threadId).firstOrNull() ?: return@getAvailableContacts
                         try {
                             context.insertOrUpdateConversation(conversation)
-                        } catch (ignored: Exception) {
-                        }
-
-                        try {
-                            context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
-                        } catch (ignored: Exception) {
+                        } catch (_: Exception) {
                         }
 
                         val senderName = context.getNameFromAddress(address, privateCursor)
@@ -147,7 +141,7 @@ class SmsReceiver : BroadcastReceiver() {
                                 subscriptionId
                             )
                         context.messagesDB.insertOrUpdate(message)
-                        if (context.config.isArchiveAvailable) {
+                        if (context.shouldUnarchive()) {
                             context.updateConversationArchivedStatus(threadId, false)
                         }
                         refreshMessages()

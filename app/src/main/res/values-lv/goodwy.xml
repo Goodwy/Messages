@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Tērzēšanas virsraksta stils</string>
     <string name="unread_at_top_g">Nelasītie vienmēr augšpusē</string>
     <string name="show_sim_selection_dialog">Sūtīšanas laikā rādīt SIM kartes izvēles dialoglodziņu</string>
-    <string name="voice_input">Balss ievade</string>
     <string name="delete_after_copy">Ziņojuma dzēšana pēc numura kopēšanas no paziņojuma</string>
     <string name="sound_on_out_going_messages">Skaņa, nosūtot ziņojumu</string>
+    <string name="delivered">Piegādāts</string>
+    <string name="failed">Neizdevās</string>
+    <string name="pending">Gaida</string>
+    <string name="message_type">Ziņojuma veids</string>
 </resources>

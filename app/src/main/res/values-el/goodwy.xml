@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Στυλ τίτλου συνομιλίας</string>
     <string name="unread_at_top_g">Μη αναγνωσμένο πάντα στην κορυφή</string>
     <string name="show_sim_selection_dialog">Εμφάνιση διαλόγου επιλογής κάρτας SIM κατά την αποστολή</string>
-    <string name="voice_input">Φωνητική είσοδος</string>
     <string name="delete_after_copy">Διαγραφή μηνύματος μετά την αντιγραφή ενός αριθμού από μια ειδοποίηση</string>
     <string name="sound_on_out_going_messages">Ήχος κατά την αποστολή μηνύματος</string>
+    <string name="delivered">Παραδόθηκε</string>
+    <string name="failed">Αποτυχημένος</string>
+    <string name="pending">Εκκρεμής</string>
+    <string name="message_type">Τύπος μηνύματος</string>
 </resources>

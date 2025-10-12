@@ -5,6 +5,8 @@ import android.app.Activity
 import android.app.AlarmManager
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 import android.content.res.ColorStateList
 import android.graphics.BitmapFactory
 import android.graphics.drawable.LayerDrawable
@@ -13,6 +15,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.provider.Telephony
 import android.provider.Telephony.Sms.MESSAGE_TYPE_QUEUED
@@ -39,7 +42,10 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.*
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsAnimationCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
@@ -53,7 +59,6 @@ import com.goodwy.commons.helpers.*
 import com.goodwy.commons.models.PhoneNumber
 import com.goodwy.commons.models.RadioItem
 import com.goodwy.commons.models.SimpleContact
-import com.goodwy.commons.models.contacts.Contact
 import com.goodwy.commons.views.MyRecyclerView
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
@@ -75,8 +80,6 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.joda.time.DateTime
 import java.io.File
-import java.io.InputStream
-import java.io.OutputStream
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -105,12 +108,13 @@ class ThreadActivity : SimpleActivity() {
     private var privateContacts = ArrayList<SimpleContact>()
     private var messages = ArrayList<Message>()
     private val availableSIMCards = ArrayList<SIMCard>()
-    private var lastAttachmentUri: String? = null
+    private var pendingAttachmentsToSave: List<Attachment>? = null
     private var capturedImageUri: Uri? = null
     private var loadingOlderMessages = false
     private var allMessagesFetched = false
     private var oldestMessageDate = -1
     private var isRecycleBin = false
+    private var isLaunchedFromShortcut = false
 
     private var isScheduledMessage: Boolean = false
     private var messageToResend: Long? = null
@@ -118,7 +122,6 @@ class ThreadActivity : SimpleActivity() {
     private lateinit var scheduledDateTime: DateTime
 
     private var isAttachmentPickerVisible = false
-    private val REQUEST_CODE_SPEECH_INPUT = 1
     private var isSpeechToTextAvailable = false
 
     private val binding by viewBinding(ActivityThreadBinding::inflate)
@@ -158,6 +161,7 @@ class ThreadActivity : SimpleActivity() {
 //            binding.threadToolbar.title = it
 //        }
         isRecycleBin = intent.getBooleanExtra(IS_RECYCLE_BIN, false)
+        isLaunchedFromShortcut = intent.getBooleanExtra(IS_LAUNCHED_FROM_SHORTCUT, false)
 
         bus = EventBus.getDefault()
         bus!!.register(this)
@@ -211,6 +215,7 @@ class ThreadActivity : SimpleActivity() {
             if (smsDraft.isNotEmpty()) {
                 runOnUiThread {
                     binding.messageHolder.threadTypeMessage.setText(smsDraft)
+                    binding.messageHolder.threadTypeMessage.setSelection(smsDraft.length)
                     binding.messageHolder.threadCharacterCounter.beVisibleIf(config.showCharacterCounter)
                 }
             }
@@ -220,8 +225,7 @@ class ThreadActivity : SimpleActivity() {
         //binding.messageHolder.root.setBackgroundColor(bottomBarColor)
         binding.shortCodeHolder.root.setBackgroundColor(bottomBarColor)
         binding.messageHolder.attachmentPickerHolder.setBackgroundColor(bottomBarColor)
-        val naviBarColor = if (isAttachmentPickerVisible) getBottomBarColor() else getProperBackgroundColor()
-        updateNavigationBarColor(naviBarColor)
+        updateNavigationBar()
         updateContactImage()
     }
 
@@ -274,8 +278,7 @@ class ThreadActivity : SimpleActivity() {
                 threadItems.isNotEmpty() && conversation?.isArchived == true && !isRecycleBin && archiveAvailable
             findItem(R.id.rename_conversation).isVisible = participants.size > 1 && conversation != null && !isRecycleBin
             findItem(R.id.conversation_details).isVisible = conversation != null && !isRecycleBin
-            //findItem(R.id.block_number).title = addLockedLabelIfNeeded(com.goodwy.commons.R.string.block_number)
-            findItem(R.id.block_number).isVisible = isNougatPlus() && !isRecycleBin
+            findItem(R.id.block_number).isVisible = !isRecycleBin
             findItem(R.id.dial_number).isVisible = participants.size == 1 && !isSpecialNumber() && !isRecycleBin
             findItem(R.id.manage_people).isVisible = !isSpecialNumber() && !isRecycleBin
             findItem(R.id.mark_as_unread).isVisible = threadItems.isNotEmpty() && !isRecycleBin
@@ -304,7 +307,7 @@ class ThreadActivity : SimpleActivity() {
                 R.id.archive -> archiveConversation()
                 R.id.unarchive -> unarchiveConversation()
                 R.id.rename_conversation -> renameConversation()
-                R.id.conversation_details -> showConversationDetails()
+                R.id.conversation_details -> launchConversationDetails(threadId)
                 R.id.add_number_to_contact -> addNumberToContact()
                 R.id.dial_number -> dialNumber()
                 R.id.manage_people -> managePeople()
@@ -317,7 +320,7 @@ class ThreadActivity : SimpleActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
-        if (resultCode != Activity.RESULT_OK) return
+        if (resultCode != RESULT_OK) return
         val data = resultData?.data
         messageToResend = null
 
@@ -332,7 +335,8 @@ class ThreadActivity : SimpleActivity() {
                 PICK_VIDEO_INTENT -> addAttachment(data)
 
                 PICK_CONTACT_INTENT -> addContactAttachment(data)
-                PICK_SAVE_FILE_INTENT -> saveAttachment(resultData)
+                PICK_SAVE_FILE_INTENT -> saveAttachments(resultData)
+                PICK_SAVE_DIR_INTENT -> saveAttachments(resultData)
             }
         }
 
@@ -345,12 +349,14 @@ class ThreadActivity : SimpleActivity() {
                 val draft = binding.messageHolder.threadTypeMessage.value
                 val draftPlusSpeech =
                     if (draft.isNotEmpty()) {
-                        if (draft.last().toString() != " ") "$draft $speechToText" else draft + speechToText
+                        if (draft.last().toString() != " ") "$draft $speechToText" else "$draft $speechToText"
                     } else speechToText
                 if (draftPlusSpeech != "") {
-                    saveSmsDraft(draftPlusSpeech, threadId)
-                    //binding.messageHolder.threadTypeMessage.setText(draftPlusSpeech)
-                    //binding.messageHolder.threadTypeMessage.requestFocusFromTouch()
+                    ensureBackgroundThread {
+                        saveSmsDraft(draftPlusSpeech, threadId)
+                    }
+//                    binding.messageHolder.threadTypeMessage.setText(draftPlusSpeech)
+//                    binding.messageHolder.threadTypeMessage.requestFocusFromTouch()
                 }
             }
         }
@@ -397,6 +403,16 @@ class ThreadActivity : SimpleActivity() {
     }
 
     private fun setupThread() {
+        if (conversation == null && isLaunchedFromShortcut) {
+            if (isTaskRoot) {
+                Intent(this, MainActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    startActivity(this)
+                }
+            }
+            finish()
+            return
+        }
         val privateCursor = getMyContactsCursor(favoritesOnly = false, withPhoneNumbersOnly = true)
         ensureBackgroundThread {
             privateContacts = MyContactsContentProvider.getSimpleContacts(this, privateCursor)
@@ -483,6 +499,9 @@ class ThreadActivity : SimpleActivity() {
     }
 
     private fun getOrCreateThreadAdapter(): ThreadAdapter {
+        if (isDynamicTheme() && !isSystemInDarkMode()) {
+            binding.threadHolder.setBackgroundColor(getSurfaceColor())
+        }
         var currAdapter = binding.threadMessagesList.adapter
         if (currAdapter == null) {
             currAdapter = ThreadAdapter(
@@ -533,7 +552,12 @@ class ThreadActivity : SimpleActivity() {
                 binding.addContactOrNumber.setOnItemClickListener { _, _, position, _ ->
                     val currContacts = (binding.addContactOrNumber.adapter as AutoCompleteTextViewAdapter).resultList
                     val selectedContact = currContacts[position]
-                    addSelectedContact(selectedContact)
+                    maybeShowNumberPickerDialog(selectedContact.phoneNumbers) { phoneNumber ->
+                        val contactWithSelectedNumber = selectedContact.copy(
+                            phoneNumbers = arrayListOf(phoneNumber)
+                        )
+                        addSelectedContact(contactWithSelectedNumber)
+                    }
                 }
 
                 binding.addContactOrNumber.onTextChangeListener {
@@ -602,7 +626,7 @@ class ThreadActivity : SimpleActivity() {
         messagesToRemove: List<Message>,
         toRecycleBin: Boolean,
         fromRecycleBin: Boolean,
-        isPopupMenu: Boolean = false
+        isPopupMenu: Boolean = false,
     ) {
         val deletePosition = threadItems.indexOf(messagesToRemove.first())
         messages.removeAll(messagesToRemove.toSet())
@@ -975,7 +999,7 @@ class ThreadActivity : SimpleActivity() {
                     senderNumber
                 ).forEach {
                     it.setOnClickListener {
-                        if (conversation != null) showConversationDetails()
+                        if (conversation != null) launchConversationDetails(threadId)
                     }
                 }
                 senderName.setOnLongClickListener { copyToClipboard(senderName.value); true }
@@ -997,7 +1021,7 @@ class ThreadActivity : SimpleActivity() {
                     senderNumberLarge
                 ).forEach {
                     it.setOnClickListener {
-                        if (conversation != null) showConversationDetails()
+                        if (conversation != null) launchConversationDetails(threadId)
                     }
                 }
                 senderNameLarge.setOnLongClickListener { copyToClipboard(senderNameLarge.value); true }
@@ -1085,7 +1109,7 @@ class ThreadActivity : SimpleActivity() {
     @SuppressLint("MissingPermission")
     private fun getProperSimIndex(
         availableSIMs: MutableList<SubscriptionInfo>,
-        numbers: List<String>
+        numbers: List<String>,
     ): Int {
         val userPreferredSimId = config.getUseSIMIdAtNumber(numbers.first())
         val userPreferredSimIdx =
@@ -1286,13 +1310,6 @@ class ThreadActivity : SimpleActivity() {
         }
     }
 
-    private fun showConversationDetails() {
-        Intent(this, ConversationDetailsActivity::class.java).apply {
-            putExtra(THREAD_ID, threadId)
-            startActivity(this)
-        }
-    }
-
     @SuppressLint("MissingPermission")
     private fun getThreadItems(): ArrayList<ThreadItem> {
         val items = ArrayList<ThreadItem>()
@@ -1365,7 +1382,7 @@ class ThreadActivity : SimpleActivity() {
     private fun launchActivityForResult(
         intent: Intent,
         requestCode: Int,
-        @StringRes error: Int = com.goodwy.commons.R.string.no_app_found
+        @StringRes error: Int = com.goodwy.commons.R.string.no_app_found,
     ) {
         hideKeyboard()
         try {
@@ -1549,29 +1566,35 @@ class ThreadActivity : SimpleActivity() {
         checkSendMessageAvailability()
     }
 
-    private fun saveAttachment(resultData: Intent) {
-        val takeFlags =
-            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+    private fun saveAttachments(resultData: Intent) {
         applicationContext.contentResolver.takePersistableUriPermission(
-            resultData.data!!,
-            takeFlags
+            resultData.data!!, FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
         )
-        var inputStream: InputStream? = null
-        var outputStream: OutputStream? = null
-        try {
-            inputStream = lastAttachmentUri?.let { contentResolver.openInputStream(it.toUri()) }
-            outputStream =
-                contentResolver.openOutputStream(resultData.dataString!!.toUri(), "rwt")
-            inputStream!!.copyTo(outputStream!!)
-            outputStream.flush()
-            toast(com.goodwy.commons.R.string.file_saved)
-        } catch (e: Exception) {
-            showErrorToast(e)
-        } finally {
-            inputStream?.close()
-            outputStream?.close()
+        val destinationUri = resultData.data ?: return
+        ensureBackgroundThread {
+            try {
+                if (DocumentsContract.isTreeUri(destinationUri)) {
+                    val outputDir = DocumentFile.fromTreeUri(this, destinationUri)
+                        ?: return@ensureBackgroundThread
+                    pendingAttachmentsToSave?.forEach { attachment ->
+                        val documentFile = outputDir.createFile(
+                            attachment.mimetype,
+                            attachment.filename.takeIf { it.isNotBlank() }
+                                ?: attachment.uriString.getFilenameFromPath()
+                        ) ?: return@forEach
+                        copyToUri(src = attachment.getUri(), dst = documentFile.uri)
+                    }
+                } else {
+                    copyToUri(pendingAttachmentsToSave!!.first().getUri(), resultData.data!!)
+                }
+
+                toast(com.goodwy.commons.R.string.file_saved)
+            } catch (e: Exception) {
+                showErrorToast(e)
+            } finally {
+                pendingAttachmentsToSave = null
+            }
         }
-        lastAttachmentUri = null
     }
 
     private fun checkSendMessageAvailability() {
@@ -1596,7 +1619,7 @@ class ThreadActivity : SimpleActivity() {
                     isEnabled = true
                     isClickable = true
                     alpha = 1f
-                    contentDescription = getString(R.string.voice_input)
+                    contentDescription = getString(com.goodwy.strings.R.string.voice_input)
                     setOnClickListener {
                         speechToText()
                     }
@@ -1753,7 +1776,9 @@ class ThreadActivity : SimpleActivity() {
             }
         }
         messagesDB.insertOrUpdate(message)
-        updateConversationArchivedStatus(message.threadId, false)
+        if (shouldUnarchive()) {
+            updateConversationArchivedStatus(message.threadId, false)
+        }
     }
 
     // show selected contacts, properly split to new lines when appropriate
@@ -1833,7 +1858,7 @@ class ThreadActivity : SimpleActivity() {
 
     private fun fixParticipantNumbers(
         participants: ArrayList<SimpleContact>,
-        properNumbers: ArrayList<String>
+        properNumbers: ArrayList<String>,
     ): ArrayList<SimpleContact> {
         for (number in properNumbers) {
             for (participant in participants) {
@@ -1854,18 +1879,29 @@ class ThreadActivity : SimpleActivity() {
         return participants
     }
 
-    fun saveMMS(mimeType: String, path: String) {
-        hideKeyboard()
-        lastAttachmentUri = path
-        Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            type = mimeType
-            addCategory(Intent.CATEGORY_OPENABLE)
-            putExtra(Intent.EXTRA_TITLE, path.split("/").last())
-            launchActivityForResult(
-                intent = this,
-                requestCode = PICK_SAVE_FILE_INTENT,
-                error = com.goodwy.commons.R.string.system_service_disabled
-            )
+    fun saveMMS(attachments: List<Attachment>) {
+        pendingAttachmentsToSave = attachments
+        if (attachments.size == 1) {
+            val attachment = attachments.first()
+            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                type = attachment.mimetype
+                addCategory(Intent.CATEGORY_OPENABLE)
+                putExtra(Intent.EXTRA_TITLE, attachment.uriString.split("/").last())
+                launchActivityForResult(
+                    intent = this,
+                    requestCode = PICK_SAVE_FILE_INTENT,
+                    error = com.goodwy.commons.R.string.system_service_disabled
+                )
+            }
+        } else {
+            Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                addCategory(Intent.CATEGORY_DEFAULT)
+                launchActivityForResult(
+                    intent = this,
+                    requestCode = PICK_SAVE_DIR_INTENT,
+                    error = com.goodwy.commons.R.string.system_service_disabled
+                )
+            }
         }
     }
 
@@ -1972,7 +2008,7 @@ class ThreadActivity : SimpleActivity() {
         clearCurrentMessage()
         binding.messageHolder.threadTypeMessage.setText(message.body)
         extractAttachments(message)
-        scheduledDateTime = DateTime(message.millis())
+        scheduledDateTime = DateTime(message.millis()) //TODO Persian date
         showScheduleMessageDialog()
     }
 
@@ -1993,37 +2029,6 @@ class ThreadActivity : SimpleActivity() {
                 }
             }
         }
-    }
-
-    private fun speechToText() {
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-
-        intent.putExtra(
-            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-        )
-
-        intent.putExtra(
-            RecognizerIntent.EXTRA_LANGUAGE,
-            Locale.getDefault()
-        )
-
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak to text")
-
-        if (isSpeechToTextAvailable) {
-            try {
-                startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
-            } catch (e: Exception) {
-                toast("SPEECH INPUT ERROR:" + e.message)
-            }
-        }
-    }
-
-    private fun isSpeechToTextAvailable(): Boolean {
-        val activities: List<*> = packageManager.queryIntentActivities(
-            Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0
-        )
-        return activities.isNotEmpty()
     }
 
 //    private fun isPlayServicesAvailable(): Boolean {
@@ -2189,7 +2194,7 @@ class ThreadActivity : SimpleActivity() {
                     pickFileText,
                     pickContactText,
                     scheduleMessageText
-                ).forEach { it.beVisibleIf(it.isGone) }
+                ).forEach { it.beVisibleIf(it.isGone()) }
                 true
             }
         }
@@ -2228,7 +2233,7 @@ class ThreadActivity : SimpleActivity() {
         binding.messageHolder.attachmentPickerDivider.showWithAnimation()
         binding.messageHolder.attachmentPickerHolder.showWithAnimation()
         animateAttachmentButton(rotation = -135f)
-        updateNavigationBarColor(getBottomBarColor())
+        updateNavigationBar()
     }
 
     private fun maybeSetupRecycleBinView() {
@@ -2247,7 +2252,7 @@ class ThreadActivity : SimpleActivity() {
 //            }
 //        }
         animateAttachmentButton(rotation = 0f)
-        updateNavigationBarColor(getProperBackgroundColor())
+        updateNavigationBar()
     }
 
     private fun animateAttachmentButton(rotation: Float) {
@@ -2273,7 +2278,7 @@ class ThreadActivity : SimpleActivity() {
 
                 override fun onProgress(
                     insets: WindowInsetsCompat,
-                    runningAnimations: MutableList<WindowInsetsAnimationCompat>
+                    runningAnimations: MutableList<WindowInsetsAnimationCompat>,
                 ) = insets
             }
         ViewCompat.setWindowInsetsAnimationCallback(window.decorView, callback)
@@ -2306,6 +2311,14 @@ class ThreadActivity : SimpleActivity() {
         getColoredMaterialStatusBarColor()
     }
 
+
+    private fun updateNavigationBar() {
+        val naviBarColor = if (isAttachmentPickerVisible) getBottomBarColor() else {
+            if (isDynamicTheme() && !isSystemInDarkMode()) getSurfaceColor() else getProperBackgroundColor()
+        }
+        updateNavigationBarColor(naviBarColor)
+    }
+
     private fun updateContactImage() {
         val senderPhoto = when (config.threadTopStyle) {
             THREAD_TOP_COMPACT -> binding.topDetailsCompact.senderPhoto
@@ -2320,12 +2333,6 @@ class ThreadActivity : SimpleActivity() {
             participants.getThreadTitle()
         }
         if (threadTitle.isEmpty()) threadTitle = intent.getStringExtra(THREAD_TITLE) ?: ""
-
-        val placeholder = if (participants.size > 1) {
-            SimpleContactsHelper(this).getColoredGroupIcon(threadTitle)
-        } else {
-            null
-        }
 
         if (conversation != null && (!isDestroyed || !isFinishing)) {
             if ((threadTitle == conversation!!.phoneNumber || conversation!!.isCompany) && conversation!!.photoUri == "") {
@@ -2343,10 +2350,22 @@ class ThreadActivity : SimpleActivity() {
                 }
                 senderPhoto.setImageDrawable(drawable)
             } else {
+                val placeholder = if (participants.size > 1) {
+                    SimpleContactsHelper(this).getColoredGroupIcon(threadTitle)
+                } else {
+                    null
+                }
+
                 SimpleContactsHelper(this).loadContactImage(conversation!!.photoUri, senderPhoto, threadTitle, placeholder)
             }
         } else {
             if (!isDestroyed || !isFinishing) {
+                val placeholder = if (participants.size > 1) {
+                    SimpleContactsHelper(this).getColoredGroupIcon(threadTitle)
+                } else {
+                    null
+                }
+
                 val number = intent.getStringExtra(THREAD_NUMBER)
                 var namePhoto: NamePhoto? = null
                 if (number != null) {

@@ -20,7 +20,6 @@ class CopyNumberReceiver : BroadcastReceiver() {
                     context.copyToClipboard(body!!)
                     context.markThreadMessagesRead(threadId)
                     context.conversationsDB.markRead(threadId)
-                    context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
                     refreshMessages()
                 }
             }
@@ -34,7 +33,6 @@ class CopyNumberReceiver : BroadcastReceiver() {
                     context.markThreadMessagesRead(threadId)
                     context.conversationsDB.markRead(threadId)
                     context.deleteMessage(messageId, false)
-                    context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
                     context.updateLastConversationMessage(threadId)
                     refreshMessages()
                 }

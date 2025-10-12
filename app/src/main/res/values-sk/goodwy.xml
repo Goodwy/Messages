@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Štýl názvu chatu</string>
     <string name="unread_at_top_g">Neprečítané vždy hore</string>
     <string name="show_sim_selection_dialog">Zobraziť dialógové okno výberu SIM karty pri odosielaní</string>
-    <string name="voice_input">Hlasový vstup</string>
     <string name="delete_after_copy">Odstránenie správy po skopírovaní čísla z upozornenia</string>
     <string name="sound_on_out_going_messages">Zvuk pri odosielaní správy</string>
+    <string name="delivered">Doručené</string>
+    <string name="failed">Nepodarilo sa</string>
+    <string name="pending">Čaká na spracovanie</string>
+    <string name="message_type">Typ správy</string>
 </resources>

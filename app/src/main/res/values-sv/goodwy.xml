@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Chattens titelstil</string>
     <string name="unread_at_top_g">Olästa alltid överst</string>
     <string name="show_sim_selection_dialog">Visa dialogrutan för val av SIM-kort när du skickar</string>
-    <string name="voice_input">Röstinmatning</string>
     <string name="delete_after_copy">Ta bort meddelande när du har kopierat ett nummer från en avisering</string>
     <string name="sound_on_out_going_messages">Ljud när du skickar ett meddelande</string>
+    <string name="delivered">Levereras</string>
+    <string name="failed">Misslyckades</string>
+    <string name="pending">I avvaktan på</string>
+    <string name="message_type">Meddelandetyp</string>
 </resources>

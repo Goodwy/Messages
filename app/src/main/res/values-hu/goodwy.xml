@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Csevegés címének stílusa</string>
     <string name="unread_at_top_g">Olvasatlan mindig a tetején</string>
     <string name="show_sim_selection_dialog">SIM-kártya kiválasztási párbeszédpanel megjelenítése küldéskor</string>
-    <string name="voice_input">Hangbevitel</string>
     <string name="delete_after_copy">Üzenet törlése szám értesítésből való másolása után</string>
     <string name="sound_on_out_going_messages">Hang üzenet küldésekor</string>
+    <string name="delivered">Szállítva</string>
+    <string name="failed">Sikertelen</string>
+    <string name="pending">Függőben levő</string>
+    <string name="message_type">Üzenet típusa</string>
 </resources>

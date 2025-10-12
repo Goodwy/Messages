@@ -5,7 +5,10 @@ import android.content.Context
 import android.content.Intent
 import com.goodwy.commons.extensions.notificationManager
 import com.goodwy.commons.helpers.ensureBackgroundThread
-import com.goodwy.smsmessenger.extensions.*
+import com.goodwy.smsmessenger.extensions.conversationsDB
+import com.goodwy.smsmessenger.extensions.deleteMessage
+import com.goodwy.smsmessenger.extensions.markThreadMessagesRead
+import com.goodwy.smsmessenger.extensions.updateLastConversationMessage
 import com.goodwy.smsmessenger.helpers.IS_MMS
 import com.goodwy.smsmessenger.helpers.MESSAGE_ID
 import com.goodwy.smsmessenger.helpers.THREAD_ID
@@ -22,7 +25,6 @@ class DeleteSmsReceiver : BroadcastReceiver() {
             context.markThreadMessagesRead(threadId)
             context.conversationsDB.markRead(threadId)
             context.deleteMessage(messageId, isMms)
-            context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
             context.updateLastConversationMessage(threadId)
             refreshMessages()
         }

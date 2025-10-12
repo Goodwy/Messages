@@ -113,7 +113,7 @@ class ExportMessagesDialog(
                     // delete the file to avoid leaving behind an empty/corrupt file
                     try {
                         DocumentsContract.deleteDocument(activity.contentResolver, uri)
-                    } catch (ignored: Exception) {
+                    } catch (_: Exception) {
                         // ignored because we don't want to show two error messages
                     }
                 }

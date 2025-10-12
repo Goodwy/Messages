@@ -36,7 +36,6 @@ class ConversationDetailsActivity : SimpleActivity() {
     private lateinit var participants: ArrayList<SimpleContact>
 
     private val white = 0xFFFFFFFF.toInt()
-    private val gray = 0xFFEBEBEB.toInt()
     private var buttonBg = white
 
     private val binding by viewBinding(ActivityConversationDetailsBinding::inflate)
@@ -120,7 +119,7 @@ class ConversationDetailsActivity : SimpleActivity() {
 
     override fun onResume() {
         super.onResume()
-        buttonBg = if (baseConfig.backgroundColor == white || baseConfig.backgroundColor == gray) white else getBottomNavigationBackgroundColor()
+        buttonBg = if ((isLightTheme() || isGrayTheme()) && !isDynamicTheme()) white else getSurfaceColor()
 
         //setupToolbar(binding.conversationDetailsToolbar, NavigationIcon.Arrow)
         updateTextColors(binding.conversationDetailsHolder)
@@ -135,16 +134,17 @@ class ConversationDetailsActivity : SimpleActivity() {
     }
 
     private fun updateBackgroundColors() {
-        if (baseConfig.backgroundColor == white) {
-            val colorToWhite = 0xFFf2f2f6.toInt()
+        if (isLightTheme() && !isDynamicTheme()) {
+            val colorToWhite = getSurfaceColor()
             supportActionBar?.setBackgroundDrawable(colorToWhite.toDrawable())
             window.decorView.setBackgroundColor(colorToWhite)
             window.statusBarColor = colorToWhite
             //window.navigationBarColor = colorToWhite
             binding.conversationDetailsAppbar.setBackgroundColor(colorToWhite)
         } else {
-            window.decorView.setBackgroundColor(getProperBackgroundColor())
-            binding.conversationDetailsAppbar.setBackgroundColor(getProperBackgroundColor())
+            val properBackgroundColor = getProperBackgroundColor()
+            window.decorView.setBackgroundColor(properBackgroundColor)
+            binding.conversationDetailsAppbar.setBackgroundColor(properBackgroundColor)
         }
 
         binding.apply {
@@ -262,11 +262,6 @@ class ConversationDetailsActivity : SimpleActivity() {
     private fun setupTopViews() {
         val title = conversation?.title
         val threadTitle = if (!title.isNullOrEmpty()) title else participants.getThreadTitle()
-        val placeholder = if (participants.size > 1) {
-            SimpleContactsHelper(this).getColoredGroupIcon(threadTitle)
-        } else {
-            null
-        }
 
         if (conversation != null) {
             if ((threadTitle == conversation!!.phoneNumber || conversation!!.isCompany) && conversation!!.photoUri == "") {
@@ -285,11 +280,21 @@ class ConversationDetailsActivity : SimpleActivity() {
                 binding.topConversationDetails.conversationDetailsImage.setImageDrawable(drawable)
             } else {
                 if (!isDestroyed || !isFinishing) {
+                    val placeholder = if (participants.size > 1) {
+                        SimpleContactsHelper(this).getColoredGroupIcon(threadTitle)
+                    } else {
+                        null
+                    }
                     SimpleContactsHelper(this).loadContactImage(conversation!!.photoUri, binding.topConversationDetails.conversationDetailsImage, threadTitle, placeholder)
                 }
             }
         } else {
             if (!isDestroyed || !isFinishing) {
+                val placeholder = if (participants.size > 1) {
+                    SimpleContactsHelper(this).getColoredGroupIcon(threadTitle)
+                } else {
+                    null
+                }
                 SimpleContactsHelper(this).loadContactImage("", binding.topConversationDetails.conversationDetailsImage, threadTitle, placeholder)
             }
         }
@@ -419,7 +424,6 @@ class ConversationDetailsActivity : SimpleActivity() {
             setOnLongClickListener { toast(com.goodwy.commons.R.string.share); true; }
         }
 
-        blockButton.beVisibleIf(isNougatPlus())
         val red = resources.getColor(com.goodwy.commons.R.color.red_missed)
         val isBlockNumbers = isBlockNumbers()
         val blockColor = if (isBlockNumbers) { primaryColor } else { red }

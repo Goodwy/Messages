@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">ചാറ്റ് ശീർഷക ശൈലി</string>
     <string name="unread_at_top_g">വായിക്കാത്തത് എപ്പോഴും മുകളിലാണ്</string>
     <string name="show_sim_selection_dialog">അയയ്ക്കുമ്പോൾ സിം കാർഡ് തിരഞ്ഞെടുക്കൽ ഡയലോഗ് കാണിക്കുക</string>
-    <string name="voice_input">വോയ്‌സ് ഇൻപുട്ട്</string>
     <string name="delete_after_copy">അറിയിപ്പിൽ നിന്ന് നമ്പർ പകർത്തിയ ശേഷം സന്ദേശം ഇല്ലാതാക്കുക</string>
     <string name="sound_on_out_going_messages">സന്ദേശം അയയ്ക്കുമ്പോൾ ശബ്ദം</string>
+    <string name="delivered">എത്തിച്ചു</string>
+    <string name="failed">പരാജയപ്പെട്ടു</string>
+    <string name="pending">തീർപ്പാക്കാത്തത്</string>
+    <string name="message_type">സന്ദേശ തരം</string>
 </resources>

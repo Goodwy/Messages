@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Vestluse pealkirja stiil</string>
     <string name="unread_at_top_g">Lugemata alati ülaosas</string>
     <string name="show_sim_selection_dialog">Kuva saatmisel SIM-kaardi valimise dialoog</string>
-    <string name="voice_input">Häälsisend</string>
     <string name="delete_after_copy">Sõnumi kustutamine pärast teatisest numbri kopeerimist</string>
     <string name="sound_on_out_going_messages">Heli sõnumi saatmisel</string>
+    <string name="delivered">Tarnitud</string>
+    <string name="failed">Ebaõnnestunud</string>
+    <string name="pending">Ootel</string>
+    <string name="message_type">Sõnumi tüüp</string>
 </resources>

@@ -147,7 +147,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/activity_margin"
         android:contentDescription="@string/new_conversation"
-        android:src="@drawable/ic_plus_vector" />
+        android:src="@drawable/ic_messages_outline" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

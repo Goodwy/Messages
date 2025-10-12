@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Söhbət başlığı üslubu</string>
     <string name="unread_at_top_g">Həmişə yuxarıda oxunmamış</string>
     <string name="show_sim_selection_dialog">Göndərərkən SİM kart seçimi dialoqunu göstərin</string>
-    <string name="voice_input">Səs daxiletmə</string>
     <string name="delete_after_copy">Bildirişdən nömrəni köçürdükdən sonra mesajı silin</string>
     <string name="sound_on_out_going_messages">Mesaj göndərərkən səs</string>
+    <string name="delivered">Çatdırıldı</string>
+    <string name="failed">Uğursuz oldu</string>
+    <string name="pending">Gözlənir</string>
+    <string name="message_type">Mesaj növü</string>
 </resources>

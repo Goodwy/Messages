@@ -16,7 +16,9 @@ import com.goodwy.commons.models.FAQItem
 import com.goodwy.commons.models.SimpleContact
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
+import com.goodwy.smsmessenger.activities.ConversationDetailsActivity
 import com.goodwy.smsmessenger.activities.SimpleActivity
+import com.goodwy.smsmessenger.helpers.THREAD_ID
 import com.google.android.material.snackbar.Snackbar
 import java.util.Locale
 
@@ -28,7 +30,7 @@ fun SimpleActivity.dialNumber(phoneNumber: String, callback: (() -> Unit)? = nul
 //        try {
 //            startActivity(this)
 //            callback?.invoke()
-//        } catch (e: ActivityNotFoundException) {
+//        } catch (_: ActivityNotFoundException) {
 //            toast(com.goodwy.commons.R.string.no_app_found)
 //        } catch (e: Exception) {
 //            showErrorToast(e)
@@ -44,7 +46,7 @@ fun SimpleActivity.dialNumber(phoneNumber: String, callback: (() -> Unit)? = nul
             try {
                 launchActivityIntent(this)
                 callback?.invoke()
-            } catch (e: ActivityNotFoundException) {
+            } catch (_: ActivityNotFoundException) {
                 toast(com.goodwy.commons.R.string.no_app_found)
             } catch (e: Exception) {
                 showErrorToast(e)
@@ -62,7 +64,7 @@ fun Activity.launchViewIntent(uri: Uri, mimetype: String, filename: String) {
         try {
             hideKeyboard()
             startActivity(this)
-        } catch (e: ActivityNotFoundException) {
+        } catch (_: ActivityNotFoundException) {
             val newMimetype = filename.getMimeType()
             if (newMimetype.isNotEmpty() && mimetype != newMimetype) {
                 launchViewIntent(uri, newMimetype, filename)
@@ -78,25 +80,53 @@ fun Activity.launchViewIntent(uri: Uri, mimetype: String, filename: String) {
 fun Activity.startContactDetailsIntent(contact: SimpleContact) {
     val simpleContacts = "com.goodwy.contacts"
     val simpleContactsDebug = "com.goodwy.contacts.debug"
-    if ((0..config.appRecommendationDialogCount).random() == 2 && (!isPackageInstalled(simpleContacts) && !isPackageInstalled(simpleContactsDebug))) {
-        NewAppDialog(this, simpleContacts, getString(com.goodwy.strings.R.string.recommendation_dialog_contacts_g), getString(com.goodwy.commons.R.string.right_contacts),
-            AppCompatResources.getDrawable(this, com.goodwy.commons.R.drawable.ic_contacts)) {}
+    if (
+        (0..config.appRecommendationDialogCount).random() == 2 &&
+        (!isPackageInstalled(simpleContacts) && !isPackageInstalled(simpleContactsDebug))
+    ) {
+        NewAppDialog(
+            this,
+            simpleContacts,
+            getString(com.goodwy.strings.R.string.recommendation_dialog_contacts_g),
+            getString(com.goodwy.commons.R.string.right_contacts),
+            AppCompatResources.getDrawable(this, com.goodwy.commons.R.drawable.ic_contacts)
+        ) {}
     } else {
-        if (contact.rawId > 1000000 && contact.contactId > 1000000 && contact.rawId == contact.contactId &&
+        if (
+            contact.rawId > 1000000 &&
+            contact.contactId > 1000000 &&
+            contact.rawId == contact.contactId &&
             (isPackageInstalled(simpleContacts) || isPackageInstalled(simpleContactsDebug))
         ) {
             Intent().apply {
                 action = Intent.ACTION_VIEW
                 putExtra(CONTACT_ID, contact.rawId)
                 putExtra(IS_PRIVATE, true)
-                `package` = if (isPackageInstalled(simpleContacts)) simpleContacts else simpleContactsDebug
-                setDataAndType(ContactsContract.Contacts.CONTENT_LOOKUP_URI, "vnd.android.cursor.dir/person")
+                setPackage(
+                    if (isPackageInstalled(simpleContacts)) {
+                        simpleContacts
+                    } else {
+                        simpleContactsDebug
+                    }
+                )
+
+                setDataAndType(
+                    ContactsContract.Contacts.CONTENT_LOOKUP_URI,
+                    "vnd.android.cursor.dir/person"
+                )
+
                 launchActivityIntent(this)
             }
         } else {
             ensureBackgroundThread {
-                val lookupKey = SimpleContactsHelper(this).getContactLookupKey((contact).rawId.toString())
-                val publicUri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey)
+                val lookupKey = SimpleContactsHelper(this)
+                    .getContactLookupKey(
+                        contactId = (contact).rawId.toString()
+                    )
+
+                val publicUri = Uri.withAppendedPath(
+                    ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey
+                )
                 runOnUiThread {
                     launchViewContactIntent(publicUri)
                 }
@@ -105,6 +135,14 @@ fun Activity.startContactDetailsIntent(contact: SimpleContact) {
     }
 }
 
+fun Activity.launchConversationDetails(threadId: Long) {
+    Intent(this, ConversationDetailsActivity::class.java).apply {
+        putExtra(THREAD_ID, threadId)
+        startActivity(this)
+    }
+}
+
+//Goodwy
 fun SimpleActivity.launchPurchase() {
     val productIdX1 = BuildConfig.PRODUCT_ID_X1
     val productIdX2 = BuildConfig.PRODUCT_ID_X2
@@ -151,9 +189,18 @@ fun SimpleActivity.launchAbout() {
     val licenses = LICENSE_EVENT_BUS or LICENSE_SMS_MMS or LICENSE_INDICATOR_FAST_SCROLL
 
     val faqItems = arrayListOf(
-        FAQItem(R.string.faq_2_title, R.string.faq_2_text),
-        FAQItem(R.string.faq_3_title, R.string.faq_3_text),
-        FAQItem(com.goodwy.commons.R.string.faq_9_title_commons, com.goodwy.commons.R.string.faq_9_text_commons)
+        FAQItem(
+            title = R.string.faq_2_title,
+            text = R.string.faq_2_text
+        ),
+        FAQItem(
+            title = R.string.faq_3_title,
+            text = R.string.faq_3_text
+        ),
+        FAQItem(
+            title = com.goodwy.commons.R.string.faq_9_title_commons,
+            text = com.goodwy.commons.R.string.faq_9_text_commons
+        )
     )
 
     if (!resources.getBoolean(com.goodwy.commons.R.bool.hide_google_relations)) {

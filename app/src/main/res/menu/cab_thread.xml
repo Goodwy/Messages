@@ -22,16 +22,6 @@
         android:id="@+id/cab_save_as"
         android:icon="@drawable/ic_save_vector"
         android:title="@string/save_as"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/cab_properties"
-        android:icon="@drawable/ic_info_vector"
-        android:title="@string/properties"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/cab_restore"
-        android:showAsAction="never"
-        android:title="@string/restore"
         app:showAsAction="never" />
     <item
         android:id="@+id/cab_forward_message"
@@ -47,5 +37,15 @@
         android:id="@+id/cab_select_all"
         android:icon="@drawable/ic_select_all_vector"
         android:title="@string/select_all"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/cab_properties"
+        android:icon="@drawable/ic_info_vector"
+        android:title="@string/properties"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/cab_restore"
+        android:showAsAction="never"
+        android:title="@string/restore"
+        app:showAsAction="never" />
 </menu>

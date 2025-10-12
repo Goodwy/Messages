@@ -20,9 +20,14 @@ import android.widget.PopupMenu
 import android.widget.RelativeLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.view.updateLayoutParams
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.net.toUri
+import androidx.core.text.layoutDirection
 import androidx.core.view.ViewCompat
+import androidx.core.view.get
+import androidx.core.view.size
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.DiffUtil
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
@@ -37,6 +42,7 @@ import com.bumptech.glide.request.target.Target
 import com.goodwy.commons.adapters.MyRecyclerViewListAdapter
 import com.goodwy.commons.dialogs.ConfirmationDialog
 import com.goodwy.commons.extensions.*
+import com.goodwy.commons.helpers.TEXT_ALIGNMENT_ALONG_EDGES
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.views.MyRecyclerView
 import com.goodwy.smsmessenger.R
@@ -56,11 +62,6 @@ import com.goodwy.smsmessenger.models.ThreadItem
 import com.goodwy.smsmessenger.models.ThreadItem.*
 import java.util.Locale
 import kotlin.math.abs
-import androidx.core.view.get
-import androidx.core.text.layoutDirection
-import androidx.core.graphics.drawable.toDrawable
-import androidx.core.net.toUri
-import androidx.core.view.size
 
 class ThreadAdapter(
     activity: SimpleActivity,
@@ -89,9 +90,13 @@ class ThreadAdapter(
         val isOneItemSelected = isOneItemSelected()
         val selectedItem = getSelectedItems().firstOrNull() as? Message
         val hasText = selectedItem?.body != null && selectedItem.body != ""
+        val showSaveAs = getSelectedItems().all {
+            it is Message && (it.attachment?.attachments?.size ?: 0) > 0
+        } && getSelectedAttachments().isNotEmpty()
+
         menu.apply {
             findItem(R.id.cab_copy_to_clipboard).isVisible = isOneItemSelected && hasText
-            findItem(R.id.cab_save_as).isVisible = isOneItemSelected && selectedItem?.attachment?.attachments?.size == 1
+            findItem(R.id.cab_save_as).isVisible = showSaveAs
             findItem(R.id.cab_share).isVisible = isOneItemSelected && hasText
             findItem(R.id.cab_forward_message).isVisible = isOneItemSelected
             findItem(R.id.cab_select_text).isVisible = isOneItemSelected && hasText
@@ -183,10 +188,16 @@ class ThreadAdapter(
         activity.copyToClipboard(firstItem.body)
     }
 
+    private fun getSelectedAttachments(): List<Attachment> {
+        val selectedMessages = getSelectedItems().filterIsInstance<Message>()
+        return selectedMessages.flatMap { it.attachment?.attachments.orEmpty() }
+    }
+
     private fun saveAs() {
-        val firstItem = getSelectedItems().firstOrNull() as? Message ?: return
-        val attachment = firstItem.attachment?.attachments?.first() ?: return
-        (activity as ThreadActivity).saveMMS(attachment.mimetype, attachment.uriString)
+        val attachments = getSelectedAttachments()
+        if (attachments.isNotEmpty()) {
+            (activity as ThreadActivity).saveMMS(attachments)
+        }
     }
 
     private fun shareText() {
@@ -357,6 +368,9 @@ class ThreadAdapter(
                 val spannable = SpannableString(message.body)
                 Linkify.addLinks(spannable, Linkify.ALL)
                 text = spannable
+                val alignment =
+                    if (context.config.textAlignment == TEXT_ALIGNMENT_ALONG_EDGES) View.TEXT_ALIGNMENT_VIEW_END else View.TEXT_ALIGNMENT_INHERIT
+                textAlignment = alignment
                 movementMethod = LinkMovementMethod.getInstance()
 
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSizeMessage)
@@ -607,7 +621,11 @@ class ThreadAdapter(
                 setPaddingBubble(activity, bubbleStyle)
                 background.applyColorFilter(backgroundReceived)
             }
+
+            val alignment =
+                if (activity.config.textAlignment == TEXT_ALIGNMENT_ALONG_EDGES) View.TEXT_ALIGNMENT_VIEW_START else View.TEXT_ALIGNMENT_INHERIT
             threadMessageBody.apply {
+                textAlignment = alignment
                 val contrastColorReceived = backgroundReceived.getContrastColor()
                 setTextColor(contrastColorReceived)
                 setLinkTextColor(contrastColorReceived)
@@ -616,6 +634,7 @@ class ThreadAdapter(
             if (isGroupChat && message.body.isNotEmpty() && message.isReceivedMessage()) {
                 threadMessageSenderName.apply {
                     beVisible()
+                    textAlignment = alignment
                     text = message.senderName
                     setTextColor(letterBackgroundColors[abs(message.senderName.hashCode()) % letterBackgroundColors.size].toInt())
                     setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSizeMessage * 0.9f)
@@ -635,8 +654,8 @@ class ThreadAdapter(
 //            }
 //            if (!activity.isFinishing && !activity.isDestroyed) {
 //                val contactLetterIcon = SimpleContactsHelper(activity).getContactLetterIcon(message.senderName)
-//                val placeholder = BitmapDrawable(activity.resources, contactLetterIcon)
-//
+//                val placeholder = contactLetterIcon.toDrawable(activity.resources)
+
 //                val options = RequestOptions()
 //                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
 //                    .error(placeholder)
@@ -757,7 +776,7 @@ class ThreadAdapter(
 
         try {
             builder.into(imageView.attachmentImage)
-        } catch (ignore: Exception) {
+        } catch (_: Exception) {
         }
 
         imageView.attachmentImage.setOnClickListener {
@@ -875,15 +894,15 @@ class ThreadAdapter(
         binding.threadLoading.setIndicatorColor(properPrimaryColor)
     }
 
-    override fun onViewRecycled(holder: ViewHolder) {
-        super.onViewRecycled(holder)
-        if (!activity.isDestroyed && !activity.isFinishing) {
-            val binding = (holder as ThreadViewHolder).binding
+//    override fun onViewRecycled(holder: ViewHolder) {
+//        super.onViewRecycled(holder)
+//        if (!activity.isDestroyed && !activity.isFinishing) {
+//            val binding = (holder as ThreadViewHolder).binding
 //            if (binding is ItemMessageBinding) {
 //                Glide.with(activity).clear(binding.threadMessageSenderPhoto)
 //            }
-        }
-    }
+//        }
+//    }
 
     inner class ThreadViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)
 }

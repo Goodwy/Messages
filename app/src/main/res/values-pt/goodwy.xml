@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Estilo de título do bate-papo</string>
     <string name="unread_at_top_g">Não lidos sempre no topo</string>
     <string name="show_sim_selection_dialog">Mostrar a caixa de diálogo de seleção do cartão SIM durante o envio</string>
-    <string name="voice_input">Entrada de voz</string>
     <string name="delete_after_copy">Eliminar uma mensagem depois de copiar um número de uma notificação</string>
     <string name="sound_on_out_going_messages">Som ao enviar uma mensagem</string>
+    <string name="delivered">Entregue</string>
+    <string name="failed">Fracassado</string>
+    <string name="pending">Pendente</string>
+    <string name="message_type">Tipo de mensagem</string>
 </resources>

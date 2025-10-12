@@ -7,7 +7,6 @@ import com.goodwy.commons.extensions.notificationManager
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.smsmessenger.extensions.conversationsDB
 import com.goodwy.smsmessenger.extensions.markThreadMessagesRead
-import com.goodwy.smsmessenger.extensions.updateUnreadCountBadge
 import com.goodwy.smsmessenger.helpers.MARK_AS_READ
 import com.goodwy.smsmessenger.helpers.THREAD_ID
 import com.goodwy.smsmessenger.helpers.refreshMessages
@@ -21,7 +20,6 @@ class MarkAsReadReceiver : BroadcastReceiver() {
                 ensureBackgroundThread {
                     context.markThreadMessagesRead(threadId)
                     context.conversationsDB.markRead(threadId)
-                    context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
                     refreshMessages()
                 }
             }

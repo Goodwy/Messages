@@ -1,15 +1,12 @@
 package com.goodwy.smsmessenger.adapters
 
 import android.content.Intent
-import android.os.Build
 import android.text.TextUtils
 import android.view.Menu
-import androidx.annotation.RequiresApi
 import com.goodwy.commons.dialogs.ConfirmationDialog
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.KEY_PHONE
 import com.goodwy.commons.helpers.ensureBackgroundThread
-import com.goodwy.commons.helpers.isNougatPlus
 import com.goodwy.commons.views.MyRecyclerView
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
@@ -50,6 +47,7 @@ class ConversationsAdapter(
             findItem(R.id.cab_dial_number).isVisible =
                 isSingleSelection && !isGroupConversation && !isShortCodeWithLetters(selectedConversation.phoneNumber)
             findItem(R.id.cab_copy_number).isVisible = isSingleSelection && !isGroupConversation
+            findItem(R.id.cab_conversation_details).isVisible = isSingleSelection
             findItem(R.id.cab_rename_conversation).isVisible = isSingleSelection && isGroupConversation
             findItem(R.id.cab_mark_as_read).isVisible = selectedItems.any { !it.read }
             findItem(R.id.cab_mark_as_unread).isVisible = selectedItems.any { it.read }
@@ -85,6 +83,9 @@ class ConversationsAdapter(
             R.id.cab_copy_number -> copyNumberToClipboard()
             R.id.cab_delete -> askConfirmDelete()
             R.id.cab_archive -> askConfirmArchive()
+            R.id.cab_conversation_details ->
+                activity.launchConversationDetails(getSelectedItems().first().threadId)
+
             R.id.cab_rename_conversation -> renameConversation(getSelectedItems().first())
             R.id.cab_mark_as_read -> markAsRead()
             R.id.cab_mark_as_unread -> markAsUnread()
@@ -93,14 +94,6 @@ class ConversationsAdapter(
             R.id.cab_select_all -> selectAll()
         }
     }
-
-//    private fun tryBlocking() {
-//        if (activity.isOrWasThankYouInstalled()) {
-//            askConfirmBlock()
-//        } else {
-//            FeatureLockedDialog(activity) { }
-//        }
-//    }
 
     private fun askConfirmBlock() {
         val numbers = getSelectedItems().distinctBy { it.phoneNumber }.map { it.phoneNumber }
@@ -216,7 +209,7 @@ class ConversationsAdapter(
 
         val newList = try {
             currentList.toMutableList().apply { removeAll(conversationsToRemove) }
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             currentList.toMutableList()
         }
 
@@ -254,7 +247,7 @@ class ConversationsAdapter(
 
         val newList = try {
             currentList.toMutableList().apply { removeAll(conversationsToRemove) }
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             currentList.toMutableList()
         }
 
@@ -413,7 +406,7 @@ class ConversationsAdapter(
 
         val newList = try {
             currentList.toMutableList().apply { removeAll(conversationsToArchive) }
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             currentList.toMutableList()
         }
 
@@ -464,7 +457,7 @@ class ConversationsAdapter(
 
         val newList = try {
             currentList.toMutableList().apply { removeAll(conversationsToRemove) }
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             currentList.toMutableList()
         }
 
@@ -487,7 +480,7 @@ class ConversationsAdapter(
             } else {
                 activity.messagesDB.getThreadMessages(threadId)
             }.toMutableList() as ArrayList<Message>
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             ArrayList()
         }
 

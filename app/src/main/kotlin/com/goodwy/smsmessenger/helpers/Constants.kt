@@ -16,7 +16,7 @@ const val THREAD_ATTACHMENT_URI = "thread_attachment_uri"
 const val THREAD_ATTACHMENT_URIS = "thread_attachment_uris"
 const val SEARCHED_MESSAGE_ID = "searched_message_id"
 const val USE_SIM_ID_PREFIX = "use_sim_id_"
-const val NOTIFICATION_CHANNEL = "simple_sms_messenger"
+const val NOTIFICATION_CHANNEL = "right_sms_messenger"
 const val SHOW_CHARACTER_COUNTER = "show_character_counter"
 const val USE_SIMPLE_CHARACTERS = "use_simple_characters"
 const val SEND_ON_ENTER = "send_on_enter"
@@ -47,13 +47,16 @@ const val LAST_RECYCLE_BIN_CHECK = "last_recycle_bin_check"
 const val IS_RECYCLE_BIN = "is_recycle_bin"
 const val IS_ARCHIVE_AVAILABLE = "is_archive_available"
 const val CUSTOM_NOTIFICATIONS = "custom_notifications"
+const val IS_LAUNCHED_FROM_SHORTCUT = "is_launched_from_shortcut"
+const val KEEP_CONVERSATIONS_ARCHIVED = "keep_conversations_archived"
+//Goodwy
 const val SIM_TO_REPLY = "sim_to_reply"
 const val SHOW_SIM_SELECTION_DIALOG = "show_sim_selection_dialog"
 const val COPY_NUMBER_AND_DELETE_PREF = "copy_number_and_delete_pref"
 const val FONT_SIZE_MESSAGE = "font_size_message"
-const val USE_SPEECH_TO_TEXT = "use_speech_to_text"
 const val SOUND_ON_OUT_GOING_MESSAGE = "sound_on_out_going_messages"
 const val NOTIFY_TURN_ON_SCREEN = "notify_turns_on_screen"
+const val INIT_CALL_BLOCKING_SETUP = "init_call_blocking_setup"
 
 private const val PATH = "com.goodwy.smsmessenger.action."
 const val MARK_AS_READ = PATH + "mark_as_read"
@@ -87,6 +90,7 @@ const val FILE_SIZE_1_MB = 1_048_576L
 const val FILE_SIZE_2_MB = 2_097_152L
 
 const val MESSAGES_LIMIT = 30
+const val MAX_MESSAGE_LENGTH = 5000
 
 // intent launch request codes
 const val PICK_PHOTO_INTENT = 42
@@ -97,6 +101,7 @@ const val CAPTURE_VIDEO_INTENT = 45
 const val CAPTURE_AUDIO_INTENT = 46
 const val PICK_DOCUMENT_INTENT = 47
 const val PICK_CONTACT_INTENT = 48
+const val PICK_SAVE_DIR_INTENT = 50
 
 const val BLOCKED_KEYWORDS_EXPORT_DELIMITER = ","
 const val BLOCKED_KEYWORDS_EXPORT_EXTENSION = ".txt"

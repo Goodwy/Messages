@@ -22,13 +22,13 @@ import com.goodwy.smsmessenger.dialogs.ExportMessagesDialog
 import com.goodwy.smsmessenger.dialogs.MessageBubbleSettingDialog
 import com.goodwy.smsmessenger.extensions.*
 import com.goodwy.smsmessenger.helpers.*
-import com.goodwy.smsmessenger.models.*
 import com.mikhaellopez.rxanimation.RxAnimation
 import com.mikhaellopez.rxanimation.shake
 import kotlin.math.abs
 import kotlin.system.exitProcess
 import kotlinx.coroutines.launch
 import ru.rustore.sdk.core.feature.model.FeatureAvailabilityResult
+import java.util.Calendar
 import java.util.Locale
 
 class SettingsActivity : SimpleActivity() {
@@ -39,7 +39,7 @@ class SettingsActivity : SimpleActivity() {
         add("application/json")
         add("application/xml")
         add("text/xml")
-        if (!isPiePlus()) {
+        if (!isQPlus()) {
             add("application/octet-stream")
         }
     }
@@ -163,8 +163,8 @@ class SettingsActivity : SimpleActivity() {
         setupPurchaseThankYou()
 
         setupCustomizeColors()
-        setupMaterialDesign3()
         setupOverflowIcon()
+        setupFloatingButtonStyle()
         setupUseColoredContacts()
         setupContactsColorList()
         setupColorSimIcons()
@@ -172,6 +172,7 @@ class SettingsActivity : SimpleActivity() {
 
         setupManageBlockedNumbers()
         setupManageBlockedKeywords()
+        setupUseSpeechToText()
         setupFontSize()
         setupChangeDateTimeFormat()
         setupUseEnglish()
@@ -192,6 +193,7 @@ class SettingsActivity : SimpleActivity() {
 
         setupThreadTopStyle()
         setupMessageBubble()
+        setupTextAlignmentMessage()
         setupFontSizeMessage()
         setupActionOnMessageClick()
 
@@ -199,7 +201,6 @@ class SettingsActivity : SimpleActivity() {
         setupSoundOnOutGoingMessages()
         setupShowSimSelectionDialog()
         setupEnableDeliveryReports()
-        setupUseSpeechToText()
         setupShowCharacterCounter()
         setupUseSimpleCharacters()
         setupSendLongMessageAsMMS()
@@ -215,6 +216,8 @@ class SettingsActivity : SimpleActivity() {
         setupUnreadIndicatorPosition()
         setupHideTopBarWhenScroll()
         setupChangeColourTopBarWhenScroll()
+
+        setupKeepConversationsArchived()
 
         setupUseRecycleBin()
         setupEmptyRecycleBin()
@@ -233,6 +236,7 @@ class SettingsActivity : SimpleActivity() {
         }
 
         binding.apply {
+            val properPrimaryColor = getProperPrimaryColor()
             arrayOf(
                 settingsAppearanceLabel,
                 settingsGeneralLabel,
@@ -246,9 +250,10 @@ class SettingsActivity : SimpleActivity() {
                 settingsBackupsLabel,
                 settingsOtherLabel
             ).forEach {
-                it.setTextColor(getProperPrimaryColor())
+                it.setTextColor(properPrimaryColor)
             }
 
+            val surfaceColor = getSurfaceColor()
             arrayOf(
                 settingsColorCustomizationHolder,
                 settingsGeneralHolder,
@@ -258,25 +263,26 @@ class SettingsActivity : SimpleActivity() {
                 settingsListViewHolder,
                 settingsSwipeGesturesHolder,
                 settingsRecycleBinHolder,
+                settingsArchivedMessagesHolder,
                 settingsSecurityHolder,
                 settingsBackupsHolder,
                 settingsOtherHolder
             ).forEach {
-                it.setCardBackgroundColor(getBottomNavigationBackgroundColor())
+                it.setCardBackgroundColor(surfaceColor)
             }
 
+            val properTextColor = getProperTextColor()
             arrayOf(
                 settingsCustomizeColorsChevron,
                 settingsManageBlockedNumbersChevron,
                 settingsManageBlockedKeywordsChevron,
-                settingsChangeDateTimeFormatChevron,
                 settingsCustomizeNotificationsChevron,
                 settingsImportMessagesChevron,
                 settingsExportMessagesChevron,
                 settingsTipJarChevron,
                 settingsAboutChevron
             ).forEach {
-                it.applyColorFilter(getProperTextColor())
+                it.applyColorFilter(properTextColor)
             }
         }
     }
@@ -302,18 +308,7 @@ class SettingsActivity : SimpleActivity() {
 
     private fun setupPurchaseThankYou() = binding.apply {
         settingsPurchaseThankYouHolder.beGoneIf(isPro())
-        settingsPurchaseThankYouHolder.setOnClickListener {
-            launchPurchase()
-        }
-        moreButton.setOnClickListener {
-            launchPurchase()
-        }
-        val appDrawable = resources.getColoredDrawableWithColor(this@SettingsActivity, com.goodwy.commons.R.drawable.ic_plus_support, getProperPrimaryColor())
-        purchaseLogo.setImageDrawable(appDrawable)
-        val drawable = resources.getColoredDrawableWithColor(this@SettingsActivity, com.goodwy.commons.R.drawable.button_gray_bg, getProperPrimaryColor())
-        moreButton.background = drawable
-        moreButton.setTextColor(getProperBackgroundColor())
-        moreButton.setPadding(2, 2, 2, 2)
+        settingsPurchaseThankYouHolder.onClick = { launchPurchase() }
     }
 
     private fun setupCustomizeColors() = binding.apply {
@@ -344,15 +339,6 @@ class SettingsActivity : SimpleActivity() {
         }
     }
 
-    private fun setupMaterialDesign3() = binding.apply {
-        settingsMaterialDesign3.isChecked = config.materialDesign3
-        settingsMaterialDesign3Holder.setOnClickListener {
-            settingsMaterialDesign3.toggle()
-            config.materialDesign3 = settingsMaterialDesign3.isChecked
-            config.tabsChanged = true
-        }
-    }
-
     private fun setupOverflowIcon() {
         binding.apply {
             settingsOverflowIcon.applyColorFilter(getProperTextColor())
@@ -378,6 +364,42 @@ class SettingsActivity : SimpleActivity() {
                             baseConfig.overflowIcon = newValue - 1
                             settingsOverflowIcon.setImageResource(getOverflowIcon(baseConfig.overflowIcon))
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupFloatingButtonStyle() {
+        binding.apply {
+            settingsFloatingButtonStyle.applyColorFilter(getProperTextColor())
+            settingsFloatingButtonStyle.setImageResource(
+                if (baseConfig.materialDesign3) com.goodwy.commons.R.drawable.squircle_bg else com.goodwy.commons.R.drawable.ic_circle_filled
+            )
+            settingsFloatingButtonStyleHolder.setOnClickListener {
+                val items = arrayListOf(
+                    com.goodwy.commons.R.drawable.ic_circle_filled,
+                    com.goodwy.commons.R.drawable.squircle_bg
+                )
+
+                IconListDialog(
+                    activity = this@SettingsActivity,
+                    items = items,
+                    checkedItemId = if (baseConfig.materialDesign3) 2 else 1,
+                    defaultItemId = 1,
+                    titleId = com.goodwy.strings.R.string.floating_button_style,
+                    size = pixels(com.goodwy.commons.R.dimen.normal_icon_size).toInt(),
+                    color = getProperTextColor()
+                ) { wasPositivePressed, newValue ->
+                    if (wasPositivePressed) {
+                        if (newValue != if (baseConfig.materialDesign3) 2 else 1) {
+                        }
+                        baseConfig.materialDesign3 = newValue == 2
+                        settingsFloatingButtonStyle.setImageResource(
+                            if (newValue == 2) com.goodwy.commons.R.drawable.squircle_bg
+                            else com.goodwy.commons.R.drawable.ic_circle_filled
+                        )
+                        config.tabsChanged = true
                     }
                 }
             }
@@ -428,6 +450,28 @@ class SettingsActivity : SimpleActivity() {
             else -> R.drawable.item_received_background
         }
     }
+
+    private fun setupTextAlignmentMessage() = binding.apply {
+        settingsTextAlignmentMessage.text = getTextAlignmentMessageText()
+        settingsTextAlignmentMessageHolder.setOnClickListener {
+            val items = arrayListOf(
+                RadioItem(TEXT_ALIGNMENT_START, getString(com.goodwy.strings.R.string.start)),
+                RadioItem(TEXT_ALIGNMENT_ALONG_EDGES, getString(com.goodwy.strings.R.string.text_alignment_along_edges))
+            )
+
+            RadioGroupDialog(this@SettingsActivity, items, config.textAlignment, com.goodwy.strings.R.string.text_alignment) {
+                config.textAlignment = it as Int
+                settingsTextAlignmentMessage.text = getTextAlignmentMessageText()
+            }
+        }
+    }
+
+    private fun getTextAlignmentMessageText() = getString(
+        when (config.textAlignment) {
+            TEXT_ALIGNMENT_START -> com.goodwy.strings.R.string.start
+            else -> com.goodwy.strings.R.string.text_alignment_along_edges
+        }
+    )
 
     private fun setupFontSizeMessage() = binding.apply {
         settingsFontSizeMessage.text = getFontSizeMessageText()
@@ -492,13 +536,6 @@ class SettingsActivity : SimpleActivity() {
             alpha = alphaUnknown
         }
 
-        val colorHidden = if (baseConfig.blockHiddenNumbers) red else getProperTextColor
-        val alphaHidden = if (baseConfig.blockHiddenNumbers) 1f else 0.6f
-        settingsManageBlockedNumbersIconHidden.apply {
-            applyColorFilter(colorHidden)
-            alpha = alphaHidden
-        }
-
         settingsManageBlockedNumbersHolder.setOnClickListener {
             Intent(this@SettingsActivity, ManageBlockedNumbersActivity::class.java).apply {
                 startActivity(this)
@@ -516,12 +553,30 @@ class SettingsActivity : SimpleActivity() {
         }
     }
 
+    private fun setupUseSpeechToText() = binding.apply {
+        settingsUseSpeechToText.isChecked = config.useSpeechToText
+        settingsUseSpeechToTextHolder.setOnClickListener {
+            settingsUseSpeechToText.toggle()
+            config.useSpeechToText = settingsUseSpeechToText.isChecked
+            config.tabsChanged = true
+        }
+    }
+
     private fun setupChangeDateTimeFormat() = binding.apply {
+        updateDateTimeFormat()
         settingsChangeDateTimeFormatHolder.setOnClickListener {
-            ChangeDateTimeFormatDialog(this@SettingsActivity) {
+            ChangeDateTimeFormatDialog(this@SettingsActivity, true) {
+                updateDateTimeFormat()
                 refreshMessages()
+                config.tabsChanged = true
             }
         }
+    }
+
+    private fun updateDateTimeFormat() {
+        val cal = Calendar.getInstance(Locale.ENGLISH).timeInMillis
+        val formatDate = cal.formatDate(this@SettingsActivity)
+        binding.settingsChangeDateTimeFormat.text = formatDate
     }
 
     private fun setupFontSize() = binding.apply {
@@ -618,14 +673,6 @@ class SettingsActivity : SimpleActivity() {
         }
     }
 
-    private fun setupUseSpeechToText() = binding.apply {
-        settingsUseSpeechToText.isChecked = config.useSpeechToText
-        settingsUseSpeechToTextHolder.setOnClickListener {
-            settingsUseSpeechToText.toggle()
-            config.useSpeechToText = settingsUseSpeechToText.isChecked
-        }
-    }
-
     private fun setupSendLongMessageAsMMS() = binding.apply {
         settingsSendLongMessageMms.isChecked = config.sendLongMessageMMS
         settingsSendLongMessageMmsHolder.setOnClickListener {
@@ -639,6 +686,14 @@ class SettingsActivity : SimpleActivity() {
         settingsSendGroupMessageMmsHolder.setOnClickListener {
             settingsSendGroupMessageMms.toggle()
             config.sendGroupMessageMMS = settingsSendGroupMessageMms.isChecked
+        }
+    }
+
+    private fun setupKeepConversationsArchived() = binding.apply {
+        settingsKeepConversationsArchived.isChecked = config.keepConversationsArchived
+        settingsKeepConversationsArchivedHolder.setOnClickListener {
+            settingsKeepConversationsArchived.toggle()
+            config.keepConversationsArchived = settingsKeepConversationsArchived.isChecked
         }
     }
 
@@ -1207,6 +1262,7 @@ class SettingsActivity : SimpleActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setupAbout() = binding.apply {
         settingsAboutVersion.text = "Version: " + BuildConfig.VERSION_NAME
         settingsAboutHolder.setOnClickListener {
@@ -1245,8 +1301,6 @@ class SettingsActivity : SimpleActivity() {
                     is FeatureAvailabilityResult.Unavailable -> {
                         //toast(event.availability.cause.message ?: "Process purchases unavailable", Toast.LENGTH_LONG)
                     }
-
-                    else -> {}
                 }
             }
 

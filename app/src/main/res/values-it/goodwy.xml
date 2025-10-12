@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Stile del titolo della chat</string>
     <string name="unread_at_top_g">Non letto sempre in primo piano</string>
     <string name="show_sim_selection_dialog">Mostra la finestra di dialogo di selezione della scheda SIM durante l\'invio</string>
-    <string name="voice_input">Input vocale</string>
     <string name="delete_after_copy">Elimina il messaggio dopo aver copiato un numero da una notifica</string>
     <string name="sound_on_out_going_messages">Suono quando si invia un messaggio</string>
+    <string name="delivered">Consegnato</string>
+    <string name="failed">Fallito</string>
+    <string name="pending">In attesa di</string>
+    <string name="message_type">Tipo di messaggio</string>
 </resources>

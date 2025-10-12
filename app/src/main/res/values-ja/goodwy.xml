@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">チャットのタイトルスタイル</string>
     <string name="unread_at_top_g">未読は常に一番上に表示されます</string>
     <string name="show_sim_selection_dialog">送信時にSIMカード選択ダイアログを表示する</string>
-    <string name="voice_input">音声入力</string>
     <string name="delete_after_copy">通知から番号をコピーした後にメッセージを削除する</string>
     <string name="sound_on_out_going_messages">メッセージ送信時の音</string>
+    <string name="delivered">配達済み</string>
+    <string name="failed">失敗した</string>
+    <string name="pending">保留中</string>
+    <string name="message_type">メッセージの種類</string>
 </resources>

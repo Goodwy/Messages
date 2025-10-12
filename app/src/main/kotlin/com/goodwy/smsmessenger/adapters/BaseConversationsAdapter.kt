@@ -41,7 +41,7 @@ abstract class BaseConversationsAdapter(
     onRefresh: () -> Unit,
     itemClick: (Any) -> Unit,
     var isArchived: Boolean = false,
-    var isRecycleBin: Boolean = false
+    var isRecycleBin: Boolean = false,
 ) : MyRecyclerViewListAdapter<Conversation>(
     activity = activity,
     recyclerView = recyclerView,
@@ -58,10 +58,8 @@ abstract class BaseConversationsAdapter(
 
     init {
         setupDragListener(true)
-        ensureBackgroundThread {
-            fetchDrafts(drafts)
-        }
         setHasStableIds(true)
+        updateDrafts()
 
         registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() = restoreRecyclerViewState()
@@ -81,7 +79,7 @@ abstract class BaseConversationsAdapter(
 
     fun updateConversations(
         newConversations: ArrayList<Conversation>,
-        commitCallback: (() -> Unit)? = null
+        commitCallback: (() -> Unit)? = null,
     ) {
         saveRecyclerViewState()
         submitList(newConversations.toList(), commitCallback)
@@ -103,8 +101,9 @@ abstract class BaseConversationsAdapter(
 
     override fun getSelectableItemCount() = itemCount
 
-    protected fun getSelectedItems() =
-        currentList.filter { selectedKeys.contains(it.hashCode()) } as ArrayList<Conversation>
+    protected fun getSelectedItems() = currentList.filter {
+        selectedKeys.contains(it.hashCode())
+    } as ArrayList<Conversation>
 
     override fun getIsItemSelectable(position: Int) = true
 
@@ -167,7 +166,10 @@ abstract class BaseConversationsAdapter(
             val smsDraft = drafts[conversation.threadId]
             draftIndicator.beVisibleIf(!smsDraft.isNullOrEmpty())
             draftIndicator.setTextColor(properPrimaryColor)
-            conversationFrame.setBackgroundColor(backgroundColor)
+
+            if (activity.isDynamicTheme() && !activity.isSystemInDarkMode()) {
+                conversationFrame.setBackgroundColor(surfaceColor)
+            } else conversationFrame.setBackgroundColor(backgroundColor)
 
             draftClear.apply {
                 beVisibleIf(smsDraft != null)
@@ -194,7 +196,10 @@ abstract class BaseConversationsAdapter(
                 val unreadCount = conversation.unreadCount
                 val unreadCountText = if (unreadCount == 0) "" else unreadCount.toString()
                 unreadIndicatorEnd.text = unreadCountText
-                pinIndicator.beVisibleIf(activity.config.pinnedConversations.contains(conversation.threadId.toString()) && conversation.read)
+                pinIndicator.beVisibleIf(
+                    activity.config.pinnedConversations.contains(conversation.threadId.toString())
+                        && conversation.read
+                )
                 pinIndicator.applyColorFilter(properPrimaryColor)
 
             }
@@ -260,13 +265,6 @@ abstract class BaseConversationsAdapter(
             }
             divider.setBackgroundColor(textColor)
 
-            // at group conversations we use an icon as the placeholder, not any letter
-            val placeholder = if (conversation.isGroupConversation) {
-                SimpleContactsHelper(activity).getColoredGroupIcon(title)
-            } else {
-                null
-            }
-
             conversationImage.beGoneIf(!showContactThumbnails)
             if (showContactThumbnails) {
                 val size = (root.context.pixels(com.goodwy.commons.R.dimen.normal_icon_size) * contactThumbnailsSize).toInt()
@@ -286,6 +284,13 @@ abstract class BaseConversationsAdapter(
                     }
                     conversationImage.setImageDrawable(drawable)
                 } else {
+                    // at group conversations we use an icon as the placeholder, not any letter
+                    val placeholder = if (conversation.isGroupConversation) {
+                        SimpleContactsHelper(activity).getColoredGroupIcon(title)
+                    } else {
+                        null
+                    }
+
                     SimpleContactsHelper(activity).loadContactImage(
                         path = conversation.photoUri,
                         imageView = conversationImage,
@@ -357,14 +362,14 @@ abstract class BaseConversationsAdapter(
             swipeView.useHapticFeedback = activity.config.swipeVibration
             swipeView.swipeGestureListener = object : SwipeGestureListener {
                 override fun onSwipedLeft(swipeActionView: SwipeActionView): Boolean {
-                    swipedLeft(conversation)
                     slideLeftReturn(swipeLeftIcon, swipeLeftIconHolder)
+                    swipedLeft(conversation)
                     return true
                 }
 
                 override fun onSwipedRight(swipeActionView: SwipeActionView): Boolean {
-                    swipedRight(conversation)
                     slideRightReturn(swipeRightIcon, swipeRightIconHolder)
+                    swipedRight(conversation)
                     return true
                 }
 

@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Babiltitolo stilo</string>
     <string name="unread_at_top_g">Lugemata alati ülaosas</string>
     <string name="show_sim_selection_dialog">Montru dialogon pri elekto de SIM-karto dum sendado</string>
-    <string name="voice_input">Voĉa enigo</string>
     <string name="delete_after_copy">Forigu mesaĝon post kopiado de numero de sciigo</string>
     <string name="sound_on_out_going_messages">Sono dum sendado de mesaĝo</string>
+    <string name="delivered">Liverita</string>
+    <string name="failed">Malsukcesis</string>
+    <string name="pending">Pritraktata</string>
+    <string name="message_type">Mesaĝo-tipo</string>
 </resources>

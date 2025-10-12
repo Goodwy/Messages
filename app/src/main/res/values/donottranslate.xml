@@ -13,6 +13,15 @@
     <string name="message_details_sim">SIM</string>
 
     <!-- Release notes -->
+    <string name="release_690">
+        Changed the color scheme of the system theme\n
+        Added voice input for search\n
+        Added the ability to disable one of the swipes\n
+        Added date format YYYY.MM.DD\n
+        Persian calendar added\n
+        Added notification about MMS download error\n
+        Fixed bugs, improved stability
+    </string>
     <string name="release_633">
         Fixed a bug where conversations disappeared when the recycle bin was enabled
     </string>

@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Chat titel stil</string>
     <string name="unread_at_top_g">Ulæst altid øverst</string>
     <string name="show_sim_selection_dialog">Vis dialogboksen til valg af SIM-kort, når du sender</string>
-    <string name="voice_input">Stemmeinput</string>
     <string name="delete_after_copy">Slet besked efter kopiering af et nummer fra en notifikation</string>
     <string name="sound_on_out_going_messages">Lyd, når du sender en besked</string>
+    <string name="delivered">Leveret</string>
+    <string name="failed">Mislykkedes</string>
+    <string name="pending">Indtil</string>
+    <string name="message_type">Meddelelsestype</string>
 </resources>

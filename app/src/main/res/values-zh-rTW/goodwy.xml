@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">聊天標題樣式</string>
     <string name="unread_at_top_g">未讀始終位於頂部</string>
     <string name="show_sim_selection_dialog">發送時顯示 SIM 卡選擇對話框</string>
-    <string name="voice_input">語音輸入</string>
     <string name="delete_after_copy">從通知中複製號碼後刪除郵件</string>
     <string name="sound_on_out_going_messages">發送消息時發出聲音</string>
+    <string name="delivered">發表</string>
+    <string name="failed">失敗的</string>
+    <string name="pending">待辦的</string>
+    <string name="message_type">訊息類型</string>
 </resources>

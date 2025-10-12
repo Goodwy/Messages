@@ -29,7 +29,7 @@ class MmsReceiver : MmsReceivedReceiver() {
         val address = mms.getSender()?.phoneNumbers?.first()?.normalizedNumber ?: ""
 
         val size = context.resources.getDimension(R.dimen.notification_large_icon_size).toInt()
-        val privateCursor = context.getMyContactsCursor(false, true)
+        val privateCursor = context.getMyContactsCursor(favoritesOnly = false, withPhoneNumbersOnly = true)
         ensureBackgroundThread {
             if (context.baseConfig.blockUnknownNumbers) {
                 val simpleContactsHelper = SimpleContactsHelper(context)
@@ -54,7 +54,10 @@ class MmsReceiver : MmsReceivedReceiver() {
         }
     }
 
-    override fun onError(context: Context, error: String) = context.showErrorToast(context.getString(R.string.couldnt_download_mms))
+    override fun onError(context: Context, error: String) {
+        context.notificationHelper.showMmsReceivedFailedNotification()
+//        context.showErrorToast(context.getString(R.string.couldnt_download_mms))
+    }
 
     private fun handleMmsMessage(
         context: Context,
@@ -73,16 +76,26 @@ class MmsReceiver : MmsReceivedReceiver() {
                 .centerCrop()
                 .into(size, size)
                 .get()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
 
         Handler(Looper.getMainLooper()).post {
-            context.showReceivedMessageNotification(mms.id, address, mms.body, mms.threadId, glideBitmap, mms.subscriptionId)
-            val conversation = context.getConversations(mms.threadId).firstOrNull() ?: return@post
+            context.showReceivedMessageNotification(
+                messageId = mms.id,
+                address = address,
+                body = mms.body,
+                threadId = mms.threadId,
+                bitmap = glideBitmap,
+                subscriptionId = mms.subscriptionId
+            )
             ensureBackgroundThread {
+                val conversation = context.getConversations(mms.threadId).firstOrNull()
+                    ?: return@ensureBackgroundThread
                 context.insertOrUpdateConversation(conversation)
-                context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
+                if (context.shouldUnarchive()) {
+                    context.updateConversationArchivedStatus(mms.threadId, false)
+                }
                 refreshMessages()
             }
         }

@@ -1,31 +1,32 @@
 [versions]
 #jetbrains
-kotlin = "1.9.25"
-kotlinxSerializationJson = "1.6.0"
+kotlin = "2.2.20"
+kotlinxSerializationJson = "1.9.0"
 #KSP
-ksp = "1.9.25-1.0.20"
+ksp = "2.2.20-2.0.3"
 #Detekt
-detekt = "1.23.3"
+detekt = "1.23.8"
+detektCompose = "0.4.27"
 #AndroidX
-androidx-constraintlayout = "2.2.0"
+androidx-constraintlayout = "2.2.1"
 androidx-swiperefreshlayout = "1.1.0"
 androidx-lifecycleprocess = "2.8.7"
 #Eventbus
 eventbus = "3.3.1"
 #Room
-room = "2.6.1"
+room = "2.8.1"
 #Simple Mobile Tools
 android-smsmms = "c3e678befd"
-indicatorFastScroll = "e37b5b2ad6"
+indicatorFastScroll = "fe6ddbc316"
 #Goodwy
-right-commons = "3615f69131"
+right-commons = "faefb227c4"
 behavioRule = "1.0.1"
 rxAnimation = "2.1.1"
 rxJava3 = "3.1.5"
 swipeToActionLayout = "bd1eb3c8a3"
 googleServices = "21.0.1"
 #Gradle
-gradlePlugins-agp = "8.7.3"
+gradlePlugins-agp = "8.11.1"
 #build
 app-build-compileSDKVersion = "34"
 app-build-targetSDK = "34"
@@ -33,12 +34,7 @@ app-build-minimumSDK = "26"
 app-build-javaVersion = "VERSION_17"
 app-build-kotlinJVMTarget = "17"
 #Helpers
-ez-vcard = "0.11.3"
-shortcut-badger = "1.1.22"
-#versioning
-app-version-appId = "com.goodwy.smsmessenger"
-app-version-versionCode = "633"
-app-version-versionName = "6.3.3"
+ez-vcard = "0.12.1"
 [libraries]
 #AndroidX
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
@@ -48,6 +44,8 @@ androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefre
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+#Compose
+compose-detekt = { module = "io.nlopez.compose.rules:detekt", version.ref = "detektCompose" }
 #Simple Mobile Tools
 indicator-fast-scroll = { module = "com.github.goodwy:IndicatorFastScroll", version.ref = "indicatorFastScroll" }
 android-smsmms = { module = "org.fossify:android-smsmms", version.ref = "android-smsmms" }
@@ -55,7 +53,6 @@ android-smsmms = { module = "org.fossify:android-smsmms", version.ref = "android
 eventbus = { module = "org.greenrobot:eventbus", version.ref = "eventbus" }
 #Helpers
 ez-vcard = { module = "com.googlecode.ez-vcard:ez-vcard", version.ref = "ez-vcard" }
-shortcut-badger = { module = "me.leolin:ShortcutBadger", version.ref = "shortcut-badger" }
 #Kotlin
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 #Goodwy

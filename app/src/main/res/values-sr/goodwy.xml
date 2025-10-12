@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">Стил наслова ћаскања</string>
     <string name="unread_at_top_g">Непрочитано увек на врху</string>
     <string name="show_sim_selection_dialog">Прикажи дијалог за избор СИМ картице приликом слања</string>
-    <string name="voice_input">Гласовни унос</string>
     <string name="delete_after_copy">Избришите поруку након копирања броја из обавештења</string>
     <string name="sound_on_out_going_messages">Звук приликом слања поруке</string>
+    <string name="delivered">Испоручено</string>
+    <string name="failed">Није успело</string>
+    <string name="pending">На чекању</string>
+    <string name="message_type">Врста поруке</string>
 </resources>

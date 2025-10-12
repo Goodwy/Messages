@@ -4,7 +4,10 @@
     <string name="chat_title_style_g">அரட்டை தலைப்பு நடை</string>
     <string name="unread_at_top_g">எப்போதும் மேலே படிக்காதது</string>
     <string name="show_sim_selection_dialog">அனுப்பும் போது சிம் கார்டு தேர்வு உரையாடலைக் காட்டு</string>
-    <string name="voice_input">குரல் உள்ளீடு</string>
     <string name="delete_after_copy">அறிவிப்பிலிருந்து எண்ணை நகலெடுத்த பிறகு செய்தியை நீக்கு.</string>
     <string name="sound_on_out_going_messages">செய்தி அனுப்பும்போது ஒலி</string>
+    <string name="delivered">வழங்கப்பட்டது</string>
+    <string name="failed">தோல்வியடைந்தது</string>
+    <string name="pending">நிலுவையில் உள்ளது</string>
+    <string name="message_type">செய்தி வகை</string>
 </resources>

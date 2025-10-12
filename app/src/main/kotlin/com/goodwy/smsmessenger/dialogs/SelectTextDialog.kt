@@ -1,6 +1,7 @@
 package com.goodwy.smsmessenger.dialogs
 
 import com.goodwy.commons.activities.BaseSimpleActivity
+import com.goodwy.commons.extensions.copyToClipboard
 import com.goodwy.commons.extensions.getAlertDialogBuilder
 import com.goodwy.commons.extensions.setupDialogStuff
 import com.goodwy.smsmessenger.databinding.DialogSelectTextBinding
@@ -14,6 +15,7 @@ class SelectTextDialog(val activity: BaseSimpleActivity, val text: String) {
 
         activity.getAlertDialogBuilder()
             .setPositiveButton(com.goodwy.commons.R.string.ok) { _, _ -> { } }
+            .setNeutralButton(com.goodwy.commons.R.string.copy) { _, _ -> activity.copyToClipboard(text) }
             .apply {
                 activity.setupDialogStuff(binding.root, this)
             }

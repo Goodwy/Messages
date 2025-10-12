@@ -1,13 +1,10 @@
 package com.goodwy.smsmessenger.activities
 
 import android.content.ActivityNotFoundException
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import com.goodwy.commons.dialogs.ExportBlockedNumbersDialog
-import com.goodwy.commons.dialogs.FilePickerDialog
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.*
 import com.goodwy.commons.interfaces.RefreshRecyclerViewListener
@@ -83,7 +80,7 @@ class ManageBlockedKeywordsActivity : SimpleActivity(), RefreshRecyclerViewListe
         }
     }
 
-    private val exportActivityResultLauncher =
+    private val createDocument =
         registerForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri ->
             try {
                 val outputStream = uri?.let { contentResolver.openOutputStream(it) }
@@ -95,7 +92,7 @@ class ManageBlockedKeywordsActivity : SimpleActivity(), RefreshRecyclerViewListe
             }
         }
 
-    private val importActivityResultLauncher =
+    private val getContent =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             try {
                 if (uri != null) {
@@ -107,32 +104,13 @@ class ManageBlockedKeywordsActivity : SimpleActivity(), RefreshRecyclerViewListe
         }
 
     private fun tryImportBlockedKeywords() {
-        if (isQPlus()) {
-            Intent(Intent.ACTION_GET_CONTENT).apply {
-                addCategory(Intent.CATEGORY_OPENABLE)
-                val mimeType = "text/plain"
-                type = mimeType
-
-                try {
-                    importActivityResultLauncher.launch(mimeType)
-                } catch (e: ActivityNotFoundException) {
-                    toast(com.goodwy.commons.R.string.system_service_disabled, Toast.LENGTH_LONG)
-                } catch (e: Exception) {
-                    showErrorToast(e)
-                }
-            }
-        } else {
-            handlePermission(PERMISSION_READ_STORAGE) { isAllowed ->
-                if (isAllowed) {
-                    pickFileToImportBlockedKeywords()
-                }
-            }
-        }
-    }
-
-    private fun pickFileToImportBlockedKeywords() {
-        FilePickerDialog(this) {
-            importBlockedKeywords(it)
+        val mimeType = "text/plain"
+        try {
+            getContent.launch(mimeType)
+        } catch (_: ActivityNotFoundException) {
+            toast(com.goodwy.commons.R.string.system_service_disabled, Toast.LENGTH_LONG)
+        } catch (e: Exception) {
+            showErrorToast(e)
         }
     }
 
@@ -192,38 +170,20 @@ class ManageBlockedKeywordsActivity : SimpleActivity(), RefreshRecyclerViewListe
     }
 
     private fun tryExportBlockedNumbers() {
-        if (isQPlus()) {
-            ExportBlockedKeywordsDialog(this, config.lastBlockedKeywordExportPath, true) { file ->
-                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_TITLE, file.name)
-                    addCategory(Intent.CATEGORY_OPENABLE)
-
-                    try {
-                        exportActivityResultLauncher.launch(file.name)
-                    } catch (e: ActivityNotFoundException) {
-                        toast(
-                            com.goodwy.commons.R.string.system_service_disabled,
-                            Toast.LENGTH_LONG
-                        )
-                    } catch (e: Exception) {
-                        showErrorToast(e)
-                    }
-                }
-            }
-        } else {
-            handlePermission(PERMISSION_WRITE_STORAGE) { isAllowed ->
-                if (isAllowed) {
-                    ExportBlockedNumbersDialog(
-                        this,
-                        config.lastBlockedKeywordExportPath,
-                        false
-                    ) { file ->
-                        getFileOutputStream(file.toFileDirItem(this), true) { out ->
-                            exportBlockedKeywordsTo(out)
-                        }
-                    }
-                }
+        ExportBlockedKeywordsDialog(
+            activity = this,
+            path = config.lastBlockedKeywordExportPath,
+            hidePath = true
+        ) { file ->
+            try {
+                createDocument.launch(file.name)
+            } catch (_: ActivityNotFoundException) {
+                toast(
+                    com.goodwy.commons.R.string.system_service_disabled,
+                    Toast.LENGTH_LONG
+                )
+            } catch (e: Exception) {
+                showErrorToast(e)
             }
         }
     }

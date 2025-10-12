@@ -1,7 +1,6 @@
 package com.goodwy.smsmessenger.activities
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.role.RoleManager
 import android.content.Intent
 import android.content.pm.ShortcutInfo
@@ -10,6 +9,7 @@ import android.graphics.drawable.Icon
 import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
 import android.provider.Telephony
+import android.speech.RecognizerIntent
 import android.text.TextUtils
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -45,6 +45,7 @@ class MainActivity : SimpleActivity() {
     private var storedFontSize = 0
     private var lastSearchedText = ""
     private var bus: EventBus? = null
+    private var isSpeechToTextAvailable = false
 
     private val binding by viewBinding(ActivityMainBinding::inflate)
 
@@ -63,7 +64,14 @@ class MainActivity : SimpleActivity() {
             useTransparentNavigation = true,
             useTopSearchMenu = true
         )
-        if (config.changeColourTopBar) setupSearchMenuScrollListener(binding.conversationsList, binding.mainMenu)
+        if (config.changeColourTopBar) {
+            val useSurfaceColor = isDynamicTheme() && !isSystemInDarkMode()
+            setupSearchMenuScrollListener(
+                scrollingView = binding.conversationsList,
+                searchMenu = binding.mainMenu,
+                surfaceColor = useSurfaceColor
+            )
+        }
 
         checkAndDeleteOldRecycleBinMessages()
         clearAllMessagesIfNeeded {
@@ -77,7 +85,7 @@ class MainActivity : SimpleActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (config.tabsChanged) {
+        if (config.tabsChanged || storedBackgroundColor != getProperBackgroundColor()) {
             finish()
             startActivity(intent)
             return
@@ -169,38 +177,50 @@ class MainActivity : SimpleActivity() {
     }
 
     private fun setupOptionsMenu() {
-        binding.mainMenu.getToolbar().inflateMenu(R.menu.menu_main)
-        binding.mainMenu.toggleHideOnScroll(config.hideTopBarWhenScroll)
-        binding.mainMenu.setupMenu()
+        binding.apply {
+            mainMenu.getToolbar().inflateMenu(R.menu.menu_main)
+            mainMenu.toggleHideOnScroll(config.hideTopBarWhenScroll)
 
-        binding.mainMenu.onSearchClosedListener = {
-            fadeOutSearch()
-        }
+            if (baseConfig.useSpeechToText) {
+                isSpeechToTextAvailable = isSpeechToTextAvailable()
+                mainMenu.showSpeechToText = isSpeechToTextAvailable
+            }
+            mainMenu.setupMenu()
 
-        binding.mainMenu.onSearchTextChangedListener = { text ->
-            if (text.isNotEmpty()) {
-                if (binding.searchHolder.alpha < 1f) {
-                    binding.searchHolder.fadeIn()
-                }
-            } else {
+            mainMenu.onSpeechToTextClickListener = {
+                speechToText()
+            }
+
+            mainMenu.onSearchClosedListener = {
                 fadeOutSearch()
             }
-            searchTextChanged(text)
-        }
 
-        binding.mainMenu.getToolbar().setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.show_recycle_bin -> launchRecycleBin()
-                R.id.show_archived -> launchArchivedConversations()
-                R.id.show_blocked_numbers -> showBlockedNumbers()
-                R.id.settings -> launchSettings()
-                R.id.about -> launchAbout()
-                else -> return@setOnMenuItemClickListener false
+            mainMenu.onSearchTextChangedListener = { text ->
+                if (text.isNotEmpty()) {
+                    if (binding.searchHolder.alpha < 1f) {
+                        binding.searchHolder.fadeIn()
+                    }
+                } else {
+                    fadeOutSearch()
+                }
+                searchTextChanged(text)
+                mainMenu.clearSearch()
             }
-            return@setOnMenuItemClickListener true
-        }
 
-        binding.mainMenu.clearSearch()
+            mainMenu.getToolbar().setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.show_recycle_bin -> launchRecycleBin()
+                    R.id.show_archived -> launchArchivedConversations()
+                    R.id.show_blocked_numbers -> showBlockedNumbers()
+                    R.id.settings -> launchSettings()
+                    R.id.about -> launchAbout()
+                    else -> return@setOnMenuItemClickListener false
+                }
+                return@setOnMenuItemClickListener true
+            }
+
+            mainMenu.clearSearch()
+        }
     }
 
     private fun refreshMenuItems() {
@@ -227,10 +247,20 @@ class MainActivity : SimpleActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
         if (requestCode == MAKE_DEFAULT_APP_REQUEST) {
-            if (resultCode == Activity.RESULT_OK) {
+            if (resultCode == RESULT_OK) {
                 askPermissions()
             } else {
                 finish()
+            }
+        } else if (requestCode == REQUEST_CODE_SPEECH_INPUT && resultCode == RESULT_OK) {
+            if (resultData != null) {
+                val res: ArrayList<String> =
+                    resultData.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as ArrayList<String>
+
+                val speechToText =  Objects.requireNonNull(res)[0]
+                if (speechToText.isNotEmpty()) {
+                    binding.mainMenu.setText(speechToText)
+                }
             }
         }
     }
@@ -244,8 +274,11 @@ class MainActivity : SimpleActivity() {
     }
 
     private fun updateMenuColors() {
-        updateStatusbarColor(getProperBackgroundColor())
-        val statusBarColor = if (config.changeColourTopBar) getRequiredStatusBarColor() else getProperBackgroundColor()
+        val useSurfaceColor = isDynamicTheme() && !isSystemInDarkMode()
+        val backgroundColor = if (useSurfaceColor) getSurfaceColor() else getProperBackgroundColor()
+        val statusBarColor = if (config.changeColourTopBar) getRequiredStatusBarColor(useSurfaceColor) else backgroundColor
+
+        updateStatusbarColor(backgroundColor)
         binding.mainMenu.updateColors(statusBarColor, scrollingView?.computeVerticalScrollOffset() ?: 0)
     }
 
@@ -274,7 +307,8 @@ class MainActivity : SimpleActivity() {
         }
     }
 
-    // while SEND_SMS and READ_SMS permissions are mandatory, READ_CONTACTS is optional. If we don't have it, we just won't be able to show the contact name in some cases
+    // while SEND_SMS and READ_SMS permissions are mandatory, READ_CONTACTS is optional.
+    // If we don't have it, we just won't be able to show the contact name in some cases
     private fun askPermissions() {
         handlePermission(PERMISSION_READ_SMS) {
             if (it) {
@@ -294,7 +328,7 @@ class MainActivity : SimpleActivity() {
                             bus = EventBus.getDefault()
                             try {
                                 bus!!.register(this)
-                            } catch (ignored: Exception) {
+                            } catch (_: Exception) {
                             }
                         }
                     } else {
@@ -311,7 +345,6 @@ class MainActivity : SimpleActivity() {
         checkWhatsNewDialog()
         storeStateVariables()
         getCachedConversations()
-        clearSystemDrafts()
         binding.noConversationsPlaceholder2.setOnClickListener {
             launchNewConversation()
         }
@@ -325,20 +358,21 @@ class MainActivity : SimpleActivity() {
         ensureBackgroundThread {
             val conversations = try {
                 conversationsDB.getNonArchived().toMutableList() as ArrayList<Conversation>
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 ArrayList()
             }
 
             val archived = try {
                 conversationsDB.getAllArchived()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 listOf()
             }
 
-            updateUnreadCountBadge(conversations)
             runOnUiThread {
                 setupConversations(conversations, cached = true)
-                getNewConversations((conversations + archived).toMutableList() as ArrayList<Conversation>)
+                getNewConversations(
+                    (conversations + archived).toMutableList() as ArrayList<Conversation>
+                )
             }
             conversations.forEach {
                 clearExpiredScheduledMessages(it.threadId)
@@ -369,13 +403,17 @@ class MainActivity : SimpleActivity() {
                     conversationsDB.deleteThreadId(threadId)
                 }
 
-                val newConversation = conversations.find { it.phoneNumber == cachedConversation.phoneNumber }
+                val newConversation =
+                    conversations.find { it.phoneNumber == cachedConversation.phoneNumber }
                 if (isTemporaryThread && newConversation != null) {
-                    // delete the original temporary thread and move any scheduled messages to the new thread
+                    // delete the original temporary thread and move any scheduled messages
+                    // to the new thread
                     conversationsDB.deleteThreadId(threadId)
                     messagesDB.getScheduledThreadMessages(threadId)
                         .forEach { message ->
-                            messagesDB.insertOrUpdate(message.copy(threadId = newConversation.threadId))
+                            messagesDB.insertOrUpdate(
+                                message.copy(threadId = newConversation.threadId)
+                            )
                         }
                     insertOrUpdateConversation(newConversation, cachedConversation)
                 }
@@ -388,7 +426,8 @@ class MainActivity : SimpleActivity() {
                     )
                 }
                 if (conv != null) {
-                    // FIXME: Scheduled message date is being reset here. Conversations with scheduled messages will have their original date.
+                    // FIXME: Scheduled message date is being reset here. Conversations with
+                    //  scheduled messages will have their original date.
                     insertOrUpdateConversation(conv)
                 }
             }
@@ -414,6 +453,10 @@ class MainActivity : SimpleActivity() {
     }
 
     private fun getOrCreateConversationsAdapter(): ConversationsAdapter {
+        if (isDynamicTheme() && !isSystemInDarkMode()) {
+            binding.conversationsList.setBackgroundColor(getSurfaceColor())
+        }
+
         var currAdapter = binding.conversationsList.adapter
         if (currAdapter == null) {
             hideKeyboard()
@@ -434,24 +477,29 @@ class MainActivity : SimpleActivity() {
 
     private fun setupConversations(
         conversations: ArrayList<Conversation>,
-        cached: Boolean = false
+        cached: Boolean = false,
     ) {
         val sortedConversations = if (config.unreadAtTop) {
             conversations.sortedWith(
-                compareByDescending<Conversation> { config.pinnedConversations.contains(it.threadId.toString()) }
+                compareByDescending<Conversation> {
+                    config.pinnedConversations.contains(it.threadId.toString())
+                }
                     .thenBy { it.read }
                     .thenByDescending { it.date }
             ).toMutableList() as ArrayList<Conversation>
         } else {
             conversations.sortedWith(
-                compareByDescending<Conversation> { config.pinnedConversations.contains(it.threadId.toString()) }
+                compareByDescending<Conversation> {
+                    config.pinnedConversations.contains(it.threadId.toString())
+                }
                     .thenByDescending { it.date }
                     .thenByDescending { it.isGroupConversation } // Group chats at the top
             ).toMutableList() as ArrayList<Conversation>
         }
 
         if (cached && config.appRunCount == 1) {
-            // there are no cached conversations on the first run so we show the loading placeholder and progress until we are done loading from telephony
+            // there are no cached conversations on the first run so we show the
+            // loading placeholder and progress until we are done loading from telephony
             showOrHideProgress(conversations.isEmpty())
         } else {
             showOrHideProgress(false)
@@ -466,7 +514,7 @@ class MainActivity : SimpleActivity() {
                     }
                 }
             }
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
         }
     }
 
@@ -519,17 +567,16 @@ class MainActivity : SimpleActivity() {
         }
     }
 
-    @SuppressLint("NewApi")
     private fun checkShortcut() {
         val iconColor = getProperPrimaryColor()
-        if (isNougatMR1Plus() && config.lastHandledShortcutColor != iconColor) {
+        if (config.lastHandledShortcutColor != iconColor) {
             val newConversation = getCreateNewContactShortcut(iconColor)
 
             val manager = getSystemService(ShortcutManager::class.java)
             try {
                 manager.dynamicShortcuts = listOf(newConversation)
                 config.lastHandledShortcutColor = iconColor
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
             }
         }
     }
@@ -551,6 +598,7 @@ class MainActivity : SimpleActivity() {
             .setLongLabel(newEvent)
             .setIcon(Icon.createWithBitmap(bmp))
             .setIntent(intent)
+            .setRank(0)
             .build()
     }
 
@@ -580,7 +628,7 @@ class MainActivity : SimpleActivity() {
     private fun showSearchResults(
         messages: List<Message>,
         conversations: List<Conversation>,
-        searchedText: String
+        searchedText: String,
     ) {
         val searchResults = ArrayList<SearchResult>()
         conversations.forEach { conversation ->
@@ -698,6 +746,7 @@ class MainActivity : SimpleActivity() {
             add(Release(631, R.string.release_631))
             add(Release(632, R.string.release_632))
             add(Release(633, R.string.release_633))
+            add(Release(690, R.string.release_690))
             checkWhatsNew(this, BuildConfig.VERSION_CODE)
         }
     }

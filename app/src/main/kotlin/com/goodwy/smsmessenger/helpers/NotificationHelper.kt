@@ -19,11 +19,14 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.SimpleContactsHelper
+import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.models.SimpleContact
 import com.goodwy.smsmessenger.R
+import com.goodwy.smsmessenger.activities.MainActivity
 import com.goodwy.smsmessenger.activities.ThreadActivity
 import com.goodwy.smsmessenger.extensions.config
 import com.goodwy.smsmessenger.extensions.getNumbersFromText
+import com.goodwy.smsmessenger.extensions.shortcutHelper
 import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import com.goodwy.smsmessenger.receivers.CopyNumberReceiver
 import com.goodwy.smsmessenger.receivers.DeleteSmsReceiver
@@ -224,7 +227,21 @@ class NotificationHelper(private val context: Context) {
             ).setChannelId(notificationChannelId)
 //        }
 
-        notificationManager.notify(notificationId, builder.build())
+        var shortcut = context.shortcutHelper.getShortcut(threadId)
+        if (shortcut == null) {
+            ensureBackgroundThread {
+                shortcut = context.shortcutHelper.createOrUpdateShortcut(threadId)
+                builder.setShortcutInfo(shortcut)
+                notificationManager.notify(notificationId, builder.build())
+                context.shortcutHelper.reportReceiveMessageUsage(threadId)
+            }
+        } else {
+            builder.setShortcutInfo(shortcut)
+            notificationManager.notify(notificationId, builder.build())
+            ensureBackgroundThread {
+                context.shortcutHelper.reportReceiveMessageUsage(threadId)
+            }
+        }
     }
 
     @SuppressLint("NewApi")
@@ -322,5 +339,34 @@ class NotificationHelper(private val context: Context) {
         } else {
             emptyList()
         }
+    }
+
+    @SuppressLint("NewApi")
+    fun showMmsReceivedFailedNotification() {
+        val notificationChannelId = NOTIFICATION_CHANNEL
+        createChannel(notificationChannelId, context.getString(R.string.couldnt_download_mms))
+
+        val notificationId = generateRandomId().hashCode()
+        val intent = Intent(context, MainActivity::class.java)
+        val contentPendingIntent = PendingIntent.getActivity(
+            context,
+            notificationId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+        )
+
+        val builder = NotificationCompat.Builder(context, notificationChannelId)
+            .setContentTitle(context.getString(R.string.couldnt_download_mms))
+            .setColor(context.getProperPrimaryColor())
+            .setSmallIcon(R.drawable.ic_messages)
+            .setStyle(NotificationCompat.BigTextStyle())
+            .setContentIntent(contentPendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setDefaults(Notification.DEFAULT_LIGHTS)
+            .setCategory(Notification.CATEGORY_MESSAGE)
+            .setAutoCancel(true)
+            .setChannelId(notificationChannelId)
+
+        notificationManager.notify(notificationId, builder.build())
     }
 }
