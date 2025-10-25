@@ -226,7 +226,7 @@ class ThreadActivity : SimpleActivity() {
         binding.shortCodeHolder.root.setBackgroundColor(bottomBarColor)
         binding.messageHolder.attachmentPickerHolder.setBackgroundColor(bottomBarColor)
         updateNavigationBar()
-        updateContactImage()
+//        updateContactImage()
     }
 
     override fun onPause() {
@@ -496,6 +496,7 @@ class ThreadActivity : SimpleActivity() {
                 setupSIMSelector()
             }
         }
+        updateContactImage()
     }
 
     private fun getOrCreateThreadAdapter(): ThreadAdapter {
@@ -2376,19 +2377,19 @@ class ThreadActivity : SimpleActivity() {
             }
         }
 
-        val firstPhoneNumber = participants.firstOrNull()?.phoneNumbers?.firstOrNull()?.value
-        if (participants.size == 1 && participants.firstOrNull()?.name != firstPhoneNumber) {
-            senderPhoto.setOnClickListener {
-                hideKeyboard()
-                val contact = participants.first()
-                getContactFromAddress(contact.phoneNumbers.first().normalizedNumber) {
-                    if (it != null) {
-                        runOnUiThread {
-                            startContactDetailsIntentRecommendation(it)
-                        }
-                    }
-                }
-            }
-        }
+//        val firstPhoneNumber = participants.firstOrNull()?.phoneNumbers?.firstOrNull()?.value
+//        if (participants.size == 1 && participants.firstOrNull()?.name != firstPhoneNumber) {
+//            senderPhoto.setOnClickListener {
+//                hideKeyboard()
+//                val contact = participants.first()
+//                getContactFromAddress(contact.phoneNumbers.first().normalizedNumber) {
+//                    if (it != null) {
+//                        runOnUiThread {
+//                            startContactDetailsIntentRecommendation(it)
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 }

@@ -29,6 +29,7 @@ import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import com.goodwy.smsmessenger.models.Conversation
 import kotlin.math.abs
 import androidx.core.graphics.drawable.toDrawable
+import com.goodwy.commons.extensions.setBackgroundColor
 
 class ConversationDetailsActivity : SimpleActivity() {
 
@@ -140,11 +141,13 @@ class ConversationDetailsActivity : SimpleActivity() {
             window.decorView.setBackgroundColor(colorToWhite)
             window.statusBarColor = colorToWhite
             //window.navigationBarColor = colorToWhite
-            binding.conversationDetailsAppbar.setBackgroundColor(colorToWhite)
+            binding.contactActionsHolder.setBackgroundColor(colorToWhite)
+            binding.collapsingToolbar.setBackgroundColor(colorToWhite)
         } else {
             val properBackgroundColor = getProperBackgroundColor()
             window.decorView.setBackgroundColor(properBackgroundColor)
-            binding.conversationDetailsAppbar.setBackgroundColor(properBackgroundColor)
+            binding.contactActionsHolder.setBackgroundColor(properBackgroundColor)
+            binding.collapsingToolbar.setBackgroundColor(properBackgroundColor)
         }
 
         binding.apply {
@@ -267,7 +270,9 @@ class ConversationDetailsActivity : SimpleActivity() {
 
         if (conversation != null) {
             if ((threadTitle == conversation!!.phoneNumber || conversation!!.isCompany) && conversation!!.photoUri == "") {
-                val drawable = SimpleContactsHelper(this).getColoredCompanyIcon(threadTitle)
+                val drawable =
+                    if (conversation!!.isCompany) SimpleContactsHelper(this).getColoredCompanyIcon(threadTitle)
+                    else SimpleContactsHelper(this).getColoredContactIcon(threadTitle)
                 binding.topConversationDetails.conversationDetailsImage.setImageDrawable(drawable)
             } else {
                 if (!isDestroyed || !isFinishing) {

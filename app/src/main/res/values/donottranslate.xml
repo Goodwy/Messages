@@ -13,6 +13,10 @@
     <string name="message_details_sim">SIM</string>
 
     <!-- Release notes -->
+    <string name="release_701">
+        Group avatars have been fixed\n
+        Fixed bugs
+    </string>
     <string name="release_700">
         Changed color schemes and theme behavior\n
         Added an auto dark/light theme\n
