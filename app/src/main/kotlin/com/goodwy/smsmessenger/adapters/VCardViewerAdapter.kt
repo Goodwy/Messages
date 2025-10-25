@@ -79,17 +79,7 @@ class VCardViewerAdapter(
                     beGoneIf(!showContactThumbnails)
                     val photo = item.vCard.photos.firstOrNull()
                     val placeholder = if (item.isCompany) {
-                        val drawable = ResourcesCompat.getDrawable(
-                            resources,
-                            R.drawable.placeholder_company,
-                            activity.theme
-                        )
-                        if (context.baseConfig.useColoredContacts) {
-                            val letterBackgroundColors = activity.getLetterBackgroundColors()
-                            val color = letterBackgroundColors[abs(name.hashCode()) % letterBackgroundColors.size].toInt()
-                            (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
-                        }
-                        drawable
+                        SimpleContactsHelper(activity).getColoredCompanyIcon(name ?: "")
                     } else if (name != null) {
                         SimpleContactsHelper(context).getContactLetterIcon(name).toDrawable(resources)
                     } else {

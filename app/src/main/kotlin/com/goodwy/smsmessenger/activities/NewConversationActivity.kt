@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.graphics.drawable.LayerDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.speech.RecognizerIntent
 import android.view.WindowManager
 import android.widget.Toast
 import android.widget.RelativeLayout
@@ -26,11 +27,13 @@ import com.goodwy.smsmessenger.helpers.*
 import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import java.net.URLDecoder
 import java.util.Locale
+import java.util.Objects
 import kotlin.math.abs
 
 class NewConversationActivity : SimpleActivity() {
     private var allContacts = ArrayList<SimpleContact>()
     private var privateContacts = ArrayList<SimpleContact>()
+    private var isSpeechToTextAvailable = false
 
     private val binding by viewBinding(ActivityNewConversationBinding::inflate)
 
@@ -61,7 +64,12 @@ class NewConversationActivity : SimpleActivity() {
     override fun onResume() {
         super.onResume()
         val getProperPrimaryColor = getProperPrimaryColor()
-        setupToolbar(binding.newConversationToolbar, NavigationIcon.Arrow, statusBarColor = getProperBackgroundColor())
+
+        val useSurfaceColor = isDynamicTheme() && !isSystemInDarkMode()
+        val backgroundColor = if (useSurfaceColor) getSurfaceColor() else getProperBackgroundColor()
+        setupToolbar(binding.newConversationToolbar, NavigationIcon.Arrow, statusBarColor = backgroundColor)
+        binding.newConversationHolder.setBackgroundColor(backgroundColor)
+
         binding.noContactsPlaceholder2.setTextColor(getProperPrimaryColor)
         binding.noContactsPlaceholder2.underlineText()
         binding.suggestionsLabel.setTextColor(getProperPrimaryColor)
@@ -74,6 +82,21 @@ class NewConversationActivity : SimpleActivity() {
         })
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
+        super.onActivityResult(requestCode, resultCode, resultData)
+        if (requestCode == REQUEST_CODE_SPEECH_INPUT && resultCode == RESULT_OK) {
+            if (resultData != null) {
+                val res: java.util.ArrayList<String> =
+                    resultData.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS) as java.util.ArrayList<String>
+
+                val speechToText =  Objects.requireNonNull(res)[0]
+                if (speechToText.isNotEmpty()) {
+                    binding.newConversationAddress.setText(speechToText)
+                }
+            }
+        }
+    }
+
     private fun initContacts() {
         if (isThirdPartyIntent()) {
             return
@@ -82,11 +105,17 @@ class NewConversationActivity : SimpleActivity() {
         fetchContacts()
         if (isDynamicTheme()) {
             (binding.newConversationAddress.layoutParams as RelativeLayout.LayoutParams).apply {
-                topMargin=12
+                topMargin = 12
             }
         }
+
+        isSpeechToTextAvailable = isSpeechToTextAvailable()
+
+        val useSurfaceColor = isDynamicTheme() && !isSystemInDarkMode()
+        val surfaceColor = if (useSurfaceColor) getProperBackgroundColor() else getSurfaceColor()
         binding.newConversationAddress.setBackgroundResource(com.goodwy.commons.R.drawable.search_bg)
-        binding.newConversationAddress.backgroundTintList = ColorStateList.valueOf(getBottomNavigationBackgroundColor())
+        binding.newConversationAddress.backgroundTintList = ColorStateList.valueOf(surfaceColor)
+
         binding.newConversationAddress.onTextChangeListener { searchString ->
             val filteredContacts = ArrayList<SimpleContact>()
             allContacts.forEach { contact ->
@@ -103,9 +132,13 @@ class NewConversationActivity : SimpleActivity() {
 
             binding.newConversationConfirm.beVisibleIf(searchString.length > 2)
             binding.newConversationAddressClear.beVisibleIf(searchString.isNotEmpty())
+            binding.newConversationAddressSpeechToText.beVisibleIf(isSpeechToTextAvailable && !searchString.isNotEmpty())
         }
 
         val properTextColor = getProperTextColor()
+        binding.newConversationAddressSpeechToText.beVisibleIf(isSpeechToTextAvailable)
+        binding.newConversationAddressSpeechToText.applyColorFilter(properTextColor)
+        binding.newConversationAddressSpeechToText.setOnClickListener { speechToText() }
         binding.newConversationAddressClear.applyColorFilter(properTextColor)
         binding.newConversationAddressClear.setOnClickListener { binding.newConversationAddress.setText("") }
         binding.newConversationConfirm.applyColorFilter(properTextColor)
@@ -231,12 +264,8 @@ class NewConversationActivity : SimpleActivity() {
 
                                 if (!isDestroyed) {
                                     if (contact.isABusinessContact() && contact.photoUri == "") {
-                                        val drawable = ResourcesCompat.getDrawable(resources, R.drawable.placeholder_company, theme)
-                                        if (baseConfig.useColoredContacts) {
-                                            val letterBackgroundColors = getLetterBackgroundColors()
-                                            val color = letterBackgroundColors[abs(contact.name.hashCode()) % letterBackgroundColors.size].toInt()
-                                            (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
-                                        }
+                                        val drawable =
+                                            SimpleContactsHelper(this@NewConversationActivity).getColoredCompanyIcon(contact.name)
                                         suggestedContactImage.setImageDrawable(drawable)
                                     } else {
                                         SimpleContactsHelper(this@NewConversationActivity).loadContactImage(
@@ -288,7 +317,7 @@ class NewConversationActivity : SimpleActivity() {
                 FastScrollItemIndicator.Text(
                     character.uppercase(Locale.getDefault()).normalizeString()
                 )
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 FastScrollItemIndicator.Text("")
             }
         })

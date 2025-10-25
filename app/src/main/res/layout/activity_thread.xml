@@ -166,25 +166,25 @@
                 android:paddingEnd="@dimen/smaller_margin"
                 android:src="@drawable/ic_plus_vector"
                 android:visibility="gone"
-                tools:visibility="visible"  />
+                tools:visibility="visible" />
         </RelativeLayout>
 
         <com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
             android:id="@+id/threadMessagesFastscroller"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@id/short_code_holder"
-            app:layout_constraintTop_toBottomOf="@id/thread_add_contacts"
             android:layout_marginBottom="@dimen/small_margin"
+            app:layout_constraintBottom_toTopOf="@id/shortCodeHolder"
+            app:layout_constraintTop_toBottomOf="@id/thread_add_contacts"
             app:supportSwipeToRefresh="true">
 
             <com.goodwy.commons.views.MyRecyclerView
                 android:id="@+id/threadMessagesList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingBottom="@dimen/medium_margin"
                 android:clipToPadding="false"
                 android:overScrollMode="ifContentScrolls"
+                android:paddingBottom="@dimen/medium_margin"
                 android:scrollbars="none"
                 app:layoutManager="com.goodwy.commons.views.MyLinearLayoutManager"
                 app:stackFromEnd="true"
@@ -207,7 +207,7 @@
             tools:visibility="visible" />
 
         <include
-            android:id="@+id/short_code_holder"
+            android:id="@+id/shortCodeHolder"
             layout="@layout/layout_invalid_short_code_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

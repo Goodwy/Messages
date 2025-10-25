@@ -144,17 +144,7 @@ fun ItemAttachmentVcardBinding.setupVCardPreview(
             val isCompany = vCards.firstOrNull()?.isCompanyVCard(title ?: "") ?: false
 
             val imageIcon = if (isCompany) {
-                val drawable = ResourcesCompat.getDrawable(
-                    activity.resources,
-                    R.drawable.placeholder_company,
-                    activity.theme
-                )
-                if (context.baseConfig.useColoredContacts) {
-                    val letterBackgroundColors = activity.getLetterBackgroundColors()
-                    val color = letterBackgroundColors[abs(title.hashCode()) % letterBackgroundColors.size].toInt()
-                    (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
-                }
-                drawable
+                SimpleContactsHelper(activity).getColoredCompanyIcon(title ?: "")
             } else if (title != null) {
                 SimpleContactsHelper(activity).getContactLetterIcon(title).toDrawable(activity.resources)
             } else {

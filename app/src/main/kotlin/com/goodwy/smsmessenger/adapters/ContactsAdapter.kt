@@ -86,12 +86,7 @@ class ContactsAdapter(
 
             itemContactImage.beGoneIf(!baseConfig.showContactThumbnails)
             if (contact.isABusinessContact() && contact.photoUri == "") {
-                val drawable = ResourcesCompat.getDrawable(resources, R.drawable.placeholder_company, activity.theme)
-                if (baseConfig.useColoredContacts) {
-                    val letterBackgroundColors = activity.getLetterBackgroundColors()
-                    val color = letterBackgroundColors[abs(contact.name.hashCode()) % letterBackgroundColors.size].toInt()
-                    (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
-                }
+                val drawable = SimpleContactsHelper(activity).getColoredCompanyIcon(contact.name)
                 itemContactImage.setImageDrawable(drawable)
             } else {
                 SimpleContactsHelper(activity).loadContactImage(contact.photoUri, itemContactImage, contact.name)

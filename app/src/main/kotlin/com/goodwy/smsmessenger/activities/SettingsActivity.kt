@@ -245,6 +245,7 @@ class SettingsActivity : SimpleActivity() {
                 settingsOutgoingMessagesLabel,
                 settingsListViewLabel,
                 settingsSwipeGesturesLabel,
+                settingsArchivedMessagesLabel,
                 settingsRecycleBinLabel,
                 settingsSecurityLabel,
                 settingsBackupsLabel,
@@ -393,13 +394,13 @@ class SettingsActivity : SimpleActivity() {
                 ) { wasPositivePressed, newValue ->
                     if (wasPositivePressed) {
                         if (newValue != if (baseConfig.materialDesign3) 2 else 1) {
+                            baseConfig.materialDesign3 = newValue == 2
+                            settingsFloatingButtonStyle.setImageResource(
+                                if (newValue == 2) com.goodwy.commons.R.drawable.squircle_bg
+                                else com.goodwy.commons.R.drawable.ic_circle_filled
+                            )
+                            config.needRestart = true
                         }
-                        baseConfig.materialDesign3 = newValue == 2
-                        settingsFloatingButtonStyle.setImageResource(
-                            if (newValue == 2) com.goodwy.commons.R.drawable.squircle_bg
-                            else com.goodwy.commons.R.drawable.ic_circle_filled
-                        )
-                        config.tabsChanged = true
                     }
                 }
             }
@@ -528,7 +529,7 @@ class SettingsActivity : SimpleActivity() {
         settingsManageBlockedNumbersCount.text = getBlockedNumbers().size.toString()
 
         val getProperTextColor = getProperTextColor()
-        val red = resources.getColor(com.goodwy.commons.R.color.red_missed)
+        val red = resources.getColor(com.goodwy.commons.R.color.red_missed, theme)
         val colorUnknown = if (baseConfig.blockUnknownNumbers) red else getProperTextColor
         val alphaUnknown = if (baseConfig.blockUnknownNumbers) 1f else 0.6f
         settingsManageBlockedNumbersIconUnknown.apply {
@@ -558,7 +559,7 @@ class SettingsActivity : SimpleActivity() {
         settingsUseSpeechToTextHolder.setOnClickListener {
             settingsUseSpeechToText.toggle()
             config.useSpeechToText = settingsUseSpeechToText.isChecked
-            config.tabsChanged = true
+            config.needRestart = true
         }
     }
 
@@ -568,7 +569,7 @@ class SettingsActivity : SimpleActivity() {
             ChangeDateTimeFormatDialog(this@SettingsActivity, true) {
                 updateDateTimeFormat()
                 refreshMessages()
-                config.tabsChanged = true
+                config.needRestart = true
             }
         }
     }
@@ -765,7 +766,7 @@ class SettingsActivity : SimpleActivity() {
             settingsUseSwipeToActionHolder.setOnClickListener {
                 settingsUseSwipeToAction.toggle()
                 config.useSwipeToAction = settingsUseSwipeToAction.isChecked
-                config.tabsChanged = true
+                config.needRestart = true
                 updateSwipeToActionVisible()
             }
         }
@@ -788,7 +789,7 @@ class SettingsActivity : SimpleActivity() {
             settingsSwipeVibrationHolder.setOnClickListener {
                 settingsSwipeVibration.toggle()
                 config.swipeVibration = settingsSwipeVibration.isChecked
-                config.tabsChanged = true
+                config.needRestart = true
             }
         }
     }
@@ -799,7 +800,7 @@ class SettingsActivity : SimpleActivity() {
             settingsSwipeRippleHolder.setOnClickListener {
                 settingsSwipeRipple.toggle()
                 config.swipeRipple = settingsSwipeRipple.isChecked
-                config.tabsChanged = true
+                config.needRestart = true
             }
         }
     }
@@ -822,7 +823,7 @@ class SettingsActivity : SimpleActivity() {
                 if (isRTLLayout) com.goodwy.strings.R.string.swipe_left_action else com.goodwy.strings.R.string.swipe_right_action
             RadioGroupIconDialog(this@SettingsActivity, items, config.swipeRightAction, title) {
                 config.swipeRightAction = it as Int
-                config.tabsChanged = true
+                config.needRestart = true
                 settingsSwipeRightAction.text = getSwipeActionText(false)
                 settingsSkipArchiveConfirmationHolder.beVisibleIf(config.swipeLeftAction == SWIPE_ACTION_ARCHIVE || config.swipeRightAction == SWIPE_ACTION_ARCHIVE)
                 settingsSkipDeleteConfirmationHolder.beVisibleIf(config.swipeLeftAction == SWIPE_ACTION_DELETE || config.swipeRightAction == SWIPE_ACTION_DELETE)
@@ -853,7 +854,7 @@ class SettingsActivity : SimpleActivity() {
                     if (isRTLLayout) com.goodwy.strings.R.string.swipe_right_action else com.goodwy.strings.R.string.swipe_left_action
                 RadioGroupIconDialog(this@SettingsActivity, items, config.swipeLeftAction, title) {
                     config.swipeLeftAction = it as Int
-                    config.tabsChanged = true
+                    config.needRestart = true
                     settingsSwipeLeftAction.text = getSwipeActionText(true)
                     settingsSkipArchiveConfirmationHolder.beVisibleIf(
                         config.swipeLeftAction == SWIPE_ACTION_ARCHIVE || config.swipeRightAction == SWIPE_ACTION_ARCHIVE
@@ -1005,7 +1006,7 @@ class SettingsActivity : SimpleActivity() {
         settingsShowDividersHolder.setOnClickListener {
             settingsShowDividers.toggle()
             config.useDividers = settingsShowDividers.isChecked
-            config.tabsChanged = true
+            config.needRestart = true
         }
     }
 
@@ -1015,7 +1016,7 @@ class SettingsActivity : SimpleActivity() {
             settingsShowContactThumbnails.toggle()
             config.showContactThumbnails = settingsShowContactThumbnails.isChecked
             settingsContactThumbnailsSizeHolder.beVisibleIf(config.showContactThumbnails)
-            config.tabsChanged = true
+            config.needRestart = true
         }
     }
 
@@ -1037,7 +1038,7 @@ class SettingsActivity : SimpleActivity() {
                 RadioGroupDialog(this@SettingsActivity, items, config.contactThumbnailsSize, com.goodwy.strings.R.string.contact_thumbnails_size) {
                     config.contactThumbnailsSize = it as Int
                     settingsContactThumbnailsSize.text = getContactThumbnailsSizeText()
-                    config.tabsChanged = true
+                    config.needRestart = true
                 }
             } else {
                 RxAnimation.from(settingsContactThumbnailsSizeHolder)
@@ -1063,7 +1064,7 @@ class SettingsActivity : SimpleActivity() {
         settingsRelativeDateHolder.setOnClickListener {
             settingsRelativeDate.toggle()
             config.useRelativeDate = settingsRelativeDate.isChecked
-            config.tabsChanged = true
+            config.needRestart = true
         }
     }
 
@@ -1072,7 +1073,7 @@ class SettingsActivity : SimpleActivity() {
         settingsUnreadAtTopHolder.setOnClickListener {
             settingsUnreadAtTop.toggle()
             config.unreadAtTop = settingsUnreadAtTop.isChecked
-            config.tabsChanged = true
+            config.needRestart = true
         }
     }
 
@@ -1090,7 +1091,7 @@ class SettingsActivity : SimpleActivity() {
             RadioGroupIconDialog(this@SettingsActivity, items, config.linesCount, com.goodwy.strings.R.string.lines_count) {
                 config.linesCount = it as Int
                 settingsLinesCount.text = it.toString()
-                config.tabsChanged = true
+                config.needRestart = true
             }
         }
     }
@@ -1106,7 +1107,7 @@ class SettingsActivity : SimpleActivity() {
             RadioGroupIconDialog(this@SettingsActivity, items, config.unreadIndicatorPosition, com.goodwy.strings.R.string.unread_indicator_position) {
                 config.unreadIndicatorPosition = it as Int
                 settingsUnreadIndicatorPosition.text = getUnreadIndicatorPositionText()
-                config.tabsChanged = true
+                config.needRestart = true
             }
         }
     }
@@ -1123,7 +1124,7 @@ class SettingsActivity : SimpleActivity() {
         settingsHideBarWhenScrollHolder.setOnClickListener {
             settingsHideBarWhenScroll.toggle()
             config.hideTopBarWhenScroll = settingsHideBarWhenScroll.isChecked
-            config.tabsChanged = true
+            config.needRestart = true
         }
     }
 
@@ -1132,7 +1133,7 @@ class SettingsActivity : SimpleActivity() {
         settingsChangeColourTopBarHolder.setOnClickListener {
             settingsChangeColourTopBar.toggle()
             config.changeColourTopBar = settingsChangeColourTopBar.isChecked
-            config.tabsChanged = true
+            config.needRestart = true
         }
     }
 
@@ -1142,7 +1143,7 @@ class SettingsActivity : SimpleActivity() {
             settingsColoredContacts.toggle()
             config.useColoredContacts = settingsColoredContacts.isChecked
             settingsContactColorListHolder.beVisibleIf(config.useColoredContacts)
-            config.tabsChanged = true
+            config.needRestart = true
         }
     }
 
@@ -1168,7 +1169,7 @@ class SettingsActivity : SimpleActivity() {
                     if (config.contactColorList != newValue) {
                         config.contactColorList = newValue
                         settingsContactColorListIcon.setImageResource(getContactsColorListIcon(config.contactColorList))
-                        config.tabsChanged = true
+                        config.needRestart = true
                     }
                 }
             }
@@ -1196,7 +1197,7 @@ class SettingsActivity : SimpleActivity() {
                     this@SettingsActivity,
                     config.simIconsColors[1],
                     addDefaultColorButton = true,
-                    colorDefault = resources.getColor(com.goodwy.commons.R.color.ic_dialer),
+                    colorDefault = resources.getColor(com.goodwy.commons.R.color.ic_dialer, theme),
                     title = resources.getString(com.goodwy.strings.R.string.color_sim_card_icons)
                 ) { wasPositivePressed, color, wasDefaultPressed ->
                     if (wasPositivePressed || wasDefaultPressed) {
@@ -1212,7 +1213,7 @@ class SettingsActivity : SimpleActivity() {
                     this@SettingsActivity,
                     config.simIconsColors[2],
                     addDefaultColorButton = true,
-                    colorDefault = resources.getColor(com.goodwy.commons.R.color.color_primary),
+                    colorDefault = resources.getColor(com.goodwy.commons.R.color.color_primary, theme),
                     title = resources.getString(com.goodwy.strings.R.string.color_sim_card_icons)
                 ) { wasPositivePressed, color, wasDefaultPressed ->
                     if (wasPositivePressed || wasDefaultPressed) {
@@ -1255,7 +1256,7 @@ class SettingsActivity : SimpleActivity() {
     private fun setupTipJar() = binding.apply {
         settingsTipJarHolder.apply {
             beVisibleIf(isPro())
-            background.applyColorFilter(getBottomNavigationBackgroundColor().lightenColor(4))
+            background.applyColorFilter(getColoredMaterialStatusBarColor())
             setOnClickListener {
                 launchPurchase()
             }

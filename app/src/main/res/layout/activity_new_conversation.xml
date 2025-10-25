@@ -36,7 +36,7 @@
             android:textSize="@dimen/bigger_text_size" />
 
         <ImageView
-            android:id="@+id/new_conversation_address_clear"
+            android:id="@+id/newConversationAddressSpeechToText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/new_conversation_address"
@@ -45,22 +45,41 @@
             android:layout_marginEnd="@dimen/medium_margin"
             android:background="?selectableItemBackgroundBorderless"
             android:alpha="0.4"
-            android:src="@drawable/ic_clear_round"
+            android:contentDescription="@string/delete"
+            android:src="@drawable/ic_microphone_vector"
             android:visibility="gone"
             tools:visibility="visible"
             tools:tint="@color/dark_grey" />
 
         <ImageView
+            android:id="@+id/newConversationAddressClear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/new_conversation_address"
+            android:layout_alignBottom="@+id/new_conversation_address"
+            android:layout_alignEnd="@+id/new_conversation_address"
+            android:layout_marginEnd="@dimen/medium_margin"
+            android:background="?selectableItemBackgroundBorderless"
+            android:alpha="0.4"
+            android:contentDescription="@string/delete"
+            android:src="@drawable/ic_clear_round"
+            android:visibility="gone"
+            tools:tint="@color/dark_grey" />
+
+        <ImageView
             android:id="@+id/new_conversation_confirm"
-            android:layout_width="@dimen/normal_icon_size"
-            android:layout_height="@dimen/normal_icon_size"
+            android:layout_width="@dimen/medium_icon_size"
+            android:layout_height="@dimen/medium_icon_size"
             android:layout_alignTop="@+id/new_conversation_address"
             android:layout_alignBottom="@+id/new_conversation_address"
             android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/medium_margin"
             android:background="?selectableItemBackgroundBorderless"
-            android:padding="@dimen/medium_margin"
+            android:contentDescription="@string/add_number"
+            android:padding="@dimen/smaller_margin"
             android:src="@drawable/ic_check_vector"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <ImageView
             android:id="@+id/add_contact_divider"

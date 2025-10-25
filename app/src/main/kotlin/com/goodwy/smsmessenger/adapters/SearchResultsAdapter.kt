@@ -98,17 +98,8 @@ class SearchResultsAdapter(
             searchResultImage.beGoneIf(!activity.config.showContactThumbnails)
             if ((searchResult.title == searchResult.phoneNumber || searchResult.isCompany) && searchResult.photoUri == "") {
                 val drawable =
-                    if (searchResult.isCompany) ResourcesCompat.getDrawable(
-                        resources,
-                        R.drawable.placeholder_company,
-                        activity.theme
-                    )
-                    else ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, activity.theme)
-                if (baseConfig.useColoredContacts) {
-                    val letterBackgroundColors = activity.getLetterBackgroundColors()
-                    val color = letterBackgroundColors[abs(searchResult.run { title.hashCode() }) % letterBackgroundColors.size].toInt()
-                    (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
-                }
+                    if (searchResult.isCompany) SimpleContactsHelper(activity).getColoredCompanyIcon(searchResult.run { title })
+                    else SimpleContactsHelper(activity).getColoredContactIcon(searchResult.run { title })
                 searchResultImage.setImageDrawable(drawable)
             } else {
                 SimpleContactsHelper(activity).loadContactImage(searchResult.photoUri, searchResultImage, searchResult.title)

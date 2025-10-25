@@ -72,6 +72,8 @@ class MainActivity : SimpleActivity() {
                 surfaceColor = useSurfaceColor
             )
         }
+        checkWhatsNewDialog()
+        storeStateVariables()
 
         checkAndDeleteOldRecycleBinMessages()
         clearAllMessagesIfNeeded {
@@ -85,7 +87,7 @@ class MainActivity : SimpleActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (config.tabsChanged || storedBackgroundColor != getProperBackgroundColor()) {
+        if (config.needRestart || storedBackgroundColor != getProperBackgroundColor()) {
             finish()
             startActivity(intent)
             return
@@ -163,7 +165,7 @@ class MainActivity : SimpleActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        config.tabsChanged = false
+        config.needRestart = false
         bus?.unregister(this)
     }
 
@@ -270,7 +272,7 @@ class MainActivity : SimpleActivity() {
         storedTextColor = getProperTextColor()
         storedBackgroundColor = getProperBackgroundColor()
         storedFontSize = config.fontSize
-        config.tabsChanged = false
+        config.needRestart = false
     }
 
     private fun updateMenuColors() {
@@ -342,8 +344,6 @@ class MainActivity : SimpleActivity() {
     }
 
     private fun initMessenger() {
-        checkWhatsNewDialog()
-        storeStateVariables()
         getCachedConversations()
         binding.noConversationsPlaceholder2.setOnClickListener {
             launchNewConversation()
@@ -746,7 +746,7 @@ class MainActivity : SimpleActivity() {
             add(Release(631, R.string.release_631))
             add(Release(632, R.string.release_632))
             add(Release(633, R.string.release_633))
-            add(Release(690, R.string.release_690))
+            add(Release(700, R.string.release_700))
             checkWhatsNew(this, BuildConfig.VERSION_CODE)
         }
     }

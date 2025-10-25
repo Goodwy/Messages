@@ -3,6 +3,7 @@ package com.goodwy.smsmessenger.activities
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.drawable.LayerDrawable
 import android.media.AudioAttributes
@@ -35,8 +36,7 @@ class ConversationDetailsActivity : SimpleActivity() {
     private var conversation: Conversation? = null
     private lateinit var participants: ArrayList<SimpleContact>
 
-    private val white = 0xFFFFFFFF.toInt()
-    private var buttonBg = white
+    private var buttonBg = Color.WHITE
 
     private val binding by viewBinding(ActivityConversationDetailsBinding::inflate)
 
@@ -119,7 +119,7 @@ class ConversationDetailsActivity : SimpleActivity() {
 
     override fun onResume() {
         super.onResume()
-        buttonBg = if ((isLightTheme() || isGrayTheme()) && !isDynamicTheme()) white else getSurfaceColor()
+        buttonBg = if ((isLightTheme() || isGrayTheme()) && !isDynamicTheme()) Color.WHITE else getSurfaceColor()
 
         //setupToolbar(binding.conversationDetailsToolbar, NavigationIcon.Arrow)
         updateTextColors(binding.conversationDetailsHolder)
@@ -159,7 +159,9 @@ class ConversationDetailsActivity : SimpleActivity() {
     }
 
     private fun setupCustomNotifications() = binding.apply {
-        customNotificationsButtonChevron.setColorFilter(getProperTextColor())
+        val textColor = getProperTextColor()
+        customNotificationsButtonChevron.setColorFilter(textColor)
+        notificationsIcon.setColorFilter(textColor)
         customNotifications.isChecked = config.customNotifications.contains(threadId.toString())
 
         if (customNotifications.isChecked) {
@@ -251,7 +253,7 @@ class ConversationDetailsActivity : SimpleActivity() {
             getContactFromAddress(address) { simpleContact ->
                 if (simpleContact != null) {
                     runOnUiThread {
-                        startContactDetailsIntent(simpleContact)
+                        startContactDetailsIntentRecommendation(simpleContact)
                     }
                 }
             }
@@ -265,18 +267,7 @@ class ConversationDetailsActivity : SimpleActivity() {
 
         if (conversation != null) {
             if ((threadTitle == conversation!!.phoneNumber || conversation!!.isCompany) && conversation!!.photoUri == "") {
-                val drawable =
-                    if (conversation!!.isCompany) ResourcesCompat.getDrawable(
-                        resources,
-                        R.drawable.placeholder_company,
-                        theme
-                    )
-                    else ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, theme)
-                if (baseConfig.useColoredContacts) {
-                    val letterBackgroundColors = getLetterBackgroundColors()
-                    val color = letterBackgroundColors[abs(conversation!!.title.hashCode()) % letterBackgroundColors.size].toInt()
-                    (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
-                }
+                val drawable = SimpleContactsHelper(this).getColoredCompanyIcon(threadTitle)
                 binding.topConversationDetails.conversationDetailsImage.setImageDrawable(drawable)
             } else {
                 if (!isDestroyed || !isFinishing) {
@@ -346,9 +337,9 @@ class ConversationDetailsActivity : SimpleActivity() {
                         runOnUiThread {
                             threeButton.alpha = 1f
                             threeButton.isClickable = true
-                            threeButton.setOnClickListener { startContactDetailsIntent(simpleContact) }
+                            threeButton.setOnClickListener { startContactDetailsIntentRecommendation(simpleContact) }
                             threeButton.setOnLongClickListener { toast(com.goodwy.commons.R.string.contact_details); true; }
-                            topConversationDetails.conversationDetailsImage.setOnClickListener { startContactDetailsIntent(simpleContact) }
+                            topConversationDetails.conversationDetailsImage.setOnClickListener { startContactDetailsIntentRecommendation(simpleContact) }
 
                             val phoneNumber = simpleContact.phoneNumbers.firstOrNull { it.normalizedNumber == address }
                             if (phoneNumber != null) {
@@ -424,7 +415,7 @@ class ConversationDetailsActivity : SimpleActivity() {
             setOnLongClickListener { toast(com.goodwy.commons.R.string.share); true; }
         }
 
-        val red = resources.getColor(com.goodwy.commons.R.color.red_missed)
+        val red = resources.getColor(com.goodwy.commons.R.color.red_missed, theme)
         val isBlockNumbers = isBlockNumbers()
         val blockColor = if (isBlockNumbers) { primaryColor } else { red }
         blockButton.setTextColor(blockColor)
@@ -466,7 +457,7 @@ class ConversationDetailsActivity : SimpleActivity() {
                         deleteBlockedNumber(it)
                         val blockText = if (participants.size == 1) com.goodwy.commons.R.string.block_number else com.goodwy.commons.R.string.block_numbers
                         binding.blockButton.text = getString(blockText)
-                        binding.blockButton.setTextColor(resources.getColor(com.goodwy.commons.R.color.red_missed))
+                        binding.blockButton.setTextColor(resources.getColor(com.goodwy.commons.R.color.red_missed, theme))
                     } else {
                         addBlockedNumber(it)
                         val unblockText = if (participants.size == 1) com.goodwy.strings.R.string.unblock_number else com.goodwy.strings.R.string.unblock_numbers

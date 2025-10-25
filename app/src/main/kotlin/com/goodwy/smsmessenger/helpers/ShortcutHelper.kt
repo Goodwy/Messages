@@ -9,6 +9,7 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.text.isDigitsOnly
 import com.goodwy.commons.extensions.getMyContactsCursor
+import com.goodwy.commons.extensions.toast
 import com.goodwy.commons.helpers.MyContactsContentProvider
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.isOnMainThread
@@ -46,6 +47,7 @@ class ShortcutHelper(private val context: Context) {
 
         val participants = context.getThreadParticipants(conv.threadId, contactsMap)
         val persons: Array<Person> = participants.map { it.toPerson(context) }.toTypedArray()
+        val isContact = if (participants.isNotEmpty()) participants[0].contactId != 0 else false
         val intent = Intent(context, ThreadActivity::class.java).apply {
             action = Intent.ACTION_VIEW
             putExtra(THREAD_ID, conv.threadId)
@@ -65,16 +67,19 @@ class ShortcutHelper(private val context: Context) {
             setPersons(persons)
             setIntent(intent)
             setRank(1)
-            if (!conv.isGroupConversation && !conv.usesCustomTitle) {
+            if (!conv.isGroupConversation && !conv.usesCustomTitle && persons.isNotEmpty() && isContact) {
                 setIcon(persons[0].icon)
             } else {
                 val icon = if (conv.isGroupConversation) {
-                    IconCompat.createWithAdaptiveBitmap(
+                    IconCompat.createWithBitmap(
                         contactsHelper.getColoredGroupIcon(conv.title).toBitmap()
                     )
                 } else {
-                    IconCompat.createWithAdaptiveBitmap(
-                        contactsHelper.getContactLetterIcon(conv.title)
+//                    IconCompat.createWithBitmap(
+//                        contactsHelper.getContactLetterIcon(conv.title)
+//                    )
+                    IconCompat.createWithBitmap(
+                        SimpleContactsHelper(context).getColoredContactIcon(conv.title).toBitmap()
                     )
                 }
                 setIcon(icon)

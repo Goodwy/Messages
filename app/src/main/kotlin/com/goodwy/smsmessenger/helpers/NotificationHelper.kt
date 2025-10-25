@@ -8,14 +8,12 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.drawable.LayerDrawable
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.RingtoneManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.Person
 import androidx.core.app.RemoteInput
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.IconCompat
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.SimpleContactsHelper
@@ -32,7 +30,6 @@ import com.goodwy.smsmessenger.receivers.CopyNumberReceiver
 import com.goodwy.smsmessenger.receivers.DeleteSmsReceiver
 import com.goodwy.smsmessenger.receivers.DirectReplyReceiver
 import com.goodwy.smsmessenger.receivers.MarkAsReadReceiver
-import kotlin.math.abs
 
 class NotificationHelper(private val context: Context) {
 
@@ -40,7 +37,7 @@ class NotificationHelper(private val context: Context) {
     private val soundUri get() = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
     private val user = Person.Builder()
         .setName(context.getString(R.string.me))
-        .setIcon(IconCompat.createWithResource(context, R.drawable.placeholder_contact))
+        .setIcon(IconCompat.createWithResource(context, com.goodwy.commons.R.drawable.placeholder_contact))
         .build()
 
     @SuppressLint("NewApi")
@@ -133,29 +130,13 @@ class NotificationHelper(private val context: Context) {
 
         val title = sender ?: senderCache
         val largeIcon = bitmap ?: if (contact != null && title != null) {
-            if (contact.isABusinessContact()) {
-                val drawable = ResourcesCompat.getDrawable(
-                    context.resources,
-                    R.drawable.placeholder_company,
-                    context.theme
-                )
-                if (context.baseConfig.useColoredContacts) {
-                    val letterBackgroundColors = context.getLetterBackgroundColors()
-                    val color = letterBackgroundColors[abs(title.hashCode()) % letterBackgroundColors.size].toInt()
-                    (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
-                }
-                drawable?.convertToBitmap()
+            if (contact.isABusinessContact() || isNoReplySms) {
+                SimpleContactsHelper(context).getColoredCompanyIcon(title).convertToBitmap()
             } else {
                 SimpleContactsHelper(context).getContactLetterIcon(title)
             }
         } else if (title == address) {
-            val drawable = ResourcesCompat.getDrawable(context.resources, R.drawable.placeholder_contact, context.theme)
-            if (context.baseConfig.useColoredContacts) {
-                val letterBackgroundColors = context.getLetterBackgroundColors()
-                val color = letterBackgroundColors[abs(title.hashCode()) % letterBackgroundColors.size].toInt()
-                (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
-            }
-            drawable?.convertToBitmap()
+            SimpleContactsHelper(context).getColoredContactIcon(title).convertToBitmap()
         } else if (sender != null) {
             SimpleContactsHelper(context).getContactLetterIcon(sender)
         } else {
@@ -230,14 +211,16 @@ class NotificationHelper(private val context: Context) {
         var shortcut = context.shortcutHelper.getShortcut(threadId)
         if (shortcut == null) {
             ensureBackgroundThread {
+                notificationManager.notify(notificationId, builder.build())
+                //The shortcut icon replaces notification icons if the shortcut was previously launched by notifications
                 shortcut = context.shortcutHelper.createOrUpdateShortcut(threadId)
                 builder.setShortcutInfo(shortcut)
-                notificationManager.notify(notificationId, builder.build())
                 context.shortcutHelper.reportReceiveMessageUsage(threadId)
             }
         } else {
-            builder.setShortcutInfo(shortcut)
             notificationManager.notify(notificationId, builder.build())
+            //The shortcut icon replaces notification icons if the shortcut was previously launched by notifications
+            builder.setShortcutInfo(shortcut)
             ensureBackgroundThread {
                 context.shortcutHelper.reportReceiveMessageUsage(threadId)
             }

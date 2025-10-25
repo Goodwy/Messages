@@ -1,7 +1,6 @@
 package com.goodwy.smsmessenger.activities
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.AlarmManager
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -87,6 +86,7 @@ import kotlin.collections.HashSet
 import kotlin.collections.set
 import kotlin.math.abs
 import androidx.core.net.toUri
+import androidx.core.view.isVisible
 
 class ThreadActivity : SimpleActivity() {
     private val MIN_DATE_TIME_DIFF_SECS = 300
@@ -374,7 +374,7 @@ class ThreadActivity : SimpleActivity() {
                         messagesDB.getThreadMessages(threadId)
                     }
                 }.toMutableList() as ArrayList<Message>
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 ArrayList()
             }
             clearExpiredScheduledMessages(threadId, messages)
@@ -437,7 +437,7 @@ class ThreadActivity : SimpleActivity() {
                     setupAdapter()
                     return@ensureBackgroundThread
                 }
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
             }
 
             setupParticipants()
@@ -585,7 +585,9 @@ class ThreadActivity : SimpleActivity() {
 
         binding.confirmInsertedNumber.setColorFilter(getProperTextColor())
         binding.addContactOrNumber.setBackgroundResource(com.goodwy.commons.R.drawable.search_bg)
-        binding.addContactOrNumber.backgroundTintList = ColorStateList.valueOf(getBottomNavigationBackgroundColor())
+        val useSurfaceColor = isDynamicTheme() && !isSystemInDarkMode()
+        val surfaceColor = if (useSurfaceColor) getProperBackgroundColor() else getSurfaceColor()
+        binding.addContactOrNumber.backgroundTintList = ColorStateList.valueOf(surfaceColor)
     }
 
     private fun scrollToBottom() {
@@ -757,7 +759,8 @@ class ThreadActivity : SimpleActivity() {
         updateTextColors(threadHolder)
         val textColor = getProperTextColor()
         val properPrimaryColor = getProperPrimaryColor()
-        val getBottomNavigationBackgroundColor = getBottomNavigationBackgroundColor()
+        val useSurfaceColor = isDynamicTheme() && !isSystemInDarkMode()
+        val surfaceColor = if (useSurfaceColor) getProperBackgroundColor() else getSurfaceColor()
 
         binding.messageHolder.apply {
             //threadSendMessage.setTextColor(textColor)
@@ -766,8 +769,8 @@ class ThreadActivity : SimpleActivity() {
 
             confirmManageContacts.applyColorFilter(textColor)
             threadAddAttachment.applyColorFilter(textColor)
-            threadAddAttachment.background.applyColorFilter(getBottomNavigationBackgroundColor)
-            threadTypeMessageHolder.background.applyColorFilter(getBottomNavigationBackgroundColor)
+            threadAddAttachment.background.applyColorFilter(surfaceColor)
+            threadTypeMessageHolder.background.applyColorFilter(surfaceColor)
 
             threadMessagesFastscroller.updateColors(properPrimaryColor)
 
@@ -932,7 +935,7 @@ class ThreadActivity : SimpleActivity() {
                     if (it.height < 0) {
                         it.height = 0
                     }
-                } catch (ignored: Exception) {
+                } catch (_: Exception) {
                 }
             }
         }
@@ -963,6 +966,7 @@ class ThreadActivity : SimpleActivity() {
             binding.messageHolder.threadTypeMessage.text?.clear()
             binding.messageHolder.root.beGone()
             binding.shortCodeHolder.root.beVisible()
+            updateNavigationBar()
             val textColor = getProperTextColor()
             binding.shortCodeHolder.replyDisabledText.setTextColor(textColor)
             binding.shortCodeHolder.replyDisabledInfo.apply {
@@ -1058,7 +1062,7 @@ class ThreadActivity : SimpleActivity() {
 
             currentSIMCardIndex = getProperSimIndex(availableSIMs, numbers)
             binding.messageHolder.threadSelectSimIcon.background.applyColorFilter(
-                resources.getColor(com.goodwy.commons.R.color.activated_item_foreground)
+                resources.getColor(com.goodwy.commons.R.color.activated_item_foreground, theme)
             )
             binding.messageHolder.threadSelectSimIcon.applyColorFilter(getProperTextColor())
             binding.messageHolder.threadSelectSimIconHolder.beVisibleIf(!config.showSimSelectionDialog)
@@ -1387,7 +1391,7 @@ class ThreadActivity : SimpleActivity() {
         hideKeyboard()
         try {
             startActivityForResult(intent, requestCode)
-        } catch (e: ActivityNotFoundException) {
+        } catch (_: ActivityNotFoundException) {
             showErrorToast(getString(error))
         } catch (e: Exception) {
             showErrorToast(e)
@@ -1453,7 +1457,7 @@ class ThreadActivity : SimpleActivity() {
                         try {
                             val privateContacts = MyContactsContentProvider.getContacts(this, privateCursor)
                             privateContacts.firstOrNull { it.id == contactId }
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                             null
                         }
                     } else {
@@ -1491,7 +1495,7 @@ class ThreadActivity : SimpleActivity() {
                         try {
                             val privateContacts = MyContactsContentProvider.getContacts(this, privateCursor)
                             privateContacts.firstOrNull { it.id == contactId }
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                             null
                         }
                     } else {
@@ -2313,9 +2317,10 @@ class ThreadActivity : SimpleActivity() {
 
 
     private fun updateNavigationBar() {
-        val naviBarColor = if (isAttachmentPickerVisible) getBottomBarColor() else {
-            if (isDynamicTheme() && !isSystemInDarkMode()) getSurfaceColor() else getProperBackgroundColor()
-        }
+        val naviBarColor =
+            if (isAttachmentPickerVisible || (isSpecialNumber() && !isRecycleBin)) getBottomBarColor()
+            else if (isDynamicTheme() && !isSystemInDarkMode()) getSurfaceColor()
+            else getProperBackgroundColor()
         updateNavigationBarColor(naviBarColor)
     }
 
@@ -2337,17 +2342,8 @@ class ThreadActivity : SimpleActivity() {
         if (conversation != null && (!isDestroyed || !isFinishing)) {
             if ((threadTitle == conversation!!.phoneNumber || conversation!!.isCompany) && conversation!!.photoUri == "") {
                 val drawable =
-                    if (conversation!!.isCompany) ResourcesCompat.getDrawable(
-                        resources,
-                        R.drawable.placeholder_company,
-                        theme
-                    )
-                    else ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, theme)
-                if (baseConfig.useColoredContacts) {
-                    val letterBackgroundColors = getLetterBackgroundColors()
-                    val color = letterBackgroundColors[abs(conversation!!.title.hashCode()) % letterBackgroundColors.size].toInt()
-                    (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
-                }
+                    if (conversation!!.isCompany) SimpleContactsHelper(this@ThreadActivity).getColoredCompanyIcon(conversation!!.title)
+                    else SimpleContactsHelper(this@ThreadActivity).getColoredContactIcon(conversation!!.title)
                 senderPhoto.setImageDrawable(drawable)
             } else {
                 val placeholder = if (participants.size > 1) {
@@ -2388,7 +2384,7 @@ class ThreadActivity : SimpleActivity() {
                 getContactFromAddress(contact.phoneNumbers.first().normalizedNumber) {
                     if (it != null) {
                         runOnUiThread {
-                            startContactDetailsIntent(it)
+                            startContactDetailsIntentRecommendation(it)
                         }
                     }
                 }

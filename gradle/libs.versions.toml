@@ -19,7 +19,7 @@ room = "2.8.1"
 android-smsmms = "c3e678befd"
 indicatorFastScroll = "fe6ddbc316"
 #Goodwy
-right-commons = "faefb227c4"
+right-commons = "d3ba8fa979"
 behavioRule = "1.0.1"
 rxAnimation = "2.1.1"
 rxJava3 = "3.1.5"
@@ -35,6 +35,7 @@ app-build-javaVersion = "VERSION_17"
 app-build-kotlinJVMTarget = "17"
 #Helpers
 ez-vcard = "0.12.1"
+documentfile = "1.1.0"
 [libraries]
 #AndroidX
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
@@ -64,6 +65,7 @@ androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-kt
 androidx-lifecycle-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycleprocess" }
 swipe-action = { module = "com.github.Goodwy:SwipeActionView", version.ref = "swipeToActionLayout" }
 google-services = { module = "com.google.android.gms:play-services-location", version.ref = "googleServices" }
+androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentfile" }
 [bundles]
 room = [
     "androidx-room-ktx",

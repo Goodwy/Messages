@@ -11,6 +11,7 @@
     <dimen name="vcard_property_start_margin">64dp</dimen>
     <dimen name="small_icon_size">20dp</dimen>
     <dimen name="medium_icon_size">38dp</dimen>
+    <dimen name="medium_icon_size_plus">40dp</dimen>
     <dimen name="attachment_button_height">96dp</dimen>
     <dimen name="attachment_button_width">90dp</dimen>
     <dimen name="attachment_button_width_small">48dp</dimen>

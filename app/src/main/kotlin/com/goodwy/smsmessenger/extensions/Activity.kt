@@ -77,7 +77,7 @@ fun Activity.launchViewIntent(uri: Uri, mimetype: String, filename: String) {
     }
 }
 
-fun Activity.startContactDetailsIntent(contact: SimpleContact) {
+fun Activity.startContactDetailsIntentRecommendation(contact: SimpleContact) {
     val simpleContacts = "com.goodwy.contacts"
     val simpleContactsDebug = "com.goodwy.contacts.debug"
     if (
@@ -90,46 +90,54 @@ fun Activity.startContactDetailsIntent(contact: SimpleContact) {
             getString(com.goodwy.strings.R.string.recommendation_dialog_contacts_g),
             getString(com.goodwy.commons.R.string.right_contacts),
             AppCompatResources.getDrawable(this, com.goodwy.commons.R.drawable.ic_contacts)
-        ) {}
-    } else {
-        if (
-            contact.rawId > 1000000 &&
-            contact.contactId > 1000000 &&
-            contact.rawId == contact.contactId &&
-            (isPackageInstalled(simpleContacts) || isPackageInstalled(simpleContactsDebug))
         ) {
-            Intent().apply {
-                action = Intent.ACTION_VIEW
-                putExtra(CONTACT_ID, contact.rawId)
-                putExtra(IS_PRIVATE, true)
-                setPackage(
-                    if (isPackageInstalled(simpleContacts)) {
-                        simpleContacts
-                    } else {
-                        simpleContactsDebug
-                    }
-                )
+            startContactDetailsIntent(contact)
+        }
+    } else {
+        startContactDetailsIntent(contact)
+    }
+}
 
-                setDataAndType(
-                    ContactsContract.Contacts.CONTENT_LOOKUP_URI,
-                    "vnd.android.cursor.dir/person"
-                )
-
-                launchActivityIntent(this)
-            }
-        } else {
-            ensureBackgroundThread {
-                val lookupKey = SimpleContactsHelper(this)
-                    .getContactLookupKey(
-                        contactId = (contact).rawId.toString()
-                    )
-
-                val publicUri = Uri.withAppendedPath(
-                    ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey
-                )
-                runOnUiThread {
-                    launchViewContactIntent(publicUri)
+fun Activity.startContactDetailsIntent(contact: SimpleContact) {
+    val simpleContacts = "com.goodwy.contacts"
+    val simpleContactsDebug = "com.goodwy.contacts.debug"
+    if (
+        contact.rawId > 1000000 &&
+        contact.contactId > 1000000 &&
+        contact.rawId == contact.contactId &&
+        (isPackageInstalled(simpleContacts) || isPackageInstalled(simpleContactsDebug))
+    ) {
+        Intent().apply {
+            action = Intent.ACTION_VIEW
+            putExtra(CONTACT_ID, contact.rawId)
+            putExtra(IS_PRIVATE, true)
+            setPackage(
+                if (isPackageInstalled(simpleContacts)) {
+                    simpleContacts
+                } else {
+                    simpleContactsDebug
                 }
+            )
+
+            setDataAndType(
+                ContactsContract.Contacts.CONTENT_LOOKUP_URI,
+                "vnd.android.cursor.dir/person"
+            )
+
+            launchActivityIntent(this)
+        }
+    } else {
+        ensureBackgroundThread {
+            val lookupKey = SimpleContactsHelper(this)
+                .getContactLookupKey(
+                    contactId = (contact).rawId.toString()
+                )
+
+            val publicUri = Uri.withAppendedPath(
+                ContactsContract.Contacts.CONTENT_LOOKUP_URI, lookupKey
+            )
+            runOnUiThread {
+                launchViewContactIntent(publicUri)
             }
         }
     }
@@ -178,7 +186,7 @@ fun SimpleActivity.showSnackbar(view: View) {
     val bgDrawable = ResourcesCompat.getDrawable(view.resources, com.goodwy.commons.R.drawable.button_background_16dp, null)
     snackbar.view.background = bgDrawable
     val properBackgroundColor = getProperBackgroundColor()
-    val backgroundColor = if (properBackgroundColor == Color.BLACK) getBottomNavigationBackgroundColor().lightenColor(6) else getBottomNavigationBackgroundColor().darkenColor(6)
+    val backgroundColor = if (properBackgroundColor == Color.BLACK) getSurfaceColor().lightenColor(6) else getSurfaceColor().darkenColor(6)
     snackbar.setBackgroundTint(backgroundColor)
     snackbar.setTextColor(getProperTextColor())
     snackbar.setActionTextColor(getProperPrimaryColor())

@@ -156,7 +156,7 @@
             android:id="@+id/conversation_details_holder"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/tiny_margin"
+            android:layout_marginTop="@dimen/small_margin"
             android:orientation="vertical">
 
             <TextView
@@ -338,9 +338,23 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/medium_margin"
-                    android:layout_marginHorizontal="@dimen/contact_padding_left"
+                    android:layout_marginStart="@dimen/contact_padding_left"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/notifications_icon"
+                    android:gravity="start"
                     android:text="@string/notifications"
                     android:textSize="@dimen/normal_text_size" />
+
+                <ImageView
+                    android:id="@+id/notifications_icon"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginTop="@dimen/contact_padding_top"
+                    android:layout_marginEnd="@dimen/contact_padding_left"
+                    android:alpha="0.8"
+                    android:layout_alignParentEnd="true"
+                    android:contentDescription="@null"
+                    app:srcCompat="@drawable/ic_bell_vector" />
 
                 <RelativeLayout
                     android:id="@+id/custom_notifications_wrapper"

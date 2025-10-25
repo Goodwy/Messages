@@ -271,17 +271,8 @@ abstract class BaseConversationsAdapter(
                 conversationImage.setHeightAndWidth(size)
                 if ((title == conversation.phoneNumber || conversation.isCompany) && conversation.photoUri == "") {
                     val drawable =
-                        if (conversation.isCompany) ResourcesCompat.getDrawable(
-                            resources,
-                            R.drawable.placeholder_company,
-                            activity.theme
-                        )
-                        else ResourcesCompat.getDrawable(resources, R.drawable.placeholder_contact, activity.theme)
-                    if (baseConfig.useColoredContacts) {
-                        val letterBackgroundColors = activity.getLetterBackgroundColors()
-                        val color = letterBackgroundColors[abs(conversation.title.hashCode()) % letterBackgroundColors.size].toInt()
-                        (drawable as LayerDrawable).findDrawableByLayerId(R.id.placeholder_contact_background).applyColorFilter(color)
-                    }
+                        if (conversation.isCompany) SimpleContactsHelper(activity).getColoredCompanyIcon(conversation.title)
+                        else SimpleContactsHelper(activity).getColoredContactIcon(conversation.title)
                     conversationImage.setImageDrawable(drawable)
                 } else {
                     // at group conversations we use an icon as the placeholder, not any letter

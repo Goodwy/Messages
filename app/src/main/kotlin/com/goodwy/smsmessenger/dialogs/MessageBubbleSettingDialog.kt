@@ -37,8 +37,15 @@ class MessageBubbleSettingDialog(
         setupColors()
         setupToggleBubbleStyle()
 
-        if (activity.isDynamicTheme() || activity.isBlackTheme()) {
-            val drawable = binding.root.resources.getColoredDrawableWithColor(R.drawable.rounded_rectangle_color, binding.root.context.getProperBackgroundColor())
+        val backgroundColor =
+            if (activity.isDynamicTheme() && !activity.isSystemInDarkMode()) activity.getSurfaceColor()
+            else activity.getProperBackgroundColor()
+        if ((activity.isDynamicTheme()) || activity.isBlackTheme()) {
+            val drawable = binding.root.resources.getColoredDrawableWithColor(
+                R.drawable.rounded_rectangle_color,
+                backgroundColor
+            )
+
             binding.styleOriginal.background = drawable
             binding.styleRounded.background = drawable
             binding.styleIosNew.background = drawable
@@ -99,7 +106,9 @@ class MessageBubbleSettingDialog(
         }
         snackbar.view.background = bgDrawable
         val properBackgroundColor = activity.getProperBackgroundColor()
-        val backgroundColor = if (properBackgroundColor == Color.BLACK || activity.isDynamicTheme()) properBackgroundColor else activity.getBottomNavigationBackgroundColor()
+        val backgroundColor =
+            if (properBackgroundColor == Color.BLACK || activity.isDynamicTheme()) properBackgroundColor
+            else activity.getSurfaceColor()
         snackbar.setBackgroundTint(backgroundColor)
         snackbar.setTextColor(activity.getProperTextColor())
         snackbar.setActionTextColor(activity.getProperPrimaryColor())
@@ -145,7 +154,10 @@ class MessageBubbleSettingDialog(
                 if (config.bubbleInContactColor) letterBackgroundColors[abs(random.hashCode()) % letterBackgroundColors.size].toInt()
                 else root.context.getProperPrimaryColor()
 
-            val backgroundReceived = if (config.bubbleInvertColor) primaryColor else root.context.getBottomNavigationBackgroundColor()
+            val useSurfaceColor = root.context.isDynamicTheme() && !root.context.isSystemInDarkMode()
+            val surfaceColor = if (useSurfaceColor) root.context.getProperBackgroundColor() else root.context.getSurfaceColor()
+
+            val backgroundReceived = if (config.bubbleInvertColor) primaryColor else surfaceColor
             val contrastColorReceived = backgroundReceived.getContrastColor()
             arrayOf(
                 styleOriginalBubbleOne,
@@ -161,7 +173,7 @@ class MessageBubbleSettingDialog(
                 it.setTextColor(contrastColorReceived)
             }
 
-            val backgroundSender = if (config.bubbleInvertColor) root.context.getBottomNavigationBackgroundColor() else primaryColor
+            val backgroundSender = if (config.bubbleInvertColor) surfaceColor else primaryColor
             val contrastColorSender = backgroundSender.getContrastColor()
             arrayOf(
                 styleOriginalBubbleThree,

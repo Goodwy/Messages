@@ -97,6 +97,7 @@
         android:orientation="horizontal"
         android:layout_marginStart="@dimen/normal_margin"
         android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toTopOf="@+id/thread_type_message_holder"
         app:layout_constraintBottom_toBottomOf="@+id/thread_type_message_holder"
         app:layout_constraintStart_toStartOf="parent" >
 
@@ -131,7 +132,7 @@
             android:gravity="center_vertical"
             android:hint="@string/type_a_message"
             android:inputType="textCapSentences|textMultiLine"
-            android:minHeight="@dimen/medium_icon_size"
+            android:minHeight="@dimen/medium_icon_size_plus"
             android:maxLines="8"
             android:paddingStart="@dimen/normal_margin"
             android:paddingTop="@dimen/smaller_margin"
@@ -211,6 +212,7 @@
         android:orientation="horizontal"
         android:layout_marginEnd="@dimen/normal_margin"
         android:background="?selectableItemBackgroundBorderless"
+        app:layout_constraintTop_toTopOf="@+id/thread_type_message_holder"
         app:layout_constraintBottom_toBottomOf="@+id/thread_type_message_holder"
         app:layout_constraintEnd_toEndOf="parent" >
 

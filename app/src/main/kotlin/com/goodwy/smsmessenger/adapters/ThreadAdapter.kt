@@ -604,7 +604,9 @@ class ThreadAdapter(
             val primaryOrSenderColor =
                 if (activity.config.bubbleInContactColor) letterBackgroundColors[abs(message.senderName.hashCode()) % letterBackgroundColors.size].toInt()
                 else activity.getProperPrimaryColor()
-            val backgroundReceived = if (activity.config.bubbleInvertColor) primaryOrSenderColor else activity.getBottomNavigationBackgroundColor()
+            val useSurfaceColor = activity.isDynamicTheme() && !activity.isSystemInDarkMode()
+            val surfaceColor = if (useSurfaceColor) activity.getProperBackgroundColor() else activity.getSurfaceColor()
+            val backgroundReceived = if (activity.config.bubbleInvertColor) primaryOrSenderColor else surfaceColor
 
             threadMessageBodyWrapper.apply {
 
@@ -642,7 +644,7 @@ class ThreadAdapter(
                         val contact = message.getSender()!!
                         activity.getContactFromAddress(contact.phoneNumbers.first().normalizedNumber) {
                             if (it != null) {
-                                activity.startContactDetailsIntent(it)
+                                activity.startContactDetailsIntentRecommendation(it)
                             }
                         }
                     }
@@ -678,7 +680,9 @@ class ThreadAdapter(
             message.senderName.hashCode().hashCode()
         ) % letterBackgroundColors.size].toInt()
         else activity.getProperPrimaryColor()
-        val backgroundReceived = if (activity.config.bubbleInvertColor) activity.getBottomNavigationBackgroundColor() else primaryOrSenderColor
+        val useSurfaceColor = activity.isDynamicTheme() && !activity.isSystemInDarkMode()
+        val surfaceColor = if (useSurfaceColor) activity.getProperBackgroundColor() else activity.getSurfaceColor()
+        val backgroundReceived = if (activity.config.bubbleInvertColor) surfaceColor else primaryOrSenderColor
 
         messageBinding.apply {
             with(ConstraintSet()) {

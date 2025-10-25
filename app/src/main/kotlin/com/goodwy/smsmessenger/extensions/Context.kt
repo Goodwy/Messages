@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import android.provider.ContactsContract
 import android.provider.ContactsContract.PhoneLookup
 import android.provider.OpenableColumns
 import android.provider.Telephony.Mms
@@ -691,15 +692,19 @@ fun Context.getThreadParticipants(
                     val namePhoto = getNameAndPhotoFromPhoneNumber(number)
                     val name = namePhoto.name
                     val photoUri = namePhoto.photoUri ?: ""
+                    val company = namePhoto.company
+                    val jobPosition = namePhoto.jobPosition
                     val phoneNumber = PhoneNumber(number, 0, "", number)
                     val contact = SimpleContact(
                         rawId = addressId,
-                        contactId = addressId,
+                        contactId = if (namePhoto.isContact) addressId else 0,
                         name = name,
                         photoUri = photoUri,
                         phoneNumbers = arrayListOf(phoneNumber),
                         birthdays = ArrayList(),
-                        anniversaries = ArrayList()
+                        anniversaries = ArrayList(),
+                        company = company,
+                        jobPosition = jobPosition,
                     )
                     participants.add(contact)
                 }
@@ -840,7 +845,8 @@ fun Context.getNameAndPhotoFromPhoneNumber(number: String): NamePhoto {
     val uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number))
     val projection = arrayOf(
         PhoneLookup.DISPLAY_NAME,
-        PhoneLookup.PHOTO_URI
+        PhoneLookup.PHOTO_URI,
+        PhoneLookup._ID
     )
 
     try {
@@ -849,13 +855,56 @@ fun Context.getNameAndPhotoFromPhoneNumber(number: String): NamePhoto {
             if (cursor?.moveToFirst() == true) {
                 val name = cursor.getStringValue(PhoneLookup.DISPLAY_NAME)
                 val photoUri = cursor.getStringValue(PhoneLookup.PHOTO_URI)
-                return NamePhoto(name, photoUri)
+                val contactId = cursor.getLongValue(PhoneLookup._ID)
+                val (company, title) = getCompanyAndTitleByContactId(contactId)
+                return NamePhoto(name, photoUri, company ?: "", title ?: "", isContact = true)
             }
         }
     } catch (_: Exception) {
     }
 
     return NamePhoto(number, null)
+}
+
+private fun Context.getCompanyAndTitleByContactId(contactId: Long): Pair<String?, String?> {
+    val organizationUri = ContactsContract.Data.CONTENT_URI
+    val organizationProjection = arrayOf(
+        ContactsContract.CommonDataKinds.Organization.COMPANY,
+        ContactsContract.CommonDataKinds.Organization.TITLE
+    )
+
+    val organizationSelection = """
+        ${ContactsContract.Data.CONTACT_ID} = ? AND 
+        ${ContactsContract.Data.MIMETYPE} = ?
+    """.trimIndent()
+
+    val organizationSelectionArgs = arrayOf(
+        contactId.toString(),
+        ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE
+    )
+
+    try {
+        val cursor = contentResolver.query(
+            organizationUri,
+            organizationProjection,
+            organizationSelection,
+            organizationSelectionArgs,
+            null
+        )
+        cursor.use {
+            if (cursor?.moveToFirst() == true) {
+                val company = cursor.getStringValue(ContactsContract.CommonDataKinds.Organization.COMPANY)
+                val title = cursor.getStringValue(ContactsContract.CommonDataKinds.Organization.TITLE)
+                return Pair(
+                    if (company.isNullOrEmpty()) null else company,
+                    if (title.isNullOrEmpty()) null else title
+                )
+            }
+        }
+    } catch (_: Exception) {
+    }
+
+    return Pair(null, null)
 }
 
 fun Context.insertNewSMS(
@@ -926,7 +975,7 @@ fun Context.deleteConversation(threadId: Long) {
         config.removeCustomNotificationsByThreadId(threadId)
         notificationManager.deleteNotificationChannel(threadId.hashCode().toString())
     }
-    if(shortcutHelper.getShortcut(threadId) != null) {
+    if (shortcutHelper.getShortcut(threadId) != null) {
         shortcutHelper.removeShortcutForThread(threadId)
     }
 }
