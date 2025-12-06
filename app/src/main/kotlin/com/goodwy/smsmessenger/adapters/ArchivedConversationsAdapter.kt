@@ -2,14 +2,28 @@ package com.goodwy.smsmessenger.adapters
 
 import android.view.Menu
 import com.goodwy.commons.dialogs.ConfirmationDialog
-import com.goodwy.commons.extensions.*
+import com.goodwy.commons.extensions.baseConfig
+import com.goodwy.commons.extensions.isRTLLayout
+import com.goodwy.commons.extensions.launchCallIntent
+import com.goodwy.commons.extensions.notificationManager
+import com.goodwy.commons.extensions.toast
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.views.MyRecyclerView
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
-import com.goodwy.smsmessenger.extensions.*
-import com.goodwy.smsmessenger.helpers.*
+import com.goodwy.smsmessenger.extensions.config
+import com.goodwy.smsmessenger.extensions.conversationsDB
+import com.goodwy.smsmessenger.extensions.deleteConversation
+import com.goodwy.smsmessenger.extensions.markLastMessageUnread
+import com.goodwy.smsmessenger.extensions.markThreadMessagesRead
+import com.goodwy.smsmessenger.extensions.updateConversationArchivedStatus
+import com.goodwy.smsmessenger.helpers.SWIPE_ACTION_ARCHIVE
+import com.goodwy.smsmessenger.helpers.SWIPE_ACTION_BLOCK
+import com.goodwy.smsmessenger.helpers.SWIPE_ACTION_CALL
+import com.goodwy.smsmessenger.helpers.SWIPE_ACTION_DELETE
+import com.goodwy.smsmessenger.helpers.SWIPE_ACTION_MESSAGE
+import com.goodwy.smsmessenger.helpers.refreshConversations
 import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import com.goodwy.smsmessenger.models.Conversation
 
@@ -84,12 +98,12 @@ class ArchivedConversationsAdapter(
 
         activity.runOnUiThread {
             if (newList.none { selectedKeys.contains(it.hashCode()) }) {
-                refreshMessages()
+                refreshConversations()
                 finishActMode()
             } else {
                 submitList(newList)
                 if (newList.isEmpty()) {
-                    refreshMessages()
+                    refreshConversations()
                 }
             }
         }
@@ -138,7 +152,7 @@ class ArchivedConversationsAdapter(
         activity.runOnUiThread {
             submitList(newList)
             if (newList.isEmpty()) {
-                refreshMessages()
+                refreshConversations()
             }
         }
     }
@@ -178,7 +192,7 @@ class ArchivedConversationsAdapter(
         activity.runOnUiThread {
             submitList(newList)
             if (newList.isEmpty()) {
-                refreshMessages()
+                refreshConversations()
             }
         }
     }
@@ -187,13 +201,16 @@ class ArchivedConversationsAdapter(
         ensureBackgroundThread {
             if (conversation.read) {
                 activity.conversationsDB.markUnread(conversation.threadId)
-                activity.markThreadMessagesUnread(conversation.threadId)
+//                activity.markThreadMessagesUnread(conversation.threadId)
+                activity.markLastMessageUnread(conversation.threadId)
             } else {
                 activity.conversationsDB.markRead(conversation.threadId)
                 activity.markThreadMessagesRead(conversation.threadId)
             }
 
-            refreshMessages()
+            activity.runOnUiThread {
+                refreshConversations()
+            }
         }
     }
 

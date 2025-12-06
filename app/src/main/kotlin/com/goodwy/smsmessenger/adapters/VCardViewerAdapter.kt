@@ -1,10 +1,7 @@
 package com.goodwy.smsmessenger.adapters
 
-import android.graphics.drawable.LayerDrawable
 import android.util.TypedValue
-import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -21,7 +18,6 @@ import com.goodwy.smsmessenger.databinding.ItemVcardContactBinding
 import com.goodwy.smsmessenger.databinding.ItemVcardContactPropertyBinding
 import com.goodwy.smsmessenger.models.VCardPropertyWrapper
 import com.goodwy.smsmessenger.models.VCardWrapper
-import kotlin.math.abs
 
 private const val TYPE_VCARD_CONTACT = 1
 private const val TYPE_VCARD_CONTACT_PROPERTY = 2

@@ -28,7 +28,6 @@ import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import java.net.URLDecoder
 import java.util.Locale
 import java.util.Objects
-import kotlin.math.abs
 
 class NewConversationActivity : SimpleActivity() {
     private var allContacts = ArrayList<SimpleContact>()
@@ -38,19 +37,16 @@ class NewConversationActivity : SimpleActivity() {
     private val binding by viewBinding(ActivityNewConversationBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        isMaterialActivity = true
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         title = getString(R.string.new_conversation)
         updateTextColors(binding.newConversationHolder)
 
-        updateMaterialActivityViews(
-            mainCoordinatorLayout = binding.newConversationCoordinator,
-            nestedView = binding.contactsList,
-            useTransparentNavigation = true,
-            useTopSearchMenu = false
-        )
-        //setupMaterialScrollListener(scrollingView = binding.contactsList, toolbar = binding.newConversationToolbar)
+        setupEdgeToEdge(padBottomImeAndSystem = listOf(binding.contactsList))
+//        setupMaterialScrollListener(
+//            scrollingView = binding.contactsList,
+//            topAppBar = binding.newConversationAppbar
+//        )
 
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
         binding.newConversationAddress.requestFocus()
@@ -67,7 +63,7 @@ class NewConversationActivity : SimpleActivity() {
 
         val useSurfaceColor = isDynamicTheme() && !isSystemInDarkMode()
         val backgroundColor = if (useSurfaceColor) getSurfaceColor() else getProperBackgroundColor()
-        setupToolbar(binding.newConversationToolbar, NavigationIcon.Arrow, statusBarColor = backgroundColor)
+        setupTopAppBar(binding.newConversationAppbar, NavigationIcon.Arrow, topBarColor = backgroundColor)
         binding.newConversationHolder.setBackgroundColor(backgroundColor)
 
         binding.noContactsPlaceholder2.setTextColor(getProperPrimaryColor)
@@ -160,12 +156,12 @@ class NewConversationActivity : SimpleActivity() {
             }
         }
 
-        val properPrimaryColor = getProperPrimaryColor()
+        val properAccentColor = getProperAccentColor()
         binding.contactsLetterFastscroller.textColor = properTextColor.getColorStateList()
-        binding.contactsLetterFastscroller.pressedTextColor = properPrimaryColor
+        binding.contactsLetterFastscroller.pressedTextColor = properAccentColor
         binding.contactsLetterFastscrollerThumb.setupWithFastScroller(binding.contactsLetterFastscroller)
-        binding.contactsLetterFastscrollerThumb.textColor = properPrimaryColor.getContrastColor()
-        binding.contactsLetterFastscrollerThumb.thumbColor = properPrimaryColor.getColorStateList()
+        binding.contactsLetterFastscrollerThumb.textColor = properAccentColor.getContrastColor()
+        binding.contactsLetterFastscrollerThumb.thumbColor = properAccentColor.getColorStateList()
     }
 
     private fun isThirdPartyIntent(): Boolean {

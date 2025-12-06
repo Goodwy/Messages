@@ -11,7 +11,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.goodwy.commons.extensions.getMyContactsCursor
 import com.goodwy.commons.helpers.ensureBackgroundThread
-import com.goodwy.smsmessenger.extensions.*
+import com.goodwy.smsmessenger.extensions.getMessageRecipientAddress
+import com.goodwy.smsmessenger.extensions.getNameFromAddress
+import com.goodwy.smsmessenger.extensions.getThreadId
+import com.goodwy.smsmessenger.extensions.messagesDB
+import com.goodwy.smsmessenger.extensions.messagingUtils
+import com.goodwy.smsmessenger.extensions.notificationHelper
+import com.goodwy.smsmessenger.helpers.refreshConversations
 import com.goodwy.smsmessenger.helpers.refreshMessages
 
 /** Handles updating databases and states when a SMS message is sent. */
@@ -48,6 +54,7 @@ class SmsStatusSentReceiver : SendStatusReceiver() {
 
                 context.messagesDB.updateType(messageId, type)
                 refreshMessages()
+                refreshConversations()
             }
         }
     }

@@ -1,46 +1,47 @@
 [versions]
 #jetbrains
-kotlin = "2.2.20"
+kotlin = "2.2.21"
 kotlinxSerializationJson = "1.9.0"
 #KSP
-ksp = "2.2.20-2.0.3"
+ksp = "2.3.0"
 #Detekt
 detekt = "1.23.8"
 detektCompose = "0.4.27"
 #AndroidX
 androidx-constraintlayout = "2.2.1"
 androidx-swiperefreshlayout = "1.1.0"
-androidx-lifecycleprocess = "2.8.7"
+androidx-lifecycleprocess = "2.9.4"
+androidx-documentfile = "1.1.0"
 #Eventbus
 eventbus = "3.3.1"
 #Room
-room = "2.8.1"
+room = "2.8.3"
 #Simple Mobile Tools
-android-smsmms = "c3e678befd"
+mmslib = "1.0.0"
 indicatorFastScroll = "fe6ddbc316"
 #Goodwy
-right-commons = "70aad40568"
+right-commons = "c2bf2db476"
 behavioRule = "1.0.1"
 rxAnimation = "2.1.1"
 rxJava3 = "3.1.5"
-swipeToActionLayout = "bd1eb3c8a3"
+swipeToActionLayout = "0f7632fc36"
 googleServices = "21.0.1"
 #Gradle
 gradlePlugins-agp = "8.11.1"
 #build
-app-build-compileSDKVersion = "34"
-app-build-targetSDK = "34"
+app-build-compileSDKVersion = "36"
+app-build-targetSDK = "36"
 app-build-minimumSDK = "26"
 app-build-javaVersion = "VERSION_17"
 app-build-kotlinJVMTarget = "17"
 #Helpers
 ez-vcard = "0.12.1"
-documentfile = "1.1.0"
 [libraries]
 #AndroidX
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "androidx-lifecycleprocess" }
 androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "androidx-swiperefreshlayout" }
+androidx-documentfile = { module = "androidx.documentfile:documentfile", version.ref = "androidx-documentfile" }
 #Room
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
@@ -49,7 +50,7 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 compose-detekt = { module = "io.nlopez.compose.rules:detekt", version.ref = "detektCompose" }
 #Simple Mobile Tools
 indicator-fast-scroll = { module = "com.github.goodwy:IndicatorFastScroll", version.ref = "indicatorFastScroll" }
-android-smsmms = { module = "org.fossify:android-smsmms", version.ref = "android-smsmms" }
+mmslib = { module = "org.fossify:mmslib", version.ref = "mmslib" }
 #EventBus
 eventbus = { module = "org.greenrobot:eventbus", version.ref = "eventbus" }
 #Helpers
@@ -57,7 +58,9 @@ ez-vcard = { module = "com.googlecode.ez-vcard:ez-vcard", version.ref = "ez-vcar
 #Kotlin
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 #Goodwy
-goodwy-commons = { module = "com.github.Goodwy:Goodwy-Commons", version.ref = "right-commons" }
+goodwy-commons-gplay = { module = "com.github.goodwy.goodwy-commons:commons-gplay", version.ref = "right-commons" }
+goodwy-commons-foss = { module = "com.github.goodwy.goodwy-commons:commons-foss", version.ref = "right-commons" }
+goodwy-commons-rustore = { module = "com.github.goodwy.goodwy-commons:commons-rustore", version.ref = "right-commons" }
 behavio-rule = { module = "com.github.Liverm0r:BehavioRule", version.ref = "behavioRule" }
 rx-animation = { module = "com.mikhaellopez:rxanimation", version.ref = "rxAnimation" }
 rx-java = { module = "io.reactivex.rxjava3:rxjava", version.ref = "rxJava3" }
@@ -65,7 +68,6 @@ androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-kt
 androidx-lifecycle-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycleprocess" }
 swipe-action = { module = "com.github.Goodwy:SwipeActionView", version.ref = "swipeToActionLayout" }
 google-services = { module = "com.google.android.gms:play-services-location", version.ref = "googleServices" }
-androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentfile" }
 [bundles]
 room = [
     "androidx-room-ktx",

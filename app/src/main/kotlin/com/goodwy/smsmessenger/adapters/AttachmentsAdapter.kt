@@ -158,6 +158,10 @@ class AttachmentsAdapter(
                     }
                 }
             } else {
+                if (attachment.isPending) {
+                    attachments.find { it.uri == attachment.uri }?.isPending = false
+                    onReady()
+                }
                 loadMediaPreview(this, attachment)
             }
         }

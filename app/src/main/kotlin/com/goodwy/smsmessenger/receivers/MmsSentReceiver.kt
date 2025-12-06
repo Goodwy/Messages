@@ -12,6 +12,7 @@ import com.goodwy.commons.extensions.showErrorToast
 import com.goodwy.commons.extensions.toast
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.extensions.deleteMessage
+import com.goodwy.smsmessenger.helpers.refreshConversations
 import com.goodwy.smsmessenger.helpers.refreshMessages
 import java.io.File
 
@@ -52,6 +53,7 @@ class MmsSentReceiver : SendStatusReceiver() {
 
     override fun updateAppDatabase(context: Context, intent: Intent, receiverResultCode: Int) {
         refreshMessages()
+        refreshConversations()
     }
 
     companion object {

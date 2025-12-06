@@ -120,7 +120,7 @@
         android:layout_marginBottom="8dp"
         android:orientation="horizontal"
         android:background="@drawable/thread_background"
-        app:layout_constraintBottom_toTopOf="@+id/attachment_picker_divider"
+        app:layout_constraintBottom_toTopOf="@+id/attachment_picker_holder"
         app:layout_constraintEnd_toStartOf="@id/threadSendMessageWrapper"
         app:layout_constraintStart_toEndOf="@+id/threadAddAttachmentHolder" >
 
@@ -229,13 +229,13 @@
             android:textSize="@dimen/smaller_text_size" />
     </LinearLayout>
 
-    <View
-        android:id="@+id/attachment_picker_divider"
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@color/divider_grey"
-        android:importantForAccessibility="no"
-        app:layout_constraintBottom_toTopOf="@id/attachment_picker_holder" />
+<!--    <View-->
+<!--        android:id="@+id/attachment_picker_divider"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1px"-->
+<!--        android:background="@color/divider_grey"-->
+<!--        android:importantForAccessibility="no"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/attachment_picker_holder" />-->
 
     <ScrollView
         android:id="@+id/attachment_picker_holder"

@@ -4,7 +4,16 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import com.goodwy.commons.dialogs.ConfirmationDialog
-import com.goodwy.commons.extensions.*
+import com.goodwy.commons.extensions.areSystemAnimationsEnabled
+import com.goodwy.commons.extensions.beGoneIf
+import com.goodwy.commons.extensions.beVisibleIf
+import com.goodwy.commons.extensions.getProperAccentColor
+import com.goodwy.commons.extensions.getProperTextColor
+import com.goodwy.commons.extensions.getSurfaceColor
+import com.goodwy.commons.extensions.hideKeyboard
+import com.goodwy.commons.extensions.isDynamicTheme
+import com.goodwy.commons.extensions.isSystemInDarkMode
+import com.goodwy.commons.extensions.viewBinding
 import com.goodwy.commons.helpers.NavigationIcon
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.smsmessenger.R
@@ -27,28 +36,24 @@ class ArchivedConversationsActivity : SimpleActivity() {
 
     @SuppressLint("InlinedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
-        isMaterialActivity = true
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupOptionsMenu()
 
-        updateMaterialActivityViews(
-            mainCoordinatorLayout = binding.archiveCoordinator,
-            nestedView = binding.conversationsList,
-            useTransparentNavigation = true,
-            useTopSearchMenu = false
+        setupEdgeToEdge(padBottomImeAndSystem = listOf(binding.conversationsList))
+        setupMaterialScrollListener(
+            scrollingView = binding.conversationsList,
+            topAppBar = binding.archiveAppbar
         )
-        setupMaterialScrollListener(scrollingView = binding.conversationsList, toolbar = binding.archiveToolbar)
 
         loadArchivedConversations()
     }
 
     override fun onResume() {
         super.onResume()
-        setupToolbar(binding.archiveToolbar, NavigationIcon.Arrow)
-        updateMenuColors()
-
+        setupTopAppBar(binding.archiveAppbar, NavigationIcon.Arrow)
         loadArchivedConversations()
+        binding.conversationsFastscroller.updateColors(getProperAccentColor())
     }
 
     override fun onDestroy() {
@@ -71,10 +76,6 @@ class ArchivedConversationsActivity : SimpleActivity() {
         binding.archiveToolbar.menu.apply {
             findItem(R.id.empty_archive).isVisible = conversations.isNotEmpty()
         }
-    }
-
-    private fun updateMenuColors() {
-        updateStatusbarColor(getProperBackgroundColor())
     }
 
     private fun loadArchivedConversations() {
@@ -112,6 +113,10 @@ class ArchivedConversationsActivity : SimpleActivity() {
     }
 
     private fun getOrCreateConversationsAdapter(): ArchivedConversationsAdapter {
+        if (isDynamicTheme() && !isSystemInDarkMode()) {
+            binding.conversationsList.setBackgroundColor(getSurfaceColor())
+        }
+
         var currAdapter = binding.conversationsList.adapter
         if (currAdapter == null) {
             hideKeyboard()
@@ -178,7 +183,7 @@ class ArchivedConversationsActivity : SimpleActivity() {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun refreshMessages(event: Events.RefreshMessages) {
+    fun refreshConversations(@Suppress("unused") event: Events.RefreshConversations) {
         loadArchivedConversations()
     }
 }

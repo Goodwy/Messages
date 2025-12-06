@@ -2,20 +2,37 @@ package com.goodwy.smsmessenger.adapters
 
 import android.annotation.SuppressLint
 import android.graphics.Typeface
-import android.graphics.drawable.LayerDrawable
 import android.os.Parcelable
 import android.text.format.DateUtils
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.behaviorule.arturdumchev.library.pixels
 import com.bumptech.glide.Glide
 import com.qtalk.recyclerviewfastscroller.RecyclerViewFastScroller
 import com.goodwy.commons.adapters.MyRecyclerViewListAdapter
-import com.goodwy.commons.extensions.*
+import com.goodwy.commons.extensions.applyColorFilter
+import com.goodwy.commons.extensions.beGone
+import com.goodwy.commons.extensions.beGoneIf
+import com.goodwy.commons.extensions.beInvisible
+import com.goodwy.commons.extensions.beInvisibleIf
+import com.goodwy.commons.extensions.beVisible
+import com.goodwy.commons.extensions.beVisibleIf
+import com.goodwy.commons.extensions.formatDateOrTime
+import com.goodwy.commons.extensions.getContrastColor
+import com.goodwy.commons.extensions.getTextSize
+import com.goodwy.commons.extensions.isDynamicTheme
+import com.goodwy.commons.extensions.isRTLLayout
+import com.goodwy.commons.extensions.isSystemInDarkMode
+import com.goodwy.commons.extensions.setHeightAndWidth
+import com.goodwy.commons.extensions.setupViewBackground
+import com.goodwy.commons.extensions.slideLeft
+import com.goodwy.commons.extensions.slideLeftReturn
+import com.goodwy.commons.extensions.slideRight
+import com.goodwy.commons.extensions.slideRightReturn
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.views.MyRecyclerView
@@ -30,7 +47,6 @@ import com.goodwy.smsmessenger.models.Conversation
 import me.thanel.swipeactionview.SwipeActionView
 import me.thanel.swipeactionview.SwipeDirection
 import me.thanel.swipeactionview.SwipeGestureListener
-import kotlin.math.abs
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
@@ -50,6 +66,11 @@ abstract class BaseConversationsAdapter(
     onRefresh = onRefresh
 ),
     RecyclerViewFastScroller.OnPopupTextUpdate {
+
+    companion object {
+        private const val MAX_UNREAD_BADGE_COUNT = 99
+    }
+
     private var fontSize = activity.getTextSize()
     private var drafts = HashMap<Long, String>()
     private var showContactThumbnails = activity.config.showContactThumbnails
@@ -121,6 +142,7 @@ abstract class BaseConversationsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        //Add a bottom margin for the last element so that it does not block the floating button
         if (position == currentList.lastIndex){
             val params = holder.itemView.layoutParams as RecyclerView.LayoutParams
             val margin = activity.resources.getDimension(com.goodwy.commons.R.dimen.shortcut_size).toInt()
@@ -182,28 +204,6 @@ abstract class BaseConversationsAdapter(
                 }
             }
 
-            if (activity.config.unreadIndicatorPosition == UNREAD_INDICATOR_START) {
-                unreadIndicatorEnd.beGone()
-                unreadIndicator.beInvisibleIf(conversation.read)
-                unreadIndicator.setColorFilter(properPrimaryColor)
-                pinIndicator.beVisibleIf(activity.config.pinnedConversations.contains(conversation.threadId.toString()))
-                pinIndicator.applyColorFilter(properPrimaryColor)
-            } else {
-                unreadIndicator.beGone()
-                unreadIndicatorEnd.beInvisibleIf(conversation.read)
-                unreadIndicatorEnd.background.applyColorFilter(properPrimaryColor)
-                unreadIndicatorEnd.setTextColor(properPrimaryColor.getContrastColor())
-                val unreadCount = conversation.unreadCount
-                val unreadCountText = if (unreadCount == 0) "" else unreadCount.toString()
-                unreadIndicatorEnd.text = unreadCountText
-                pinIndicator.beVisibleIf(
-                    activity.config.pinnedConversations.contains(conversation.threadId.toString())
-                        && conversation.read
-                )
-                pinIndicator.applyColorFilter(properPrimaryColor)
-
-            }
-
             if (currentList.last() == conversation || !activity.config.useDividers) divider.beInvisible() else divider.beVisible()
 
             swipeView.isSelected = selectedKeys.contains(conversation.hashCode())
@@ -221,34 +221,21 @@ abstract class BaseConversationsAdapter(
             }
 
             conversationDate.apply {
-                text = if (activity.config.useRelativeDate) {
-                    DateUtils.getRelativeDateTimeString(
-                        context,
-                        conversation.date * 1000L,
-                        1.minutes.inWholeMilliseconds,
-                        2.days.inWholeMilliseconds,
-                        0,
-                    )
-                } else {
-                    (conversation.date * 1000L).formatDateOrTime(
-                        context = context,
-                        hideTimeOnOtherDays = true,
-                        showCurrentYear = false
-                    )
-                }
+                text = formatConversationDate(conversation.date)
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize * 0.8f)
             }
 
-            val style = if (conversation.read) {
-                conversationBodyShort.alpha = 0.7f
-                if (conversation.isScheduled) Typeface.ITALIC else Typeface.NORMAL
-            } else {
+            val isUnread = !conversation.read
+            val style = if (isUnread) {
                 conversationBodyShort.alpha = 1f
                 if (conversation.isScheduled) Typeface.BOLD_ITALIC else Typeface.BOLD
-
+            } else {
+                conversationBodyShort.alpha = 0.7f
+                if (conversation.isScheduled) Typeface.ITALIC else Typeface.NORMAL
             }
             conversationAddress.setTypeface(null, style)
             conversationBodyShort.setTypeface(null, style)
+            conversationDate.setTypeface(null, style)
 
 
             if (conversation.isBlocked) {
@@ -263,8 +250,24 @@ abstract class BaseConversationsAdapter(
                     it.setTextColor(textColor)
                 }
             }
-            divider.setBackgroundColor(textColor)
 
+            if (activity.config.unreadIndicatorPosition == UNREAD_INDICATOR_START) {
+                unreadCountBadge.beGone()
+                unreadIndicator.beInvisibleIf(!isUnread)
+                unreadIndicator.setColorFilter(properPrimaryColor)
+                pinIndicator.beVisibleIf(activity.config.pinnedConversations.contains(conversation.threadId.toString()))
+                pinIndicator.applyColorFilter(properPrimaryColor)
+            } else {
+                unreadIndicator.beGone()
+                setupBadgeCount(unreadCountBadge, isUnread, conversation.unreadCount)
+                pinIndicator.beVisibleIf(
+                    activity.config.pinnedConversations.contains(conversation.threadId.toString())
+                        && conversation.read
+                )
+                pinIndicator.applyColorFilter(properPrimaryColor)
+            }
+
+            divider.setBackgroundColor(textColor)
             conversationImage.beGoneIf(!showContactThumbnails)
             if (showContactThumbnails) {
                 val size = (root.context.pixels(com.goodwy.commons.R.dimen.normal_icon_size) * contactThumbnailsSize).toInt()
@@ -314,11 +317,11 @@ abstract class BaseConversationsAdapter(
                 }
             } else {
                 val swipeLeftAction = if (isRTL) activity.config.swipeRightAction else activity.config.swipeLeftAction
-                swipeLeftIcon.setImageResource(swipeActionImageResource(swipeLeftAction))
+                swipeLeftIcon.setImageResource(swipeActionImageResource(swipeLeftAction, conversation.read))
                 swipeLeftIconHolder.setBackgroundColor(swipeActionColor(swipeLeftAction))
 
                 val swipeRightAction = if (isRTL) activity.config.swipeLeftAction else activity.config.swipeRightAction
-                swipeRightIcon.setImageResource(swipeActionImageResource(swipeRightAction))
+                swipeRightIcon.setImageResource(swipeActionImageResource(swipeRightAction, conversation.read))
                 swipeRightIconHolder.setBackgroundColor(swipeActionColor(swipeRightAction))
 
                 if (!activity.config.useSwipeToAction) {
@@ -353,51 +356,67 @@ abstract class BaseConversationsAdapter(
             swipeView.useHapticFeedback = activity.config.swipeVibration
             swipeView.swipeGestureListener = object : SwipeGestureListener {
                 override fun onSwipedLeft(swipeActionView: SwipeActionView): Boolean {
-                    slideLeftReturn(swipeLeftIcon, swipeLeftIconHolder)
+                    swipeLeftIcon.slideLeftReturn(swipeLeftIconHolder)
                     swipedLeft(conversation)
                     return true
                 }
 
                 override fun onSwipedRight(swipeActionView: SwipeActionView): Boolean {
-                    slideRightReturn(swipeRightIcon, swipeRightIconHolder)
+                    swipeRightIcon.slideRightReturn(swipeRightIconHolder)
                     swipedRight(conversation)
                     return true
                 }
 
                 override fun onSwipedActivated(swipedRight: Boolean) {
-                    if (swipedRight) slideRight(swipeRightIcon, swipeRightIconHolder)
-                    else slideLeft(swipeLeftIcon)
+                    if (swipedRight) swipeRightIcon.slideRight(swipeRightIconHolder)
+                    else swipeLeftIcon.slideLeft()
                 }
 
                 override fun onSwipedDeactivated(swipedRight: Boolean) {
-                    if (swipedRight) slideRightReturn(swipeRightIcon, swipeRightIconHolder)
-                    else slideLeftReturn(swipeLeftIcon, swipeLeftIconHolder)
+                    if (swipedRight) swipeRightIcon.slideRightReturn(swipeRightIconHolder)
+                    else swipeLeftIcon.slideLeftReturn(swipeLeftIconHolder)
                 }
             }
         }
     }
 
-    private fun slideRight(view: View, parent: View) {
-        view.animate()
-            .x(parent.right - activity.resources.getDimension(com.goodwy.commons.R.dimen.big_margin) - view.width)
+    private fun setupBadgeCount(view: TextView, isUnread: Boolean, count: Int) {
+        view.apply {
+            beInvisibleIf(!isUnread)
+            if (isUnread) {
+                text = when {
+                    count > MAX_UNREAD_BADGE_COUNT -> "$MAX_UNREAD_BADGE_COUNT+"
+                    count == 0 -> ""
+                    else -> count.toString()
+                }
+                setTextColor(properPrimaryColor.getContrastColor())
+                background?.applyColorFilter(properPrimaryColor)
+            }
+        }
     }
 
-    private fun slideLeft(view: View) {
-        view.animate()
-            .x(activity.resources.getDimension(com.goodwy.commons.R.dimen.big_margin))
+    private fun formatConversationDate(date: Int?): String {
+        return if (date != null) {
+            if (activity.config.useRelativeDate) {
+                DateUtils.getRelativeDateTimeString(
+                    activity,
+                    date * 1000L,
+                    1.minutes.inWholeMilliseconds,
+                    2.days.inWholeMilliseconds,
+                    0,
+                )
+            } else {
+                (date * 1000L).formatDateOrTime(
+                    context = activity,
+                    hideTimeOnOtherDays = true,
+                    showCurrentYear = false
+                )
+            }.toString()
+        } else "No date"
     }
 
-    private fun slideRightReturn(view: View, parent: View) {
-        view.animate()
-            .x(parent.left + activity.resources.getDimension(com.goodwy.commons.R.dimen.big_margin))
-    }
-
-    private fun slideLeftReturn(view: View, parent: View) {
-        view.animate()
-            .x(parent.width - activity.resources.getDimension(com.goodwy.commons.R.dimen.big_margin) - view.width)
-    }
-
-    override fun onChange(position: Int) = currentList.getOrNull(position)?.title ?: ""
+//    override fun onChange(position: Int) = currentList.getOrNull(position)?.title ?: ""
+    override fun onChange(position: Int) = formatConversationDate(currentList.getOrNull(position)?.date)
 
     private fun saveRecyclerViewState() {
         recyclerViewState = recyclerView.layoutManager?.onSaveInstanceState()
@@ -421,14 +440,14 @@ abstract class BaseConversationsAdapter(
 
     abstract fun swipedRight(conversation: Conversation)
 
-    private fun swipeActionImageResource(swipeAction: Int): Int {
+    private fun swipeActionImageResource(swipeAction: Int, read: Boolean): Int {
         return when (swipeAction) {
             SWIPE_ACTION_DELETE -> com.goodwy.commons.R.drawable.ic_delete_outline
             SWIPE_ACTION_ARCHIVE -> if (isArchived) R.drawable.ic_unarchive_vector else R.drawable.ic_archive_vector
             SWIPE_ACTION_BLOCK -> com.goodwy.commons.R.drawable.ic_block_vector
             SWIPE_ACTION_CALL -> com.goodwy.commons.R.drawable.ic_phone_vector
             SWIPE_ACTION_MESSAGE -> R.drawable.ic_messages
-            else -> R.drawable.ic_mark_read
+            else -> if (read) R.drawable.ic_mark_unread else R.drawable.ic_mark_read
         }
     }
 

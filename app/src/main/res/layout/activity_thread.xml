@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/thread_app_bar_layout"
+    <com.goodwy.commons.views.MyAppBarLayout
+        android:id="@+id/threadAppbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         tools:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
@@ -37,7 +37,7 @@
                     android:id="@+id/sender_photo_large"
                     android:layout_width="@dimen/normal_icon_size"
                     android:layout_height="@dimen/normal_icon_size"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="8dp"
                     android:contentDescription="@string/conversation_details"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -77,15 +77,15 @@
                     app:layout_constraintTop_toBottomOf="@+id/sender_name_large"
                     tools:text="+12345678"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-    </com.google.android.material.appbar.AppBarLayout>
 
-    <include
-        android:id="@+id/top_details_compact"
-        layout="@layout/top_view"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        tools:visibility="gone" />
+            <include
+                android:id="@+id/topDetailsCompact"
+                layout="@layout/top_view"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                tools:visibility="gone" />
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.goodwy.commons.views.MyAppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/thread_holder"

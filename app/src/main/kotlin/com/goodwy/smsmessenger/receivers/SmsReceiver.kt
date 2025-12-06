@@ -16,8 +16,19 @@ import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.models.PhoneNumber
 import com.goodwy.commons.models.SimpleContact
-import com.goodwy.smsmessenger.extensions.*
+import com.goodwy.smsmessenger.extensions.config
+import com.goodwy.smsmessenger.extensions.getConversations
+import com.goodwy.smsmessenger.extensions.getNameFromAddress
+import com.goodwy.smsmessenger.extensions.getNotificationBitmap
+import com.goodwy.smsmessenger.extensions.getThreadId
+import com.goodwy.smsmessenger.extensions.insertNewSMS
+import com.goodwy.smsmessenger.extensions.insertOrUpdateConversation
+import com.goodwy.smsmessenger.extensions.messagesDB
+import com.goodwy.smsmessenger.extensions.shouldUnarchive
+import com.goodwy.smsmessenger.extensions.showReceivedMessageNotification
+import com.goodwy.smsmessenger.extensions.updateConversationArchivedStatus
 import com.goodwy.smsmessenger.helpers.ReceiverUtils.isMessageFilteredOut
+import com.goodwy.smsmessenger.helpers.refreshConversations
 import com.goodwy.smsmessenger.helpers.refreshMessages
 import com.goodwy.smsmessenger.models.Message
 
@@ -145,6 +156,7 @@ class SmsReceiver : BroadcastReceiver() {
                             context.updateConversationArchivedStatus(threadId, false)
                         }
                         refreshMessages()
+                        refreshConversations()
                         context.showReceivedMessageNotification(newMessageId, address, body, threadId, bitmap, subscriptionId)
                     }
                 }

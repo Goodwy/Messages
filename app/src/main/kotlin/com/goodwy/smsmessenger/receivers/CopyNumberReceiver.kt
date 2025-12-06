@@ -6,8 +6,17 @@ import android.content.Intent
 import com.goodwy.commons.extensions.copyToClipboard
 import com.goodwy.commons.extensions.notificationManager
 import com.goodwy.commons.helpers.ensureBackgroundThread
-import com.goodwy.smsmessenger.extensions.*
-import com.goodwy.smsmessenger.helpers.*
+import com.goodwy.smsmessenger.extensions.conversationsDB
+import com.goodwy.smsmessenger.extensions.deleteMessage
+import com.goodwy.smsmessenger.extensions.markThreadMessagesRead
+import com.goodwy.smsmessenger.extensions.updateLastConversationMessage
+import com.goodwy.smsmessenger.helpers.COPY_NUMBER
+import com.goodwy.smsmessenger.helpers.COPY_NUMBER_AND_DELETE
+import com.goodwy.smsmessenger.helpers.MESSAGE_ID
+import com.goodwy.smsmessenger.helpers.THREAD_ID
+import com.goodwy.smsmessenger.helpers.THREAD_TEXT
+import com.goodwy.smsmessenger.helpers.refreshConversations
+import com.goodwy.smsmessenger.helpers.refreshMessages
 
 class CopyNumberReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -21,6 +30,7 @@ class CopyNumberReceiver : BroadcastReceiver() {
                     context.markThreadMessagesRead(threadId)
                     context.conversationsDB.markRead(threadId)
                     refreshMessages()
+                    refreshConversations()
                 }
             }
             COPY_NUMBER_AND_DELETE -> {
@@ -35,6 +45,7 @@ class CopyNumberReceiver : BroadcastReceiver() {
                     context.deleteMessage(messageId, false)
                     context.updateLastConversationMessage(threadId)
                     refreshMessages()
+                    refreshConversations()
                 }
             }
         }

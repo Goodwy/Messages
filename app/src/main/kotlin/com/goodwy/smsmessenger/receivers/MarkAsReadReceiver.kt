@@ -9,7 +9,7 @@ import com.goodwy.smsmessenger.extensions.conversationsDB
 import com.goodwy.smsmessenger.extensions.markThreadMessagesRead
 import com.goodwy.smsmessenger.helpers.MARK_AS_READ
 import com.goodwy.smsmessenger.helpers.THREAD_ID
-import com.goodwy.smsmessenger.helpers.refreshMessages
+import com.goodwy.smsmessenger.helpers.refreshConversations
 
 class MarkAsReadReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -20,7 +20,7 @@ class MarkAsReadReceiver : BroadcastReceiver() {
                 ensureBackgroundThread {
                     context.markThreadMessagesRead(threadId)
                     context.conversationsDB.markRead(threadId)
-                    refreshMessages()
+                    refreshConversations()
                 }
             }
         }

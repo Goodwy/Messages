@@ -1,12 +1,10 @@
 package com.goodwy.smsmessenger.adapters
 
-import android.graphics.drawable.LayerDrawable
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
 import com.bumptech.glide.Glide
 import com.goodwy.commons.adapters.MyRecyclerViewAdapter
 import com.goodwy.commons.databinding.ItemContactWithNumberBinding
@@ -14,9 +12,7 @@ import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.models.SimpleContact
 import com.goodwy.commons.views.MyRecyclerView
-import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
-import kotlin.math.abs
 
 class ContactsAdapter(
     activity: SimpleActivity, var contacts: ArrayList<SimpleContact>, recyclerView: MyRecyclerView, itemClick: (Any) -> Unit

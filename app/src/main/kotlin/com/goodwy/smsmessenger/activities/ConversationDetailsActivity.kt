@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
-import android.graphics.drawable.LayerDrawable
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.RingtoneManager
@@ -19,7 +18,6 @@ import com.goodwy.commons.dialogs.ConfirmationDialog
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.*
 import com.goodwy.commons.models.SimpleContact
-import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.adapters.ContactsAdapter
 import com.goodwy.smsmessenger.databinding.ActivityConversationDetailsBinding
 import com.goodwy.smsmessenger.dialogs.RenameConversationDialog
@@ -27,9 +25,7 @@ import com.goodwy.smsmessenger.extensions.*
 import com.goodwy.smsmessenger.helpers.*
 import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import com.goodwy.smsmessenger.models.Conversation
-import kotlin.math.abs
 import androidx.core.graphics.drawable.toDrawable
-import com.goodwy.commons.extensions.setBackgroundColor
 
 class ConversationDetailsActivity : SimpleActivity() {
 
@@ -42,21 +38,10 @@ class ConversationDetailsActivity : SimpleActivity() {
     private val binding by viewBinding(ActivityConversationDetailsBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        isMaterialActivity = true
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        updateMaterialActivityViews(
-            mainCoordinatorLayout = binding.conversationDetailsCoordinator,
-            nestedView = binding.participantsRecyclerview,
-            useTransparentNavigation = true,
-            useTopSearchMenu = false
-        )
-//        setupMaterialScrollListener(scrollingView = binding.participantsRecyclerview, toolbar = binding.conversationDetailsToolbar)
-        setWindowTransparency(true) { _, _, leftNavigationBarSize, rightNavigationBarSize ->
-            binding.conversationDetailsCoordinator.setPadding(leftNavigationBarSize, 0, rightNavigationBarSize, 0)
-            updateNavigationBarColor(getProperBackgroundColor())
-        }
+        setupEdgeToEdge(padBottomSystem = listOf(binding.conversationDetailsNestedScrollview))
 
         initButton()
 
@@ -122,7 +107,8 @@ class ConversationDetailsActivity : SimpleActivity() {
         super.onResume()
         buttonBg = if ((isLightTheme() || isGrayTheme()) && !isDynamicTheme()) Color.WHITE else getSurfaceColor()
 
-        //setupToolbar(binding.conversationDetailsToolbar, NavigationIcon.Arrow)
+//        setupToolbar(binding.conversationDetailsToolbar, NavigationIcon.Arrow)
+//        setupTopAppBar(binding.conversationDetailsAppbar, NavigationIcon.Arrow)
         updateTextColors(binding.conversationDetailsHolder)
 
         val primaryColor = getProperPrimaryColor()

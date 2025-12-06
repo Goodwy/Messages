@@ -14,6 +14,7 @@ import com.goodwy.smsmessenger.extensions.getAddresses
 import com.goodwy.smsmessenger.extensions.messagesDB
 import com.goodwy.smsmessenger.helpers.SCHEDULED_MESSAGE_ID
 import com.goodwy.smsmessenger.helpers.THREAD_ID
+import com.goodwy.smsmessenger.helpers.refreshConversations
 import com.goodwy.smsmessenger.helpers.refreshMessages
 import com.goodwy.smsmessenger.messaging.sendMessageCompat
 
@@ -52,6 +53,7 @@ class ScheduledMessageReceiver : BroadcastReceiver() {
             context.deleteScheduledMessage(messageId)
             context.conversationsDB.deleteThreadId(messageId)
             refreshMessages()
+            refreshConversations()
         } catch (e: Exception) {
             context.showErrorToast(e)
         } catch (e: Error) {

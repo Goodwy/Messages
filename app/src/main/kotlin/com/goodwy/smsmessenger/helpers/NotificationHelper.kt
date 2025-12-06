@@ -23,7 +23,7 @@ import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.MainActivity
 import com.goodwy.smsmessenger.activities.ThreadActivity
 import com.goodwy.smsmessenger.extensions.config
-import com.goodwy.smsmessenger.extensions.getNumbersFromText
+import com.goodwy.smsmessenger.extensions.getOTPFromText
 import com.goodwy.smsmessenger.extensions.shortcutHelper
 import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import com.goodwy.smsmessenger.receivers.CopyNumberReceiver
@@ -182,7 +182,7 @@ class NotificationHelper(private val context: Context) {
         )
             .setChannelId(notificationChannelId)
 
-        val number = body.getNumbersFromText()
+        val number = body.getOTPFromText()
         if (number != null) {
             val copyNumberAndDelete = context.config.copyNumberAndDelete
             val copyNumberIntent = Intent(context, CopyNumberReceiver::class.java).apply {

@@ -1,6 +1,8 @@
 package com.goodwy.smsmessenger.adapters
 
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.text.TextUtils
 import android.view.Menu
 import com.goodwy.commons.dialogs.ConfirmationDialog
@@ -12,8 +14,28 @@ import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
 import com.goodwy.smsmessenger.dialogs.RenameConversationDialog
-import com.goodwy.smsmessenger.extensions.*
-import com.goodwy.smsmessenger.helpers.*
+import com.goodwy.smsmessenger.extensions.config
+import com.goodwy.smsmessenger.extensions.conversationsDB
+import com.goodwy.smsmessenger.extensions.createTemporaryThread
+import com.goodwy.smsmessenger.extensions.deleteConversation
+import com.goodwy.smsmessenger.extensions.deleteMessage
+import com.goodwy.smsmessenger.extensions.deleteScheduledMessage
+import com.goodwy.smsmessenger.extensions.launchConversationDetails
+import com.goodwy.smsmessenger.extensions.markLastMessageUnread
+import com.goodwy.smsmessenger.extensions.markThreadMessagesRead
+import com.goodwy.smsmessenger.extensions.messagesDB
+import com.goodwy.smsmessenger.extensions.moveMessageToRecycleBin
+import com.goodwy.smsmessenger.extensions.renameConversation
+import com.goodwy.smsmessenger.extensions.updateConversationArchivedStatus
+import com.goodwy.smsmessenger.extensions.updateLastConversationMessage
+import com.goodwy.smsmessenger.extensions.updateScheduledMessagesThreadId
+import com.goodwy.smsmessenger.helpers.SWIPE_ACTION_ARCHIVE
+import com.goodwy.smsmessenger.helpers.SWIPE_ACTION_BLOCK
+import com.goodwy.smsmessenger.helpers.SWIPE_ACTION_CALL
+import com.goodwy.smsmessenger.helpers.SWIPE_ACTION_DELETE
+import com.goodwy.smsmessenger.helpers.SWIPE_ACTION_MESSAGE
+import com.goodwy.smsmessenger.helpers.generateRandomId
+import com.goodwy.smsmessenger.helpers.refreshConversations
 import com.goodwy.smsmessenger.messaging.cancelScheduleSendPendingIntent
 import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
 import com.goodwy.smsmessenger.models.Conversation
@@ -122,7 +144,7 @@ class ConversationsAdapter(
                 activity.runOnUiThread {
                     selectedKeys.clear()
                     finishActMode()
-                    refreshMessages()
+                    refreshConversations()
                     getBlockedNumbers = activity.getBlockedNumbers()
                 }
             }
@@ -144,7 +166,7 @@ class ConversationsAdapter(
                     if (!activity.config.showBlockedNumbers) submitList(newList)
                     selectedKeys.clear()
                     finishActMode()
-                    refreshMessages()
+                    refreshConversations()
                     getBlockedNumbers = activity.getBlockedNumbers()
                 }
             }
@@ -215,12 +237,12 @@ class ConversationsAdapter(
 
         activity.runOnUiThread {
             if (newList.none { selectedKeys.contains(it.hashCode()) }) {
-                refreshMessages()
+                refreshConversations()
                 finishActMode()
             } else {
                 submitList(newList)
                 if (newList.isEmpty()) {
-                    refreshMessages()
+                    refreshConversations()
                 }
             }
         }
@@ -253,12 +275,12 @@ class ConversationsAdapter(
 
         activity.runOnUiThread {
             if (newList.none { selectedKeys.contains(it.hashCode()) }) {
-                refreshMessages()
+                refreshConversations()
                 finishActMode()
             } else {
                 submitList(newList)
                 if (newList.isEmpty()) {
-                    refreshMessages()
+                    refreshConversations()
                 }
             }
         }
@@ -292,7 +314,7 @@ class ConversationsAdapter(
                 activity.markThreadMessagesRead(it.threadId)
             }
 
-            refreshConversations()
+            refreshConversationsAndFinishActMode()
         }
     }
 
@@ -306,10 +328,11 @@ class ConversationsAdapter(
         ensureBackgroundThread {
             conversationsMarkedAsUnread.filter { conversation -> conversation.read }.forEach {
                 activity.conversationsDB.markUnread(it.threadId)
-                activity.markThreadMessagesUnread(it.threadId)
+//                activity.markThreadMessagesUnread(it.threadId)
+                activity.markLastMessageUnread(it.threadId)
             }
 
-            refreshConversations()
+            refreshConversationsAndFinishActMode()
         }
     }
 
@@ -338,7 +361,7 @@ class ConversationsAdapter(
         getSelectedItemPositions().forEach {
             notifyItemChanged(it)
         }
-        refreshConversations()
+        refreshConversationsAndFinishActMode()
     }
 
     private fun checkPinBtnVisibility(menu: Menu) {
@@ -350,9 +373,9 @@ class ConversationsAdapter(
             selectedConversations.any { pinnedConversations.contains(it.threadId.toString()) }
     }
 
-    private fun refreshConversations() {
+    private fun refreshConversationsAndFinishActMode() {
         activity.runOnUiThread {
-            refreshMessages()
+            refreshConversations()
             finishActMode()
         }
     }
@@ -413,7 +436,7 @@ class ConversationsAdapter(
         activity.runOnUiThread {
             submitList(newList)
             if (newList.isEmpty()) {
-                refreshMessages()
+                refreshConversations()
             }
         }
     }
@@ -464,7 +487,7 @@ class ConversationsAdapter(
         activity.runOnUiThread {
             submitList(newList)
             if (newList.isEmpty()) {
-                refreshMessages()
+                refreshConversations()
             }
         }
     }
@@ -512,13 +535,16 @@ class ConversationsAdapter(
         ensureBackgroundThread {
             if (conversation.read) {
                 activity.conversationsDB.markUnread(conversation.threadId)
-                activity.markThreadMessagesUnread(conversation.threadId)
+//                activity.markThreadMessagesUnread(conversation.threadId)
+                activity.markLastMessageUnread(conversation.threadId)
             } else {
                 activity.conversationsDB.markRead(conversation.threadId)
                 activity.markThreadMessagesRead(conversation.threadId)
             }
 
-            refreshMessages()
+            Handler(Looper.getMainLooper()).postDelayed({
+                refreshConversationsAndFinishActMode()
+            }, 100)
         }
     }
 

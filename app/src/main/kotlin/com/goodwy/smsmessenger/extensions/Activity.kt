@@ -9,9 +9,31 @@ import android.provider.ContactsContract
 import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
+import com.goodwy.commons.activities.BaseSimpleActivity
 import com.goodwy.commons.dialogs.NewAppDialog
-import com.goodwy.commons.extensions.*
-import com.goodwy.commons.helpers.*
+import com.goodwy.commons.extensions.darkenColor
+import com.goodwy.commons.extensions.getMimeType
+import com.goodwy.commons.extensions.getProperBackgroundColor
+import com.goodwy.commons.extensions.getProperPrimaryColor
+import com.goodwy.commons.extensions.getProperTextColor
+import com.goodwy.commons.extensions.getSurfaceColor
+import com.goodwy.commons.extensions.hideKeyboard
+import com.goodwy.commons.extensions.isPackageInstalled
+import com.goodwy.commons.extensions.launchActivityIntent
+import com.goodwy.commons.extensions.launchViewContactIntent
+import com.goodwy.commons.extensions.lightenColor
+import com.goodwy.commons.extensions.performHapticFeedback
+import com.goodwy.commons.extensions.showErrorToast
+import com.goodwy.commons.extensions.toast
+import com.goodwy.commons.helpers.CONTACT_ID
+import com.goodwy.commons.helpers.IS_PRIVATE
+import com.goodwy.commons.helpers.IS_RIGHT_APP
+import com.goodwy.commons.helpers.LICENSE_EVENT_BUS
+import com.goodwy.commons.helpers.LICENSE_INDICATOR_FAST_SCROLL
+import com.goodwy.commons.helpers.LICENSE_SMS_MMS
+import com.goodwy.commons.helpers.PERMISSION_CALL_PHONE
+import com.goodwy.commons.helpers.SimpleContactsHelper
+import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.models.FAQItem
 import com.goodwy.commons.models.SimpleContact
 import com.goodwy.smsmessenger.BuildConfig
@@ -22,21 +44,8 @@ import com.goodwy.smsmessenger.helpers.THREAD_ID
 import com.google.android.material.snackbar.Snackbar
 import java.util.Locale
 
-fun SimpleActivity.dialNumber(phoneNumber: String, callback: (() -> Unit)? = null) {
+fun BaseSimpleActivity.dialNumber(phoneNumber: String, callback: (() -> Unit)? = null) {
     hideKeyboard()
-//    Intent(Intent.ACTION_DIAL).apply {
-//        data = Uri.fromParts("tel", phoneNumber, null)
-//
-//        try {
-//            startActivity(this)
-//            callback?.invoke()
-//        } catch (_: ActivityNotFoundException) {
-//            toast(com.goodwy.commons.R.string.no_app_found)
-//        } catch (e: Exception) {
-//            showErrorToast(e)
-//        }
-//    }
-
     handlePermission(PERMISSION_CALL_PHONE) {
         val action = if (it) Intent.ACTION_CALL else Intent.ACTION_DIAL
         Intent(action).apply {
@@ -80,16 +89,19 @@ fun Activity.launchViewIntent(uri: Uri, mimetype: String, filename: String) {
 fun Activity.startContactDetailsIntentRecommendation(contact: SimpleContact) {
     val simpleContacts = "com.goodwy.contacts"
     val simpleContactsDebug = "com.goodwy.contacts.debug"
+    val newSimpleContacts = "dev.goodwy.contacts"
+    val newSimpleContactsDebug = "dev.goodwy.contacts.debug"
     if (
         (0..config.appRecommendationDialogCount).random() == 2 &&
-        (!isPackageInstalled(simpleContacts) && !isPackageInstalled(simpleContactsDebug))
+        (!isPackageInstalled(simpleContacts) && !isPackageInstalled(simpleContactsDebug) &&
+            !isPackageInstalled(newSimpleContacts) && !isPackageInstalled(newSimpleContactsDebug))
     ) {
         NewAppDialog(
-            this,
-            simpleContacts,
-            getString(com.goodwy.strings.R.string.recommendation_dialog_contacts_g),
-            getString(com.goodwy.commons.R.string.right_contacts),
-            AppCompatResources.getDrawable(this, com.goodwy.commons.R.drawable.ic_contacts)
+            activity = this,
+            packageName = if (packageName.startsWith("dev.")) newSimpleContacts else simpleContacts,
+            title = getString(com.goodwy.strings.R.string.recommendation_dialog_contacts_g),
+            text = getString(com.goodwy.commons.R.string.right_contacts),
+            drawable = AppCompatResources.getDrawable(this, com.goodwy.commons.R.drawable.ic_contacts)
         ) {
             startContactDetailsIntent(contact)
         }
@@ -101,11 +113,14 @@ fun Activity.startContactDetailsIntentRecommendation(contact: SimpleContact) {
 fun Activity.startContactDetailsIntent(contact: SimpleContact) {
     val simpleContacts = "com.goodwy.contacts"
     val simpleContactsDebug = "com.goodwy.contacts.debug"
+    val newSimpleContacts = "dev.goodwy.contacts"
+    val newSimpleContactsDebug = "dev.goodwy.contacts.debug"
     if (
         contact.rawId > 1000000 &&
         contact.contactId > 1000000 &&
         contact.rawId == contact.contactId &&
-        (isPackageInstalled(simpleContacts) || isPackageInstalled(simpleContactsDebug))
+        (isPackageInstalled(simpleContacts) || isPackageInstalled(simpleContactsDebug) ||
+            isPackageInstalled(newSimpleContacts) || isPackageInstalled(newSimpleContactsDebug))
     ) {
         Intent().apply {
             action = Intent.ACTION_VIEW
@@ -170,8 +185,6 @@ fun SimpleActivity.launchPurchase() {
         subscriptionIdListRu = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
         subscriptionYearIdList = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
         subscriptionYearIdListRu = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
-        playStoreInstalled = isPlayStoreInstalled(),
-        ruStoreInstalled = isRuStoreInstalled()
     )
 }
 
@@ -206,6 +219,10 @@ fun SimpleActivity.launchAbout() {
             text = R.string.faq_3_text
         ),
         FAQItem(
+            title = R.string.faq_4_title,
+            text = R.string.faq_4_text
+        ),
+        FAQItem(
             title = com.goodwy.commons.R.string.faq_9_title_commons,
             text = com.goodwy.commons.R.string.faq_9_text_commons
         )
@@ -226,10 +243,21 @@ fun SimpleActivity.launchAbout() {
     val subscriptionYearIdX2 = BuildConfig.SUBSCRIPTION_YEAR_ID_X2
     val subscriptionYearIdX3 = BuildConfig.SUBSCRIPTION_YEAR_ID_X3
 
+    val flavorName = BuildConfig.FLAVOR
+    val storeDisplayName = when (flavorName) {
+        "gplay" -> "Google Play"
+        "foss" -> "FOSS"
+        "rustore" -> "RuStore"
+        else -> ""
+    }
+    val versionName = BuildConfig.VERSION_NAME
+    val fullVersionText = "$versionName ($storeDisplayName)"
+
     startAboutActivity(
         appNameId = R.string.app_name_g,
         licenseMask = licenses,
-        versionName = BuildConfig.VERSION_NAME,
+        versionName = fullVersionText,
+        flavorName = BuildConfig.FLAVOR,
         faqItems = faqItems,
         showFAQBeforeMail = true,
         productIdList = arrayListOf(productIdX1, productIdX2, productIdX3),
@@ -238,7 +266,5 @@ fun SimpleActivity.launchAbout() {
         subscriptionIdListRu = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
         subscriptionYearIdList = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
         subscriptionYearIdListRu = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
-        playStoreInstalled = isPlayStoreInstalled(),
-        ruStoreInstalled = isRuStoreInstalled()
     )
 }

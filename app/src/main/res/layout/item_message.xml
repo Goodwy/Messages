@@ -22,8 +22,8 @@
 
         <ImageView
             android:id="@+id/threadMessageSenderPhoto"
-            android:layout_width="@dimen/list_avatar_size"
-            android:layout_height="@dimen/list_avatar_size"
+            android:layout_width="@dimen/list_icon_size_medium"
+            android:layout_height="@dimen/list_icon_size_medium"
             android:layout_alignBottom="@+id/threadMessageBodyWrapper"
             android:layout_alignParentStart="true"
             android:layout_marginEnd="@dimen/medium_margin"

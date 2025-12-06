@@ -4,7 +4,15 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import com.goodwy.commons.dialogs.ConfirmationDialog
-import com.goodwy.commons.extensions.*
+import com.goodwy.commons.extensions.areSystemAnimationsEnabled
+import com.goodwy.commons.extensions.beGoneIf
+import com.goodwy.commons.extensions.beVisibleIf
+import com.goodwy.commons.extensions.getProperAccentColor
+import com.goodwy.commons.extensions.getSurfaceColor
+import com.goodwy.commons.extensions.hideKeyboard
+import com.goodwy.commons.extensions.isDynamicTheme
+import com.goodwy.commons.extensions.isSystemInDarkMode
+import com.goodwy.commons.extensions.viewBinding
 import com.goodwy.commons.helpers.NavigationIcon
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.smsmessenger.R
@@ -28,20 +36,14 @@ class RecycleBinConversationsActivity : SimpleActivity() {
 
     @SuppressLint("InlinedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
-        isMaterialActivity = true
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupOptionsMenu()
 
-        updateMaterialActivityViews(
-            mainCoordinatorLayout = binding.recycleBinCoordinator,
-            nestedView = binding.conversationsList,
-            useTransparentNavigation = true,
-            useTopSearchMenu = false
-        )
+        setupEdgeToEdge(padBottomImeAndSystem = listOf(binding.conversationsList))
         setupMaterialScrollListener(
             scrollingView = binding.conversationsList,
-            toolbar = binding.recycleBinToolbar
+            topAppBar = binding.recycleBinAppbar
         )
 
         loadRecycleBinConversations()
@@ -49,10 +51,9 @@ class RecycleBinConversationsActivity : SimpleActivity() {
 
     override fun onResume() {
         super.onResume()
-        setupToolbar(binding.recycleBinToolbar, NavigationIcon.Arrow)
-        updateMenuColors()
-
+        setupTopAppBar(binding.recycleBinAppbar, NavigationIcon.Arrow)
         loadRecycleBinConversations()
+        binding.conversationsFastscroller.updateColors(getProperAccentColor())
     }
 
     override fun onDestroy() {
@@ -77,16 +78,12 @@ class RecycleBinConversationsActivity : SimpleActivity() {
         }
     }
 
-    private fun updateMenuColors() {
-        updateStatusbarColor(getProperBackgroundColor())
-    }
-
     private fun loadRecycleBinConversations() {
         ensureBackgroundThread {
             val conversations = try {
                 conversationsDB.getAllWithMessagesInRecycleBin()
                     .toMutableList() as ArrayList<Conversation>
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 ArrayList()
             }
 
@@ -98,7 +95,7 @@ class RecycleBinConversationsActivity : SimpleActivity() {
         bus = EventBus.getDefault()
         try {
             bus!!.register(this)
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
         }
     }
 
@@ -118,6 +115,10 @@ class RecycleBinConversationsActivity : SimpleActivity() {
     }
 
     private fun getOrCreateConversationsAdapter(): RecycleBinConversationsAdapter {
+        if (isDynamicTheme() && !isSystemInDarkMode()) {
+            binding.conversationsList.setBackgroundColor(getSurfaceColor())
+        }
+
         var currAdapter = binding.conversationsList.adapter
         if (currAdapter == null) {
             hideKeyboard()
@@ -149,7 +150,7 @@ class RecycleBinConversationsActivity : SimpleActivity() {
             getOrCreateConversationsAdapter().apply {
                 updateConversations(sortedConversations)
             }
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
         }
     }
 
@@ -175,7 +176,7 @@ class RecycleBinConversationsActivity : SimpleActivity() {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun refreshMessages(event: Events.RefreshMessages) {
+    fun refreshConversations(@Suppress("unused") event: Events.RefreshConversations) {
         loadRecycleBinConversations()
     }
 }

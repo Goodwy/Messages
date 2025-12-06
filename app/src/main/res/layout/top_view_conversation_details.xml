@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_person" />
+        tools:src="@drawable/placeholder_contact" />
 
     <com.goodwy.commons.views.MyTextView
         android:id="@+id/conversation_details_name"

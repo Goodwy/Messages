@@ -11,10 +11,6 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
-base {
-    archivesName.set("sms-messenger")
-}
-
 val keystorePropertiesFile: File = rootProject.file("keystore.properties")
 val keystoreProperties = Properties()
 if (keystorePropertiesFile.exists()) {
@@ -40,7 +36,7 @@ android {
         targetSdk = project.libs.versions.app.build.targetSDK.get().toInt()
         versionName = project.property("VERSION_NAME").toString()
         versionCode = project.property("VERSION_CODE").toString().toInt()
-        setProperty("archivesBaseName", "sms-messenger-$versionCode")
+        setProperty("archivesBaseName", "messages-$versionCode")
         buildConfigField("String", "RIGHT_APP_KEY", "\"${properties["RIGHT_APP_KEY"]}\"")
         buildConfigField("String", "PRODUCT_ID_X1", "\"${properties["PRODUCT_ID_X1"]}\"")
         buildConfigField("String", "PRODUCT_ID_X2", "\"${properties["PRODUCT_ID_X2"]}\"")
@@ -98,11 +94,11 @@ android {
         }
     }
 
-    flavorDimensions.add("variants")
+    flavorDimensions += "distribution"
     productFlavors {
-        register("core")
-        register("foss")
-        register("gplay")
+        create("gplay") { dimension = "distribution" }
+        create("foss") { dimension = "distribution" }
+        create("rustore") { dimension = "distribution" }
     }
 
     sourceSets {
@@ -157,19 +153,22 @@ detekt {
 dependencies {
     implementation(libs.eventbus)
     implementation(libs.indicator.fast.scroll)
-    implementation(libs.android.smsmms)
+    implementation(libs.mmslib)
     implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.documentfile)
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.ez.vcard)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.bundles.room)
-    implementation(libs.androidx.documentfile)
     ksp(libs.androidx.room.compiler)
     detektPlugins(libs.compose.detekt)
 
     //Goodwy
-    implementation(libs.goodwy.commons)
+    "gplayImplementation"(libs.goodwy.commons.gplay)
+    "fossImplementation"(libs.goodwy.commons.foss)
+    "rustoreImplementation"(libs.goodwy.commons.rustore)
+//    implementation(libs.goodwy.commons)
     implementation(libs.behavio.rule)
     implementation(libs.rx.animation)
     implementation(libs.rx.java)

@@ -7,10 +7,8 @@ import android.content.Intent
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 import android.content.res.ColorStateList
-import android.graphics.BitmapFactory
 import android.graphics.drawable.LayerDrawable
 import android.media.AudioManager
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
@@ -41,8 +39,8 @@ import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -58,7 +56,6 @@ import com.goodwy.commons.helpers.*
 import com.goodwy.commons.models.PhoneNumber
 import com.goodwy.commons.models.RadioItem
 import com.goodwy.commons.models.SimpleContact
-import com.goodwy.commons.views.MyRecyclerView
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.adapters.AttachmentsAdapter
@@ -73,7 +70,10 @@ import com.goodwy.smsmessenger.extensions.*
 import com.goodwy.smsmessenger.helpers.*
 import com.goodwy.smsmessenger.messaging.*
 import com.goodwy.smsmessenger.models.*
-import com.goodwy.smsmessenger.models.ThreadItem.*
+import com.goodwy.smsmessenger.models.ThreadItem.ThreadDateTime
+import com.goodwy.smsmessenger.models.ThreadItem.ThreadError
+import com.goodwy.smsmessenger.models.ThreadItem.ThreadSending
+import com.goodwy.smsmessenger.models.ThreadItem.ThreadSent
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -84,19 +84,8 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 import kotlin.collections.set
-import kotlin.math.abs
-import androidx.core.net.toUri
-import androidx.core.view.isVisible
 
 class ThreadActivity : SimpleActivity() {
-    private val MIN_DATE_TIME_DIFF_SECS = 300
-
-    private val TYPE_EDIT = 14
-    private val TYPE_SEND = 15
-    private val TYPE_DELETE = 16
-
-    private val SCROLL_TO_BOTTOM_FAB_LIMIT = 10
-
     private var threadId = 0L
     private var currentSIMCardIndex = 0
     private var isActivityVisible = false
@@ -112,7 +101,7 @@ class ThreadActivity : SimpleActivity() {
     private var capturedImageUri: Uri? = null
     private var loadingOlderMessages = false
     private var allMessagesFetched = false
-    private var oldestMessageDate = -1
+    private var isJumpingToMessage = false
     private var isRecycleBin = false
     private var isLaunchedFromShortcut = false
 
@@ -133,19 +122,22 @@ class ThreadActivity : SimpleActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        isMaterialActivity = true
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupOptionsMenu()
         refreshMenuItems()
 
-        updateMaterialActivityViews(
-            mainCoordinatorLayout = binding.threadCoordinator,
-            nestedView = null,
-            useTransparentNavigation = false,
-            useTopSearchMenu = false
+        val bottomView = if (isRecycleBin) binding.threadMessagesList else binding.messageHolder.root
+        setupEdgeToEdge(
+//            padTopSystem = listOf(binding.topDetailsCompact.root),
+            padBottomImeAndSystem = listOf(
+                bottomView,
+                binding.shortCodeHolder.root
+            ),
+            animateIme= true
         )
-        setupMaterialScrollListener(null, binding.threadToolbar)
+//        setupMessagingEdgeToEdge()
+//        setupMaterialScrollListener(null, binding.threadAppbar)
 
         val extras = intent.extras
         if (extras == null) {
@@ -168,35 +160,28 @@ class ThreadActivity : SimpleActivity() {
 
         loadConversation()
         setupAttachmentPickerView()
-        //setupKeyboardListener()
         hideAttachmentPicker()
         maybeSetupRecycleBinView()
     }
 
     override fun onResume() {
         super.onResume()
-        //val toolbarColor = if (getProperBackgroundColor() == Color.BLACK) resources.getColor(android.R.color.transparent)
-        //else getColoredMaterialStatusBarColor()
-        if (config.threadTopStyle == THREAD_TOP_LARGE) {
-            binding.topDetailsCompact.root.beGone()
-            setupToolbar(
-                toolbar = binding.threadToolbar,
-                toolbarNavigationIcon = NavigationIcon.Arrow,
-                statusBarColor = getColoredMaterialStatusBarColor(),
-                appBarLayout = binding.threadAppBarLayout
-            )
+        if (config.threadTopStyle == THREAD_TOP_LARGE) binding.topDetailsCompact.root.beGone()
+        else binding.topDetailsLarge.beGone()
 
-            updateStatusbarColor(getColoredMaterialStatusBarColor())
-            binding.threadAppBarLayout.setBackgroundColor(getColoredMaterialStatusBarColor())
-        } else {
-            binding.topDetailsLarge.beGone()
-            setupToolbar(
-                toolbar = binding.threadToolbar,
-                toolbarNavigationIcon = NavigationIcon.Arrow,
-                appBarLayout = binding.threadAppBarLayout
-            )
-        }
-        //updateNavigationBarColor(isColorPreview = true)
+        val topBarColor = getColoredMaterialStatusBarColor()
+        setupTopAppBar(
+            topAppBar = binding.threadAppbar,
+            navigationIcon = NavigationIcon.Arrow,
+            topBarColor = topBarColor,
+            appBarLayout = binding.threadAppbar
+        )
+        setupToolbar(
+            toolbar = binding.threadToolbar,
+            toolbarNavigationIcon = NavigationIcon.Arrow,
+        )
+        updateToolbarColors(binding.threadToolbar, topBarColor, useOverflowIcon = false)
+        binding.threadToolbar.setBackgroundColor(topBarColor)
 
         isActivityVisible = true
 
@@ -219,20 +204,19 @@ class ThreadActivity : SimpleActivity() {
                     binding.messageHolder.threadCharacterCounter.beVisibleIf(config.showCharacterCounter)
                 }
             }
+
+            markThreadMessagesRead(threadId)
         }
 
         val bottomBarColor = getBottomBarColor()
-        //binding.messageHolder.root.setBackgroundColor(bottomBarColor)
         binding.shortCodeHolder.root.setBackgroundColor(bottomBarColor)
-        binding.messageHolder.attachmentPickerHolder.setBackgroundColor(bottomBarColor)
-        updateNavigationBar()
-//        updateContactImage()
+//        binding.messageHolder.attachmentPickerHolder.setBackgroundColor(bottomBarColor)
     }
 
     override fun onPause() {
         super.onPause()
         saveDraftMessage()
-        bus?.post(Events.RefreshMessages())
+        bus?.post(Events.RefreshConversations())
         isActivityVisible = false
     }
 
@@ -241,12 +225,13 @@ class ThreadActivity : SimpleActivity() {
         saveDraftMessage()
     }
 
-//    override fun onBackPressed() {
+//    override fun onBackPressedCompat(): Boolean {
 //        isAttachmentPickerVisible = false
-//        if (binding.messageHolder.attachmentPickerHolder.isVisible()) {
+//        return if (binding.messageHolder.attachmentPickerHolder.isVisible()) {
 //            hideAttachmentPicker()
+//            true
 //        } else {
-//            super.onBackPressed()
+//            false
 //        }
 //    }
 
@@ -389,7 +374,7 @@ class ThreadActivity : SimpleActivity() {
             setupAdapter()
 
             runOnUiThread {
-                if (messages.isEmpty()) {
+                if (messages.isEmpty() && !isSpecialNumber()) {
                     window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                     binding.messageHolder.threadTypeMessage.requestFocus()
                 }
@@ -402,7 +387,7 @@ class ThreadActivity : SimpleActivity() {
         }
     }
 
-    private fun setupThread() {
+    private fun setupThread(callback: () -> Unit) {
         if (conversation == null && isLaunchedFromShortcut) {
             if (isTaskRoot) {
                 Intent(this, MainActivity::class.java).apply {
@@ -419,12 +404,10 @@ class ThreadActivity : SimpleActivity() {
 
             val cachedMessagesCode = messages.clone().hashCode()
             if (!isRecycleBin) {
-                messages = getMessages(threadId, true)
+                messages = getMessages(threadId)
                 if (config.useRecycleBin) {
-                    val recycledMessages =
-                        messagesDB.getThreadMessagesFromRecycleBin(threadId).map { it.id }
-                    messages = messages.filter { !recycledMessages.contains(it.id) }
-                        .toMutableList() as ArrayList<Message>
+                    val recycledMessages = messagesDB.getThreadMessagesFromRecycleBin(threadId)
+                    messages = messages.filterNotInByKey(recycledMessages) { it.getStableId() }
                 }
             }
 
@@ -435,6 +418,7 @@ class ThreadActivity : SimpleActivity() {
             try {
                 if (participants.isNotEmpty() && messages.hashCode() == cachedMessagesCode && !hasParticipantWithoutName) {
                     setupAdapter()
+                    runOnUiThread { callback() }
                     return@ensureBackgroundThread
                 }
             } catch (_: Exception) {
@@ -489,11 +473,11 @@ class ThreadActivity : SimpleActivity() {
                 }
             }
 
-            setupAttachmentSizes()
             setupAdapter()
             runOnUiThread {
                 setupThreadTitle()
                 setupSIMSelector()
+                callback()
             }
         }
         updateContactImage()
@@ -517,14 +501,6 @@ class ThreadActivity : SimpleActivity() {
             )
 
             binding.threadMessagesList.adapter = currAdapter
-            binding.threadMessagesList.endlessScrollListener =
-                object : MyRecyclerView.EndlessScrollListener {
-                    override fun updateBottom() {}
-
-                    override fun updateTop() {
-                        fetchNextMessages()
-                    }
-            }
         }
         return currAdapter as ThreadAdapter
     }
@@ -598,21 +574,21 @@ class ThreadActivity : SimpleActivity() {
         }
     }
 
-    private fun setupScrollFab() {
-        binding.threadMessagesList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+    private fun setupScrollListener() {
+        binding.threadMessagesList.onScroll(
+            onScrolled = { dx, dy ->
+                tryLoadMoreMessages()
                 val layoutManager = binding.threadMessagesList.layoutManager as LinearLayoutManager
                 val lastVisibleItemPosition = layoutManager.findLastCompletelyVisibleItemPosition()
                 val isCloseToBottom =
                     lastVisibleItemPosition >= getOrCreateThreadAdapter().itemCount - SCROLL_TO_BOTTOM_FAB_LIMIT
-                if (isCloseToBottom) {
-                    binding.scrollToBottomFab.hide()
-                } else {
-                    binding.scrollToBottomFab.show()
-                }
+                val fab = binding.scrollToBottomFab
+                if (isCloseToBottom) fab.hide() else fab.show()
+            },
+            onScrollStateChanged = { newState ->
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) tryLoadMoreMessages()
             }
-        })
+        )
     }
 
     private fun handleItemClick(any: Any) {
@@ -673,56 +649,80 @@ class ThreadActivity : SimpleActivity() {
         }
     }
 
-    private fun fetchNextMessages() {
-        if (messages.isEmpty() || allMessagesFetched || loadingOlderMessages) {
-            if (allMessagesFetched) {
-                getOrCreateThreadAdapter().apply {
-                    val newList = currentList.toMutableList().apply {
-                        removeAll { it is ThreadLoading }
-                    }
-                    updateMessages(
-                        newMessages = newList as ArrayList<ThreadItem>,
-                        scrollPosition = 0
-                    )
-                }
-            }
+    private fun jumpToMessage(messageId: Long) {
+        if (messages.any { it.id == messageId }) {
+            val index = threadItems.indexOfFirst { (it as? Message)?.id == messageId }
+            if (index != -1) binding.threadMessagesList.smoothScrollToPosition(index)
             return
         }
-
-        val firstItem = messages.first()
-        val dateOfFirstItem = firstItem.date
-        if (oldestMessageDate == dateOfFirstItem) {
-            allMessagesFetched = true
-            return
-        }
-
-        oldestMessageDate = dateOfFirstItem
-        loadingOlderMessages = true
 
         ensureBackgroundThread {
-//            val olderMessages = getMessages(threadId, true, oldestMessageDate)
-//                .filter { message -> !messages.contains(message) }
-            val olderMessages = if (isRecycleBin) {
-                messagesDB.getThreadMessagesFromRecycleBin(threadId)
-                    .filter { message -> !messages.contains(message) }
-            } else if (config.useRecycleBin) {
-                messagesDB.getNonRecycledThreadMessages(threadId)
-                    .filter { message -> !messages.contains(message) }
-            } else {
-                messagesDB.getThreadMessages(threadId)
-                    .filter { message -> !messages.contains(message) }
+            if (loadingOlderMessages) return@ensureBackgroundThread
+            loadingOlderMessages = true
+            isJumpingToMessage = true
+
+            var cutoff = messages.firstOrNull()?.date ?: Int.MAX_VALUE
+            var found = false
+            var loops = 0
+
+            // not the best solution, but this will do for now.
+            while (!found && !allMessagesFetched) {
+                if (fetchOlderMessages(cutoff).isEmpty() || loops >= 1000) break
+                cutoff = messages.first().date
+                found = messages.any { it.id == messageId }
+                loops++
             }
 
-            messages.addAll(0, olderMessages)
-            allMessagesFetched = olderMessages.isEmpty()
             threadItems = getThreadItems()
-
             runOnUiThread {
                 loadingOlderMessages = false
-                val itemAtRefreshIndex = threadItems.indexOfFirst { it == firstItem }
-                getOrCreateThreadAdapter().updateMessages(threadItems, itemAtRefreshIndex)
+                val index = threadItems.indexOfFirst { (it as? Message)?.id == messageId }
+                getOrCreateThreadAdapter().updateMessages(
+                    newMessages = threadItems, scrollPosition = index, smoothScroll = true
+                )
+                isJumpingToMessage = false
             }
         }
+    }
+
+    private fun tryLoadMoreMessages() {
+        if (isJumpingToMessage) return
+        val layoutManager = binding.threadMessagesList.layoutManager as LinearLayoutManager
+        if (layoutManager.findFirstVisibleItemPosition() <= PREFETCH_THRESHOLD) {
+            loadMoreMessages()
+        }
+    }
+
+    private fun loadMoreMessages() {
+        if (messages.isEmpty() || allMessagesFetched || loadingOlderMessages) return
+        loadingOlderMessages = true
+        val cutoff = messages.first().date
+        ensureBackgroundThread {
+            fetchOlderMessages(cutoff)
+            threadItems = getThreadItems()
+            runOnUiThread {
+                loadingOlderMessages = false
+                getOrCreateThreadAdapter().updateMessages(threadItems)
+                getOrCreateThreadAdapter().updateTitle()
+            }
+        }
+    }
+
+    private fun fetchOlderMessages(cutoff: Int): List<Message> {
+        var older = getMessages(threadId, cutoff)
+            .filterNotInByKey(messages) { it.getStableId() }
+        if (config.useRecycleBin && !isRecycleBin) {
+            val recycledMessages = messagesDB.getThreadMessagesFromRecycleBin(threadId)
+            older = older.filterNotInByKey(recycledMessages) { it.getStableId() }
+        }
+
+        if (older.isEmpty()) {
+            allMessagesFetched = true
+            return older
+        }
+
+        messages.addAll(0, older)
+        return older
     }
 
     private fun loadConversation() {
@@ -731,18 +731,14 @@ class ThreadActivity : SimpleActivity() {
                 setupButtons()
                 setupConversation()
                 setupCachedMessages {
-                    val searchedMessageId = intent.getLongExtra(SEARCHED_MESSAGE_ID, -1L)
-                    intent.removeExtra(SEARCHED_MESSAGE_ID)
-                    if (searchedMessageId != -1L) {
-                        val index =
-                            threadItems.indexOfFirst { (it as? Message)?.id == searchedMessageId }
-                        if (index != -1) {
-                            binding.threadMessagesList.smoothScrollToPosition(index)
+                    setupThread {
+                        val searchedMessageId = intent.getLongExtra(SEARCHED_MESSAGE_ID, -1L)
+                        intent.removeExtra(SEARCHED_MESSAGE_ID)
+                        if (searchedMessageId != -1L) {
+                            jumpToMessage(searchedMessageId)
                         }
                     }
-
-                    setupThread()
-                    setupScrollFab()
+                    setupScrollListener()
                 }
             } else {
                 finish()
@@ -773,7 +769,7 @@ class ThreadActivity : SimpleActivity() {
             threadAddAttachment.background.applyColorFilter(surfaceColor)
             threadTypeMessageHolder.background.applyColorFilter(surfaceColor)
 
-            threadMessagesFastscroller.updateColors(properPrimaryColor)
+            threadMessagesFastscroller.updateColors(getProperAccentColor())
 
             threadCharacterCounter.beVisibleIf(threadTypeMessage.value.isNotEmpty() && config.showCharacterCounter)
             threadCharacterCounter.backgroundTintList = getProperBackgroundColor().getColorStateList()
@@ -857,19 +853,20 @@ class ThreadActivity : SimpleActivity() {
                 if (attachmentPickerHolder.isVisible()) {
                     isAttachmentPickerVisible = false
                     hideAttachmentPicker()
-                    //WindowCompat.getInsetsController(window, threadTypeMessage).show(WindowInsetsCompat.Type.ime())
+//                    window.insetsController(binding.messageHolder.threadTypeMessage)
+//                        .show(WindowInsetsCompat.Type.ime())
                 } else {
                     isAttachmentPickerVisible = true
                     showAttachmentPicker()
-                    //showOrHideAttachmentPicker()
-                    //WindowCompat.getInsetsController(window, threadTypeMessage).hide(WindowInsetsCompat.Type.ime())
+//                    window.insetsController(binding.messageHolder.threadTypeMessage)
+//                        .hide(WindowInsetsCompat.Type.ime())
                 }
-                window.decorView.requestApplyInsets()
+                binding.messageHolder.threadTypeMessage.requestApplyInsets()
             }
 
             if (intent.extras?.containsKey(THREAD_ATTACHMENT_URI) == true) {
-                val uri = intent.getStringExtra(THREAD_ATTACHMENT_URI)?.toUri()
-                if (uri != null) addAttachment(uri)
+                val uri = intent.getStringExtra(THREAD_ATTACHMENT_URI)!!.toUri()
+                addAttachment(uri)
             } else if (intent.extras?.containsKey(THREAD_ATTACHMENT_URIS) == true) {
                 (intent.getSerializableExtra(THREAD_ATTACHMENT_URIS) as? ArrayList<Uri>)?.forEach {
                     addAttachment(it)
@@ -904,44 +901,6 @@ class ThreadActivity : SimpleActivity() {
         }
     }
 
-    private fun setupAttachmentSizes() {
-        messages.filter { it.attachment != null }.forEach { message ->
-            message.attachment!!.attachments.forEach {
-                try {
-                    if (it.mimetype.startsWith("image/")) {
-                        val fileOptions = BitmapFactory.Options()
-                        fileOptions.inJustDecodeBounds = true
-                        BitmapFactory.decodeStream(
-                            contentResolver.openInputStream(it.getUri()),
-                            null,
-                            fileOptions
-                        )
-                        it.width = fileOptions.outWidth
-                        it.height = fileOptions.outHeight
-                    } else if (it.mimetype.startsWith("video/")) {
-                        val metaRetriever = MediaMetadataRetriever()
-                        metaRetriever.setDataSource(this, it.getUri())
-                        it.width = metaRetriever.extractMetadata(
-                            MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH
-                        )!!.toInt()
-                        it.height = metaRetriever.extractMetadata(
-                            MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT
-                        )!!.toInt()
-                    }
-
-                    if (it.width < 0) {
-                        it.width = 0
-                    }
-
-                    if (it.height < 0) {
-                        it.height = 0
-                    }
-                } catch (_: Exception) {
-                }
-            }
-        }
-    }
-
     private fun setupParticipants() {
         if (participants.isEmpty()) {
             participants = if (messages.isEmpty()) {
@@ -964,10 +923,12 @@ class ThreadActivity : SimpleActivity() {
 
     private fun maybeDisableShortCodeReply() {
         if (isSpecialNumber() && !isRecycleBin) {
+            currentFocus?.clearFocus()
+            hideKeyboard()
             binding.messageHolder.threadTypeMessage.text?.clear()
             binding.messageHolder.root.beGone()
             binding.shortCodeHolder.root.beVisible()
-            updateNavigationBar()
+            
             val textColor = getProperTextColor()
             binding.shortCodeHolder.replyDisabledText.setTextColor(textColor)
             binding.shortCodeHolder.replyDisabledInfo.apply {
@@ -1169,7 +1130,7 @@ class ThreadActivity : SimpleActivity() {
                         runOnUiThread { refreshMenuItems()}
                     }
                 }
-                refreshMessages()
+                refreshConversations()
                 //finish()
             }
         }
@@ -1185,7 +1146,7 @@ class ThreadActivity : SimpleActivity() {
                     deleteConversation(threadId)
                 }
                 runOnUiThread {
-                    refreshMessages()
+                    refreshConversations()
                     finish()
                 }
             }
@@ -1197,7 +1158,7 @@ class ThreadActivity : SimpleActivity() {
             ensureBackgroundThread {
                 restoreAllMessagesFromRecycleBinForConversation(threadId)
                 runOnUiThread {
-                    refreshMessages()
+                    refreshConversations()
                     finish()
                 }
             }
@@ -1208,7 +1169,7 @@ class ThreadActivity : SimpleActivity() {
         ensureBackgroundThread {
             updateConversationArchivedStatus(threadId, true)
             runOnUiThread {
-                refreshMessages()
+                refreshConversations()
                 finish()
             }
         }
@@ -1218,7 +1179,7 @@ class ThreadActivity : SimpleActivity() {
         ensureBackgroundThread {
             updateConversationArchivedStatus(threadId, false)
             runOnUiThread {
-                refreshMessages()
+                refreshConversations()
                 finish()
             }
         }
@@ -1287,7 +1248,7 @@ class ThreadActivity : SimpleActivity() {
             markThreadMessagesUnread(threadId)
             runOnUiThread {
                 finish()
-                bus?.post(Events.RefreshMessages())
+                bus?.post(Events.RefreshConversations())
             }
         }
     }
@@ -1373,12 +1334,7 @@ class ThreadActivity : SimpleActivity() {
         }
 
         if (hadUnreadItems) {
-            bus?.post(Events.RefreshMessages())
-        }
-
-        if (!allMessagesFetched && messages.size >= MESSAGES_LIMIT) {
-            val threadLoading = ThreadLoading(generateRandomId())
-            items.add(0, threadLoading)
+            bus?.post(Events.RefreshConversations())
         }
 
         return items
@@ -1737,13 +1693,8 @@ class ThreadActivity : SimpleActivity() {
             refreshedSinceSent = false
             sendMessageCompat(text, addresses, subscriptionId, attachments, messageToResend)
             ensureBackgroundThread {
-                val messageIds = messages.map { it.id }
-                val messages = getMessages(
-                    threadId = threadId,
-                    getImageResolutions = true,
-                    limit = maxOf(1, attachments.size)
-                )
-                    .filter { it.id !in messageIds }
+                val messages = getMessages(threadId, limit = maxOf(1, attachments.size))
+                    .filterNotInByKey(messages) { it.getStableId() }
                 for (message in messages) {
                     insertOrUpdateMessage(message)
                 }
@@ -1783,6 +1734,7 @@ class ThreadActivity : SimpleActivity() {
         messagesDB.insertOrUpdate(message)
         if (shouldUnarchive()) {
             updateConversationArchivedStatus(message.threadId, false)
+            refreshConversations()
         }
     }
 
@@ -1911,14 +1863,13 @@ class ThreadActivity : SimpleActivity() {
     }
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
-    fun refreshMessages(event: Events.RefreshMessages) {
+    fun refreshMessages(@Suppress("unused") event: Events.RefreshMessages) {
         if (isRecycleBin) {
             return
         }
 
         refreshedSinceSent = true
         allMessagesFetched = false
-        oldestMessageDate = -1
 
         if (isActivityVisible) {
             notificationManager.cancel(threadId.hashCode())
@@ -1926,8 +1877,7 @@ class ThreadActivity : SimpleActivity() {
 
         val lastMaxId = messages.filterNot { it.isScheduled }.maxByOrNull { it.id }?.id ?: 0L
         val newThreadId = getThreadId(participants.getAddresses().toSet())
-        val newMessages =
-            getMessages(newThreadId, getImageResolutions = true, includeScheduledMessages = false)
+        val newMessages = getMessages(newThreadId, includeScheduledMessages = false)
 
         if (messages.isNotEmpty() && messages.all { it.isScheduled } && newMessages.isNotEmpty()) {
             // update scheduled messages with real thread id
@@ -2235,10 +2185,9 @@ class ThreadActivity : SimpleActivity() {
     }
 
     private fun showAttachmentPicker() {
-        binding.messageHolder.attachmentPickerDivider.showWithAnimation()
+//        binding.messageHolder.attachmentPickerDivider.showWithAnimation()
         binding.messageHolder.attachmentPickerHolder.showWithAnimation()
         animateAttachmentButton(rotation = -135f)
-        updateNavigationBar()
     }
 
     private fun maybeSetupRecycleBinView() {
@@ -2248,7 +2197,7 @@ class ThreadActivity : SimpleActivity() {
     }
 
     private fun hideAttachmentPicker() {
-        binding.messageHolder.attachmentPickerDivider.beGone()
+//        binding.messageHolder.attachmentPickerDivider.beGone()
         binding.messageHolder.attachmentPickerHolder.beGone()
 //        binding.messageHolder.attachmentPickerHolder.apply {
 //            beGone()
@@ -2257,7 +2206,6 @@ class ThreadActivity : SimpleActivity() {
 //            }
 //        }
         animateAttachmentButton(rotation = 0f)
-        updateNavigationBar()
     }
 
     private fun animateAttachmentButton(rotation: Float) {
@@ -2268,61 +2216,44 @@ class ThreadActivity : SimpleActivity() {
             .start()
     }
 
-    private fun setupKeyboardListener() {
-        window.decorView.setOnApplyWindowInsetsListener { view, insets ->
-            showOrHideAttachmentPicker()
-            view.onApplyWindowInsets(insets)
-        }
-
-        val callback =
-            object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_CONTINUE_ON_SUBTREE) {
-                override fun onPrepare(animation: WindowInsetsAnimationCompat) {
-                    super.onPrepare(animation)
-                    showOrHideAttachmentPicker()
-                }
-
-                override fun onProgress(
-                    insets: WindowInsetsCompat,
-                    runningAnimations: MutableList<WindowInsetsAnimationCompat>,
-                ) = insets
-            }
-        ViewCompat.setWindowInsetsAnimationCallback(window.decorView, callback)
-    }
-
-    private fun showOrHideAttachmentPicker() {
-        val type = WindowInsetsCompat.Type.ime()
-        val insets = ViewCompat.getRootWindowInsets(window.decorView) ?: return
-        val isKeyboardVisible = insets.isVisible(type)
-
-        if (isKeyboardVisible) {
-            val keyboardHeight = insets.getInsets(type).bottom
-            val bottomBarHeight = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
-
-            // check keyboard height just to be sure, 150 seems like a good middle ground between ime and navigation bar
-            config.keyboardHeight = if (keyboardHeight > 150) {
-                keyboardHeight - bottomBarHeight
-            } else {
-                getDefaultKeyboardHeight()
-            }
-            hideAttachmentPicker()
-        } else if (isAttachmentPickerVisible) {
-            showAttachmentPicker()
-        }
-    }
-
     private fun getBottomBarColor() = if (isDynamicTheme()) {
         getColoredMaterialStatusBarColor() //resources.getColor(R.color.you_bottom_bar_color)
     } else {
         getColoredMaterialStatusBarColor()
     }
 
+    fun setupMessagingEdgeToEdge() {
+        ViewCompat.setOnApplyWindowInsetsListener(
+            binding.messageHolder.threadTypeMessage
+        ) { view, insets ->
+            val type = WindowInsetsCompat.Type.ime()
+            val isKeyboardVisible = insets.isVisible(type)
+            if (isKeyboardVisible) {
+                val keyboardHeight = insets.getInsets(type).bottom
+                val bottomBarHeight = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
 
-    private fun updateNavigationBar() {
-        val naviBarColor =
-            if (isAttachmentPickerVisible || (isSpecialNumber() && !isRecycleBin)) getBottomBarColor()
-            else if (isDynamicTheme() && !isSystemInDarkMode()) getSurfaceColor()
-            else getProperBackgroundColor()
-        updateNavigationBarColor(naviBarColor)
+                // check keyboard height just to be sure, 150 seems like a good middle ground between ime and navigation bar
+                config.keyboardHeight = if (keyboardHeight > 150) {
+                    keyboardHeight - bottomBarHeight
+                } else {
+                    getDefaultKeyboardHeight()
+                }
+                hideAttachmentPicker()
+            } else if (isAttachmentPickerVisible) {
+                showAttachmentPicker()
+            }
+
+            insets
+        }
+    }
+
+    companion object {
+        private const val TYPE_EDIT = 14
+        private const val TYPE_SEND = 15
+        private const val TYPE_DELETE = 16
+        private const val MIN_DATE_TIME_DIFF_SECS = 300
+        private const val SCROLL_TO_BOTTOM_FAB_LIMIT = 20
+        private const val PREFETCH_THRESHOLD = 45
     }
 
     private fun updateContactImage() {
@@ -2376,20 +2307,5 @@ class ThreadActivity : SimpleActivity() {
                 SimpleContactsHelper(this).loadContactImage(threadUri, senderPhoto, threadTitle, placeholder)
             }
         }
-
-//        val firstPhoneNumber = participants.firstOrNull()?.phoneNumbers?.firstOrNull()?.value
-//        if (participants.size == 1 && participants.firstOrNull()?.name != firstPhoneNumber) {
-//            senderPhoto.setOnClickListener {
-//                hideKeyboard()
-//                val contact = participants.first()
-//                getContactFromAddress(contact.phoneNumbers.first().normalizedNumber) {
-//                    if (it != null) {
-//                        runOnUiThread {
-//                            startContactDetailsIntentRecommendation(it)
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
 }

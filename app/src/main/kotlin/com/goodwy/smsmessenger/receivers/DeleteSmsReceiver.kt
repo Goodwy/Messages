@@ -12,6 +12,7 @@ import com.goodwy.smsmessenger.extensions.updateLastConversationMessage
 import com.goodwy.smsmessenger.helpers.IS_MMS
 import com.goodwy.smsmessenger.helpers.MESSAGE_ID
 import com.goodwy.smsmessenger.helpers.THREAD_ID
+import com.goodwy.smsmessenger.helpers.refreshConversations
 import com.goodwy.smsmessenger.helpers.refreshMessages
 
 class DeleteSmsReceiver : BroadcastReceiver() {
@@ -27,6 +28,7 @@ class DeleteSmsReceiver : BroadcastReceiver() {
             context.deleteMessage(messageId, isMms)
             context.updateLastConversationMessage(threadId)
             refreshMessages()
+            refreshConversations()
         }
     }
 }

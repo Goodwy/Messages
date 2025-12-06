@@ -11,17 +11,28 @@ import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.smsmessenger.R
-import com.goodwy.smsmessenger.extensions.*
+import com.goodwy.smsmessenger.extensions.config
+import com.goodwy.smsmessenger.extensions.getConversations
+import com.goodwy.smsmessenger.extensions.getLatestMMS
+import com.goodwy.smsmessenger.extensions.insertOrUpdateConversation
+import com.goodwy.smsmessenger.extensions.notificationHelper
+import com.goodwy.smsmessenger.extensions.shouldUnarchive
+import com.goodwy.smsmessenger.extensions.showReceivedMessageNotification
+import com.goodwy.smsmessenger.extensions.updateConversationArchivedStatus
 import com.goodwy.smsmessenger.helpers.ReceiverUtils.isMessageFilteredOut
+import com.goodwy.smsmessenger.helpers.refreshConversations
 import com.goodwy.smsmessenger.helpers.refreshMessages
 import com.goodwy.smsmessenger.models.Message
 
-// more info at https://github.com/klinker41/android-smsmms
 class MmsReceiver : MmsReceivedReceiver() {
 
     override fun isAddressBlocked(context: Context, address: String): Boolean {
         val normalizedAddress = address.normalizePhoneNumber()
         return context.isNumberBlocked(normalizedAddress)
+    }
+
+    override fun isContentBlocked(context: Context, content: String): Boolean {
+        return isMessageFilteredOut(context, content)
     }
 
     override fun onMessageReceived(context: Context, messageUri: Uri) {
@@ -65,10 +76,6 @@ class MmsReceiver : MmsReceivedReceiver() {
         size: Int,
         address: String
     ) {
-        if (isMessageFilteredOut(context, mms.body)) {
-            return
-        }
-
         val glideBitmap = try {
             Glide.with(context)
                 .asBitmap()
@@ -97,6 +104,7 @@ class MmsReceiver : MmsReceivedReceiver() {
                     context.updateConversationArchivedStatus(mms.threadId, false)
                 }
                 refreshMessages()
+                refreshConversations()
             }
         }
     }

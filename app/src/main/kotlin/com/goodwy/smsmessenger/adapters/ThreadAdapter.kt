@@ -12,7 +12,6 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ForegroundColorSpan
 import android.text.style.URLSpan
 import android.text.util.Linkify
-import android.util.Size
 import android.util.TypedValue
 import android.view.*
 import android.widget.LinearLayout
@@ -22,6 +21,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toDrawable
+import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.core.net.toUri
 import androidx.core.text.layoutDirection
 import androidx.core.view.ViewCompat
@@ -34,14 +34,35 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
 import com.bumptech.glide.load.resource.bitmap.FitCenter
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import com.goodwy.commons.adapters.MyRecyclerViewListAdapter
 import com.goodwy.commons.dialogs.ConfirmationDialog
-import com.goodwy.commons.extensions.*
+import com.goodwy.commons.extensions.applyColorFilter
+import com.goodwy.commons.extensions.beGone
+import com.goodwy.commons.extensions.beVisible
+import com.goodwy.commons.extensions.beVisibleIf
+import com.goodwy.commons.extensions.copyToClipboard
+import com.goodwy.commons.extensions.formatDateOrTime
+import com.goodwy.commons.extensions.getContrastColor
+import com.goodwy.commons.extensions.getLetterBackgroundColors
+import com.goodwy.commons.extensions.getPopupMenuTheme
+import com.goodwy.commons.extensions.getProperBackgroundColor
+import com.goodwy.commons.extensions.getProperPrimaryColor
+import com.goodwy.commons.extensions.getSurfaceColor
+import com.goodwy.commons.extensions.getTextSize
+import com.goodwy.commons.extensions.getTextSizeSmall
+import com.goodwy.commons.extensions.isDynamicTheme
+import com.goodwy.commons.extensions.isRTLLayout
+import com.goodwy.commons.extensions.isSystemInDarkMode
+import com.goodwy.commons.extensions.launchInternetSearch
+import com.goodwy.commons.extensions.launchSendSMSIntent
+import com.goodwy.commons.extensions.shareTextIntent
+import com.goodwy.commons.extensions.showErrorToast
+import com.goodwy.commons.extensions.usableScreenSize
 import com.goodwy.commons.helpers.TEXT_ALIGNMENT_ALONG_EDGES
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.views.MyRecyclerView
@@ -50,16 +71,52 @@ import com.goodwy.smsmessenger.activities.NewConversationActivity
 import com.goodwy.smsmessenger.activities.SimpleActivity
 import com.goodwy.smsmessenger.activities.ThreadActivity
 import com.goodwy.smsmessenger.activities.VCardViewerActivity
-import com.goodwy.smsmessenger.databinding.*
+import com.goodwy.smsmessenger.databinding.ItemAttachmentDocumentBinding
+import com.goodwy.smsmessenger.databinding.ItemAttachmentImageBinding
+import com.goodwy.smsmessenger.databinding.ItemAttachmentVcardBinding
+import com.goodwy.smsmessenger.databinding.ItemMessageBinding
+import com.goodwy.smsmessenger.databinding.ItemThreadDateTimeBinding
+import com.goodwy.smsmessenger.databinding.ItemThreadErrorBinding
+import com.goodwy.smsmessenger.databinding.ItemThreadSendingBinding
+import com.goodwy.smsmessenger.databinding.ItemThreadSuccessBinding
 import com.goodwy.smsmessenger.dialogs.DeleteConfirmationDialog
 import com.goodwy.smsmessenger.dialogs.MessageDetailsDialog
 import com.goodwy.smsmessenger.dialogs.SelectTextDialog
-import com.goodwy.smsmessenger.extensions.*
-import com.goodwy.smsmessenger.helpers.*
+import com.goodwy.smsmessenger.extensions.config
+import com.goodwy.smsmessenger.extensions.getContactFromAddress
+import com.goodwy.smsmessenger.extensions.getListNumbersFromText
+import com.goodwy.smsmessenger.extensions.getTextSizeMessage
+import com.goodwy.smsmessenger.extensions.isImageMimeType
+import com.goodwy.smsmessenger.extensions.isVCardMimeType
+import com.goodwy.smsmessenger.extensions.isVideoMimeType
+import com.goodwy.smsmessenger.extensions.launchViewIntent
+import com.goodwy.smsmessenger.extensions.setPaddingBubble
+import com.goodwy.smsmessenger.extensions.startContactDetailsIntentRecommendation
+import com.goodwy.smsmessenger.extensions.subscriptionManagerCompat
+import com.goodwy.smsmessenger.helpers.ACTION_COPY_CODE
+import com.goodwy.smsmessenger.helpers.ACTION_COPY_MESSAGE
+import com.goodwy.smsmessenger.helpers.ACTION_NOTHING
+import com.goodwy.smsmessenger.helpers.ACTION_SELECT_TEXT
+import com.goodwy.smsmessenger.helpers.BUBBLE_STYLE_IOS
+import com.goodwy.smsmessenger.helpers.BUBBLE_STYLE_IOS_NEW
+import com.goodwy.smsmessenger.helpers.BUBBLE_STYLE_ROUNDED
+import com.goodwy.smsmessenger.helpers.EXTRA_VCARD_URI
+import com.goodwy.smsmessenger.helpers.THREAD_DATE_TIME
+import com.goodwy.smsmessenger.helpers.THREAD_RECEIVED_MESSAGE
+import com.goodwy.smsmessenger.helpers.THREAD_SENT_MESSAGE
+import com.goodwy.smsmessenger.helpers.THREAD_SENT_MESSAGE_ERROR
+import com.goodwy.smsmessenger.helpers.THREAD_SENT_MESSAGE_SENDING
+import com.goodwy.smsmessenger.helpers.THREAD_SENT_MESSAGE_SENT
+import com.goodwy.smsmessenger.helpers.generateStableId
+import com.goodwy.smsmessenger.helpers.setupDocumentPreview
+import com.goodwy.smsmessenger.helpers.setupVCardPreview
 import com.goodwy.smsmessenger.models.Attachment
 import com.goodwy.smsmessenger.models.Message
 import com.goodwy.smsmessenger.models.ThreadItem
-import com.goodwy.smsmessenger.models.ThreadItem.*
+import com.goodwy.smsmessenger.models.ThreadItem.ThreadDateTime
+import com.goodwy.smsmessenger.models.ThreadItem.ThreadError
+import com.goodwy.smsmessenger.models.ThreadItem.ThreadSending
+import com.goodwy.smsmessenger.models.ThreadItem.ThreadSent
 import java.util.Locale
 import kotlin.math.abs
 
@@ -77,11 +134,18 @@ class ThreadAdapter(
 
     @SuppressLint("MissingPermission")
     private val hasMultipleSIMCards = (activity.subscriptionManagerCompat().activeSubscriptionInfoList?.size ?: 0) > 1
-    private val maxChatBubbleWidth = activity.usableScreenSize.x * 0.8f
+    private val maxChatBubbleWidth = (activity.usableScreenSize.x * 0.8f).toInt()
+
+    companion object {
+        private const val MAX_MEDIA_HEIGHT_RATIO = 3
+        private const val SIM_BITS = 21
+        private const val SIM_MASK = (1L shl SIM_BITS) - 1
+    }
 
     init {
         setupDragListener(true)
         setHasStableIds(true)
+        (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
     }
 
     override fun getActionMenuId() = R.menu.cab_thread
@@ -127,9 +191,13 @@ class ThreadAdapter(
 
     override fun getIsItemSelectable(position: Int) = !isThreadDateTime(position)
 
-    override fun getItemSelectionKey(position: Int) = (currentList.getOrNull(position) as? Message)?.hashCode()
+    override fun getItemSelectionKey(position: Int): Int? {
+        return (currentList.getOrNull(position) as? Message)?.getSelectionKey()
+    }
 
-    override fun getItemKeyPosition(key: Int) = currentList.indexOfFirst { (it as? Message)?.hashCode() == key }
+    override fun getItemKeyPosition(key: Int): Int {
+        return currentList.indexOfFirst { (it as? Message)?.getSelectionKey() == key }
+    }
 
     override fun onActionModeCreated() {}
 
@@ -137,7 +205,6 @@ class ThreadAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = when (viewType) {
-            THREAD_LOADING -> ItemThreadLoadingBinding.inflate(layoutInflater, parent, false)
             THREAD_DATE_TIME -> ItemThreadDateTimeBinding.inflate(layoutInflater, parent, false)
             THREAD_SENT_MESSAGE_ERROR -> ItemThreadErrorBinding.inflate(layoutInflater, parent, false)
             THREAD_SENT_MESSAGE_SENT -> ItemThreadSuccessBinding.inflate(layoutInflater, parent, false)
@@ -154,7 +221,6 @@ class ThreadAdapter(
         val isLongClickable = item is Message
         holder.bindView(item, isClickable, isLongClickable) { itemView, _ ->
             when (item) {
-                is ThreadLoading -> setupThreadLoading(itemView)
                 is ThreadDateTime -> setupDateTime(itemView, item)
                 is ThreadError -> setupThreadError(itemView)
                 is ThreadSent -> setupThreadSuccess(itemView, item.delivered)
@@ -167,14 +233,20 @@ class ThreadAdapter(
 
     override fun getItemId(position: Int): Long {
         return when (val item = getItem(position)) {
-            is Message -> Message.getStableId(item)
-            else -> item.hashCode().toLong()
+            is Message -> item.getStableId()
+            is ThreadDateTime -> {
+                val sim = (item.simID.hashCode().toLong() and SIM_MASK)
+                val key = (item.date.toLong() shl SIM_BITS) or sim
+                generateStableId(THREAD_DATE_TIME, key)
+            }
+            is ThreadError -> generateStableId(THREAD_SENT_MESSAGE_ERROR, item.messageId)
+            is ThreadSending -> generateStableId(THREAD_SENT_MESSAGE_SENDING, item.messageId)
+            is ThreadSent -> generateStableId(THREAD_SENT_MESSAGE_SENT, item.messageId)
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         return when (val item = getItem(position)) {
-            is ThreadLoading -> THREAD_LOADING
             is ThreadDateTime -> THREAD_DATE_TIME
             is ThreadError -> THREAD_SENT_MESSAGE_ERROR
             is ThreadSent -> THREAD_SENT_MESSAGE_SENT
@@ -285,15 +357,27 @@ class ThreadAdapter(
         }
     }
 
-    private fun getSelectedItems() = currentList.filter { selectedKeys.contains((it as? Message)?.hashCode() ?: 0) } as ArrayList<ThreadItem>
+    private fun getSelectedItems(): ArrayList<ThreadItem> {
+        return currentList.filter {
+            selectedKeys.contains((it as? Message)?.getSelectionKey() ?: 0)
+        } as ArrayList<ThreadItem>
+    }
 
     private fun isThreadDateTime(position: Int) = currentList.getOrNull(position) is ThreadDateTime
 
-    fun updateMessages(newMessages: ArrayList<ThreadItem>, scrollPosition: Int = -1) {
+    fun updateMessages(
+        newMessages: ArrayList<ThreadItem>,
+        scrollPosition: Int = -1,
+        smoothScroll: Boolean = false
+    ) {
         val latestMessages = newMessages.toMutableList()
         submitList(latestMessages) {
             if (scrollPosition != -1) {
-                recyclerView.scrollToPosition(scrollPosition)
+                if (smoothScroll) {
+                    recyclerView.smoothScrollToPosition(scrollPosition)
+                } else {
+                    recyclerView.scrollToPosition(scrollPosition)
+                }
             }
         }
     }
@@ -309,13 +393,14 @@ class ThreadAdapter(
 
     private fun showLinkPopupMenu(context: Context, url: String, view: View) {
         val wrapper: Context = ContextThemeWrapper(activity, activity.getPopupMenuTheme())
-        val popupMenu = PopupMenu(wrapper, view, Gravity.END)
+        val popupMenu = PopupMenu(wrapper, view, Gravity.START)
         val text = url.toUri().schemeSpecificPart
         val (title, icon) = getActionTitleAndIcon(url)
 
+        // Use only 24dp icons
         popupMenu.menu.add(1, 0, 0, text).setIcon(R.drawable.ic_empty)
         popupMenu.menu.add(1, 1, 1, title).setIcon(icon)
-        if (title == com.goodwy.commons.R.string.call) popupMenu.menu.add(1, 2, 2, com.goodwy.strings.R.string.message).setIcon(R.drawable.ic_messages)
+        if (title == com.goodwy.commons.R.string.call) popupMenu.menu.add(1, 2, 2, com.goodwy.strings.R.string.message).setIcon(R.drawable.ic_comment)
         popupMenu.menu.add(1, 3, 3, com.goodwy.strings.R.string.search_the_web).setIcon(R.drawable.ic_internet)
         popupMenu.menu.add(1, 4, 4, com.goodwy.commons.R.string.share).setIcon(com.goodwy.commons.R.drawable.ic_ios_share)
         popupMenu.menu.add(1, 5, 5, com.goodwy.commons.R.string.copy).setIcon(com.goodwy.commons.R.drawable.ic_copy_vector)
@@ -362,7 +447,7 @@ class ThreadAdapter(
     @SuppressLint("ClickableViewAccessibility")
     private fun setupView(holder: ViewHolder, view: View, message: Message) {
         ItemMessageBinding.bind(view).apply {
-            threadMessageHolder.isSelected = selectedKeys.contains(message.hashCode())
+            threadMessageHolder.isSelected = selectedKeys.contains(message.getSelectionKey())
             threadMessageBodyWrapper.beVisibleIf(message.body.isNotEmpty())
             threadMessageBody.apply {
                 val spannable = SpannableString(message.body)
@@ -745,16 +830,17 @@ class ThreadAdapter(
         threadMessageAttachmentsHolder.addView(imageView.root)
 
         val placeholderDrawable = Color.TRANSPARENT.toDrawable()
-        val isTallImage = attachment.height > attachment.width
-        val transformation = if (isTallImage) CenterCrop() else FitCenter()
         val options = RequestOptions()
             .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
             .placeholder(placeholderDrawable)
-            .transform(transformation)
+            .transform(FitCenter())
 
-        var builder = Glide.with(root.context)
+        Glide.with(root.context)
             .load(uri)
             .apply(options)
+            .dontAnimate()
+            .override(maxChatBubbleWidth, maxChatBubbleWidth * MAX_MEDIA_HEIGHT_RATIO)
+            .downsample(DownsampleStrategy.AT_MOST)
             .listener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>, isFirstResource: Boolean): Boolean {
                     threadMessagePlayOutline.beGone()
@@ -764,23 +850,11 @@ class ThreadAdapter(
 
                 override fun onResourceReady(dr: Drawable, a: Any, t: Target<Drawable>, d: DataSource, i: Boolean) = false
             })
+            .into(imageView.attachmentImage)
 
-        // limit attachment sizes to avoid causing OOM
-        var wantedAttachmentSize = Size(attachment.width, attachment.height)
-        if (wantedAttachmentSize.width > maxChatBubbleWidth) {
-            val newHeight = wantedAttachmentSize.height / (wantedAttachmentSize.width / maxChatBubbleWidth)
-            wantedAttachmentSize = Size(maxChatBubbleWidth.toInt(), newHeight.toInt())
-        }
-
-        builder = if (isTallImage) {
-            builder.override(wantedAttachmentSize.width, wantedAttachmentSize.width)
-        } else {
-            builder.override(wantedAttachmentSize.width, wantedAttachmentSize.height)
-        }
-
-        try {
-            builder.into(imageView.attachmentImage)
-        } catch (_: Exception) {
+        imageView.attachmentImage.updateLayoutParams<ViewGroup.LayoutParams> {
+            width = maxChatBubbleWidth
+            height = ViewGroup.LayoutParams.WRAP_CONTENT
         }
 
         imageView.attachmentImage.setOnClickListener {
@@ -893,20 +967,15 @@ class ThreadAdapter(
         }
     }
 
-    private fun setupThreadLoading(view: View) {
-        val binding = ItemThreadLoadingBinding.bind(view)
-        binding.threadLoading.setIndicatorColor(properPrimaryColor)
+    override fun onViewRecycled(holder: ViewHolder) {
+        super.onViewRecycled(holder)
+        if (!activity.isDestroyed && !activity.isFinishing) {
+            val binding = (holder as ThreadViewHolder).binding
+            if (binding is ItemMessageBinding) {
+                Glide.with(activity).clear(binding.threadMessageSenderPhoto)
+            }
+        }
     }
-
-//    override fun onViewRecycled(holder: ViewHolder) {
-//        super.onViewRecycled(holder)
-//        if (!activity.isDestroyed && !activity.isFinishing) {
-//            val binding = (holder as ThreadViewHolder).binding
-//            if (binding is ItemMessageBinding) {
-//                Glide.with(activity).clear(binding.threadMessageSenderPhoto)
-//            }
-//        }
-//    }
 
     inner class ThreadViewHolder(val binding: ViewBinding) : ViewHolder(binding.root)
 }
@@ -916,19 +985,21 @@ private class ThreadItemDiffCallback : DiffUtil.ItemCallback<ThreadItem>() {
     override fun areItemsTheSame(oldItem: ThreadItem, newItem: ThreadItem): Boolean {
         if (oldItem::class.java != newItem::class.java) return false
         return when (oldItem) {
-            is ThreadLoading -> oldItem.id == (newItem as ThreadLoading).id
-            is ThreadDateTime -> oldItem.date == (newItem as ThreadDateTime).date
             is ThreadError -> oldItem.messageId == (newItem as ThreadError).messageId
             is ThreadSent -> oldItem.messageId == (newItem as ThreadSent).messageId
             is ThreadSending -> oldItem.messageId == (newItem as ThreadSending).messageId
             is Message -> Message.areItemsTheSame(oldItem, newItem as Message)
+            is ThreadDateTime -> {
+                val new = newItem as ThreadDateTime
+                oldItem.date == new.date && oldItem.simID == new.simID
+            }
         }
     }
 
     override fun areContentsTheSame(oldItem: ThreadItem, newItem: ThreadItem): Boolean {
         if (oldItem::class.java != newItem::class.java) return false
         return when (oldItem) {
-            is ThreadLoading, is ThreadSending -> true
+            is ThreadSending -> true
             is ThreadDateTime -> oldItem.simID == (newItem as ThreadDateTime).simID
             is ThreadError -> oldItem.messageText == (newItem as ThreadError).messageText
             is ThreadSent -> oldItem.delivered == (newItem as ThreadSent).delivered

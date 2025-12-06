@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/conversation_details_coordinator"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/conversationDetailsAppbar"
@@ -12,6 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:background="@android:color/transparent"
+        android:fitsSystemWindows="true"
         android:elevation="0dp"
         app:elevation="0dp"
         tools:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
@@ -26,9 +28,9 @@
                 android:id="@+id/conversationDetailsToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/toolbar_height"
+                app:navigationContentDescription="@string/back"
                 app:layout_collapseMode="pin"
                 app:navigationIcon="@drawable/ic_chevron_left_vector"/>
-
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -143,7 +145,7 @@
         app:layout_behavior="com.goodwy.smsmessenger.helpers.ConversationDetailsTopBehavior"/>
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/conversation_details_scrollview"
+        android:id="@+id/conversation_details_nested_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/conversationDetailsAppbar"

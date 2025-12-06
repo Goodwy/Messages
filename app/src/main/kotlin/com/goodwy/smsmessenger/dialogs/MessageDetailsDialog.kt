@@ -7,10 +7,12 @@ import com.goodwy.commons.activities.BaseSimpleActivity
 import com.goodwy.commons.dialogs.BasePropertiesDialog
 import com.goodwy.commons.extensions.formatDateOrTime
 import com.goodwy.commons.extensions.getAlertDialogBuilder
+import com.goodwy.commons.extensions.getTimeFormatWithSeconds
 import com.goodwy.commons.extensions.setupDialogStuff
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.extensions.subscriptionManagerCompat
 import com.goodwy.smsmessenger.models.Message
+import org.joda.time.DateTime
 
 class MessageDetailsDialog(val activity: BaseSimpleActivity, val message: Message) : BasePropertiesDialog(activity) {
     init {
@@ -18,7 +20,7 @@ class MessageDetailsDialog(val activity: BaseSimpleActivity, val message: Messag
         addProperty(com.goodwy.strings.R.string.status, message.getStatus())
 
         @SuppressLint("MissingPermission")
-        val availableSIMs = activity.subscriptionManagerCompat().activeSubscriptionInfoList
+        val availableSIMs = activity.subscriptionManagerCompat().activeSubscriptionInfoList.orEmpty()
 
         addProperty(message.getSenderOrReceiverLabel(), message.getSenderOrReceiverPhoneNumbers())
         if (availableSIMs.count() > 1) {
@@ -73,12 +75,13 @@ class MessageDetailsDialog(val activity: BaseSimpleActivity, val message: Messag
     }
 
     private fun Message.getSentOrReceivedAt(): String {
-//        return DateTime(date * 1000L).toString("${activity.config.dateFormat} ${activity.getTimeFormat()}")
+//        return DateTime(date * 1000L).toString("${activity.config.dateFormat} ${activity.getTimeFormatWithSeconds()}")
         return (date * 1000L).formatDateOrTime(
             context = activity,
             hideTimeOnOtherDays = false,
             showCurrentYear = true,
-            hideTodaysDate = false
+            hideTodaysDate = false,
+            timeFormat = activity.getTimeFormatWithSeconds()
         )
     }
 

@@ -25,21 +25,15 @@ class ManageBlockedKeywordsActivity : SimpleActivity(), RefreshRecyclerViewListe
     private val binding by viewBinding(ActivityManageBlockedKeywordsBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        isMaterialActivity = true
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         updateBlockedKeywords()
         setupOptionsMenu()
 
-        updateMaterialActivityViews(
-            mainCoordinatorLayout = binding.blockKeywordsCoordinator,
-            nestedView = binding.manageBlockedKeywordsList,
-            useTransparentNavigation = true,
-            useTopSearchMenu = false
-        )
+        setupEdgeToEdge(padBottomImeAndSystem = listOf(binding.manageBlockedKeywordsList))
         setupMaterialScrollListener(
             scrollingView = binding.manageBlockedKeywordsList,
-            toolbar = binding.blockKeywordsToolbar
+            topAppBar = binding.blockKeywordsAppbar
         )
         updateTextColors(binding.manageBlockedKeywordsWrapper)
 
@@ -54,7 +48,7 @@ class ManageBlockedKeywordsActivity : SimpleActivity(), RefreshRecyclerViewListe
 
     override fun onResume() {
         super.onResume()
-        setupToolbar(binding.blockKeywordsToolbar, NavigationIcon.Arrow)
+        setupTopAppBar(binding.blockKeywordsAppbar, NavigationIcon.Arrow)
     }
 
     private fun setupOptionsMenu() {

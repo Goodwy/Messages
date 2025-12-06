@@ -1,6 +1,6 @@
 <resources>
     <string name="package_name">com.goodwy.smsmessenger</string>
-    <string name="app_name">Right Messages</string>
+    <string name="app_name">AlRight Messages</string>
 
     <string name="mms_file_size_limit_100kb">100KB</string>
     <string name="mms_file_size_limit_200kb">200KB</string>
@@ -13,8 +13,17 @@
     <string name="message_details_sim">SIM</string>
 
     <!-- Release notes -->
-    <string name="release_702">
-        Fixed bugs, improved stability
+    <string name="release_800">
+        Compatibility updates for Android 15 &amp; 16\n
+        Optimized loading messages in conversations\n
+        Changed the logic of styles\n
+        Changed colors of context action modes\n
+        Message time in the properties dialog now includes seconds\n
+        Improved detection of OTP codes\n
+        The ‘Move items into the Recycle Bin instead of deleting’ option is now enabled by default\n
+        The ‘Hide the top app bar when scrolling’ option is hidden because it does not work correctly on newer versions of Android\n
+        Fixed deletion of conversations from the Recycle Bin\n
+        Fixed display of unread notifications in conversations
     </string>
     <string name="release_701">
         Group avatars have been fixed\n
@@ -55,9 +64,6 @@
         Fixed ability to attach private contacts\n
         Fixed bugs, improved stability
     </string>
-    <string name="release_611">
-        Fixed bugs, improved stability
-    </string>
     <string name="release_610">
         Changed theme logic\n
         Added ‘App icon color’ option\n
@@ -86,14 +92,8 @@
     <string name="release_515">
         Fix privacy policy
     </string>
-    <string name="release_514">
-        Bug fixes
-    </string>
     <string name="release_513">
         Corrected the text of deletion confirmation dialog
-    </string>
-    <string name="release_512">
-        Bug fixes
     </string>
     <string name="release_511">
         Added swipe gestures (call, message, block)\n
@@ -109,14 +109,8 @@
         Long-pressing the send button now launches voice dialing\n
         Bug fixes
     </string>
-    <string name="release_501">
-        Bug fixes
-    </string>
     <string name="release_500">
         Updated the interface\n
-        Bug fixes
-    </string>
-    <string name="release_423">
         Bug fixes
     </string>
     <string name="release_421">

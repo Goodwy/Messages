@@ -9,7 +9,6 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.text.isDigitsOnly
 import com.goodwy.commons.extensions.getMyContactsCursor
-import com.goodwy.commons.extensions.toast
 import com.goodwy.commons.helpers.MyContactsContentProvider
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.isOnMainThread
@@ -19,7 +18,6 @@ import com.goodwy.smsmessenger.extensions.conversationsDB
 import com.goodwy.smsmessenger.extensions.getThreadParticipants
 import com.goodwy.smsmessenger.extensions.toPerson
 import com.goodwy.smsmessenger.models.Conversation
-
 
 class ShortcutHelper(private val context: Context) {
     val contactsHelper = SimpleContactsHelper(context)

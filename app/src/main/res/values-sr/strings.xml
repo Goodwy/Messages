@@ -17,9 +17,9 @@
     <string name="draft">Нацрт</string>
     <string name="sending">Слање…</string>
     <string name="pin_conversation">Закачи на врх</string>
-    <string name="unpin_conversation">Откачи</string>
+    <string name="unpin_conversation">Oткачи</string>
     <string name="forward_message">Проследи</string>
-    <string name="compress_error">Није могуће компримовати слику на изабрану величину</string>
+    <string name="compress_error">Није могуће сажети слику на изабрану величину</string>
     <!-- Attachments -->
     <string name="duplicate_item_warning">Дупликат ставке није укључен</string>
     <!-- vCard-->
@@ -33,11 +33,11 @@
     <string name="add_contact_or_number">Додај контакт или број…</string>
     <string name="suggestions">Предлози</string>
     <!-- Group conversation -->
-    <string name="members">Members</string>
-    <string name="conversation_name">Conversation name</string>
-    <string name="conversation_details">Conversation details</string>
-    <string name="rename_conversation">Rename conversation</string>
-    <string name="rename_conversation_warning">Only you can see this conversation name</string>
+    <string name="members">Чланови</string>
+    <string name="conversation_name">Име разговора</string>
+    <string name="conversation_details">Детаљи разговора</string>
+    <string name="rename_conversation">Преимениј разговор</string>
+    <string name="rename_conversation_warning">Само ти можеш да видиш име овог разговора</string>
     <!-- Schedule send -->
     <string name="scheduled_message">Заказана порука</string>
     <string name="schedule_message">Закажите поруку</string>
@@ -95,7 +95,7 @@
     <string name="blocked_keywords">Блокиране ријечи</string>
     <string name="manage_blocked_keywords">Управљање блокираним ријечима</string>
     <string name="not_blocking_keywords">Не блокирате ни једну ријеч. Овдје можете додати ријечи како бисте блокирали све поруке које их садрже.</string>
-    <string name="add_a_blocked_keyword">Додај блокирану ријеч.</string>
+    <string name="add_a_blocked_keyword">Додај блокирану реч</string>
     <string name="lock_screen_visibility">Видљивост обавештења на закључаном екрану</string>
     <string name="sender_and_message">Пошиљалац и порука</string>
     <string name="sender_only">Само пошиљалац</string>
@@ -127,7 +127,7 @@
     <string name="invalid_short_code_desc">Можете одговорити само на кратке кодове са бројевима као што је \"803801\" али не и на кодове који садрже слова и бројеве попут \"AB-CD8\".</string>
     <string name="attachment_sized_exceeds_max_limit">Величина прилога премашује максимално ограничење MMS</string>
     <string name="sim_card_not_available">SIM картица није доступна</string>
-    <string name="couldnt_download_mms">Није могуће преузети MMS</string>
+    <string name="couldnt_download_mms">Преузимање MMS-а није успело</string>
     <!-- FAQ -->
     <string name="faq_1_title">Зашто је апликацији потребан приступ интернету?</string>
     <string name="faq_1_text">Нажалост, то је потребно за слање MMS прилога. Немогућност слања MMS-а би био заиста велики недостатак у поређењу са другим апликацијама, па смо одлучили да идемо овим путем.
@@ -136,4 +136,12 @@
     <string name="faq_2_text">Величину MMS-а ограничавају оператери, можете покушати да подесите мање ограничење у подешавањима апликације.</string>
     <string name="faq_3_title">Да ли апликација подржава заказане поруке?</string>
     <string name="faq_3_text">Да, можете заказати слање порука у будућности дугим притиском на дугме Пошаљи и одабиром жељеног датума и времена.</string>
+    <string name="faq_4_title">Зашто се моји одговори на групне поруке приказују као појединачне поруке примаоцима?</string>
+    <string name="faq_4_text">Потребно је да омогућите „Шаљи групне поруке као MMS“ у подешавањима апликације. Ово ће осигурати да се групне поруке шаљу као исправни MMS, омогућавајући свим учесницима да виде међусобне одговоре.</string>
+
+    <string name="enable_custom_notifications">Укључи прилагођена обавештења</string>
+    <string name="keep_conversations_archived">Задржи разговоре архивиране</string>
+    <string name="keywords">Кључне речи</string>
+    <string name="export_blocked_keywords">Извези блокиране кључне речи</string>
+    <string name="import_blocked_keywords">Увези блокиране кључне речи</string>
 </resources>

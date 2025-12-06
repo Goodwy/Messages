@@ -12,12 +12,10 @@ import android.provider.Telephony
 import android.speech.RecognizerIntent
 import android.text.TextUtils
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.goodwy.commons.dialogs.PermissionRequiredDialog
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.*
-import com.goodwy.commons.models.Release
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.adapters.ConversationsAdapter
@@ -27,6 +25,7 @@ import com.goodwy.smsmessenger.extensions.*
 import com.goodwy.smsmessenger.helpers.SEARCHED_MESSAGE_ID
 import com.goodwy.smsmessenger.helpers.THREAD_ID
 import com.goodwy.smsmessenger.helpers.THREAD_TITLE
+import com.goodwy.smsmessenger.helpers.whatsNewList
 import com.goodwy.smsmessenger.models.Conversation
 import com.goodwy.smsmessenger.models.Events
 import com.goodwy.smsmessenger.models.Message
@@ -37,6 +36,8 @@ import org.greenrobot.eventbus.ThreadMode
 import java.util.*
 
 class MainActivity : SimpleActivity() {
+    override var isSearchBarEnabled = true
+
     private val MAKE_DEFAULT_APP_REQUEST = 1
 
     private var storedPrimaryColor = 0
@@ -51,19 +52,14 @@ class MainActivity : SimpleActivity() {
 
     @SuppressLint("InlinedApi")
     override fun onCreate(savedInstanceState: Bundle?) {
-        isMaterialActivity = true
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         appLaunched(BuildConfig.APPLICATION_ID)
         setupOptionsMenu()
         refreshMenuItems()
 
-        updateMaterialActivityViews(
-            mainCoordinatorLayout = binding.mainCoordinator,
-            nestedView = binding.conversationsList,
-            useTransparentNavigation = true,
-            useTopSearchMenu = true
-        )
+        binding.mainMenu.updateTitle(getString(R.string.messages))
+        setupEdgeToEdge(padBottomImeAndSystem = listOf(binding.conversationsList, binding.searchResultsList))
         if (config.changeColourTopBar) {
             val useSurfaceColor = isDynamicTheme() && !isSystemInDarkMode()
             setupSearchMenuScrollListener(
@@ -79,8 +75,6 @@ class MainActivity : SimpleActivity() {
         clearAllMessagesIfNeeded {
             loadMessages()
         }
-
-        binding.mainMenu.updateTitle(getString(R.string.messages))
     }
 
     @SuppressLint("UnsafeIntentLaunch")
@@ -122,26 +116,10 @@ class MainActivity : SimpleActivity() {
         val properPrimaryColor = getProperPrimaryColor()
         binding.noConversationsPlaceholder2.setTextColor(properPrimaryColor)
         binding.noConversationsPlaceholder2.underlineText()
-        binding.conversationsFastscroller.updateColors(properPrimaryColor)
+        binding.conversationsFastscroller.updateColors(getProperAccentColor())
         binding.conversationsProgressBar.setIndicatorColor(properPrimaryColor)
         binding.conversationsProgressBar.trackColor = properPrimaryColor.adjustAlpha(LOWER_ALPHA)
         checkShortcut()
-        binding.conversationsFastscroller.trackMarginEnd = navigationBarHeight
-        (binding.conversationsFab.layoutParams as? CoordinatorLayout.LayoutParams)?.bottomMargin =
-            navigationBarHeight + resources.getDimension(com.goodwy.commons.R.dimen.activity_margin).toInt()
-
-
-//        if (baseConfig.isUsingSystemTheme) {
-//            (search_bar.layoutParams as RelativeLayout.Lay outParams).apply {
-//                topMargin=12
-//            }
-//        }
-//        search_bar.setBackgroundResource(R.drawable.search_bg)
-//        search_bar.setTextColor(getProperTextColor().adjustAlpha(0.4f))
-//        val searchDrawable = resources.getColoredDrawableWithColor(R.drawable.ic_search_top_padding, getProperTextColor(), 102)
-//        search_bar.setCompoundDrawablesWithIntrinsicBounds(searchDrawable, null, null, null)
-//        search_bar.backgroundTintList = ColorStateList.valueOf(getBottomNavigationBackgroundColor())
-//        search_bar.setOnClickListener { launchSearch() }
 
         binding.conversationsList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -169,19 +147,20 @@ class MainActivity : SimpleActivity() {
         bus?.unregister(this)
     }
 
-    override fun onBackPressed() {
-        if (binding.mainMenu.isSearchOpen) {
+    override fun onBackPressedCompat(): Boolean {
+        return if (binding.mainMenu.isSearchOpen) {
             binding.mainMenu.closeSearch()
+            true
         } else {
             appLockManager.lock()
-            super.onBackPressed()
+            false
         }
     }
 
     private fun setupOptionsMenu() {
         binding.apply {
-            mainMenu.getToolbar().inflateMenu(R.menu.menu_main)
-            mainMenu.toggleHideOnScroll(config.hideTopBarWhenScroll)
+            mainMenu.requireToolbar().inflateMenu(R.menu.menu_main)
+//            mainMenu.toggleHideOnScroll(config.hideTopBarWhenScroll)
 
             if (baseConfig.useSpeechToText) {
                 isSpeechToTextAvailable = isSpeechToTextAvailable()
@@ -209,7 +188,7 @@ class MainActivity : SimpleActivity() {
                 mainMenu.clearSearch()
             }
 
-            mainMenu.getToolbar().setOnMenuItemClickListener { menuItem ->
+            mainMenu.requireToolbar().setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.show_recycle_bin -> launchRecycleBin()
                     R.id.show_archived -> launchArchivedConversations()
@@ -226,7 +205,7 @@ class MainActivity : SimpleActivity() {
     }
 
     private fun refreshMenuItems() {
-        binding.mainMenu.getToolbar().menu.apply {
+        binding.mainMenu.requireToolbar().menu.apply {
             findItem(R.id.show_recycle_bin).isVisible = config.useRecycleBin
             findItem(R.id.show_archived).isVisible = config.isArchiveAvailable
             findItem(R.id.show_blocked_numbers).title =
@@ -237,7 +216,7 @@ class MainActivity : SimpleActivity() {
 
     private fun showBlockedNumbers() {
         config.showBlockedNumbers = !config.showBlockedNumbers
-        binding.mainMenu.getToolbar().menu.findItem(R.id.show_blocked_numbers).title =
+        binding.mainMenu.requireToolbar().menu.findItem(R.id.show_blocked_numbers).title =
             if (config.showBlockedNumbers) getString(com.goodwy.strings.R.string.hide_blocked_numbers)
             else getString(com.goodwy.strings.R.string.show_blocked_numbers)
 //        runOnUiThread {
@@ -279,8 +258,6 @@ class MainActivity : SimpleActivity() {
         val useSurfaceColor = isDynamicTheme() && !isSystemInDarkMode()
         val backgroundColor = if (useSurfaceColor) getSurfaceColor() else getProperBackgroundColor()
         val statusBarColor = if (config.changeColourTopBar) getRequiredStatusBarColor(useSurfaceColor) else backgroundColor
-
-        updateStatusbarColor(backgroundColor)
         binding.mainMenu.updateColors(statusBarColor, scrollingView?.computeVerticalScrollOffset() ?: 0)
     }
 
@@ -439,11 +416,7 @@ class MainActivity : SimpleActivity() {
 
             if (config.appRunCount == 1) {
                 conversations.map { it.threadId }.forEach { threadId ->
-                    val messages = getMessages(
-                        threadId = threadId,
-                        getImageResolutions = false,
-                        includeScheduledMessages = false
-                    )
+                    val messages = getMessages(threadId, includeScheduledMessages = false)
                     messages.chunked(30).forEach { currentMessages ->
                         messagesDB.insertMessages(*currentMessages.toTypedArray())
                     }
@@ -720,35 +693,12 @@ class MainActivity : SimpleActivity() {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    fun refreshMessages(event: Events.RefreshMessages) {
+    fun refreshConversations(@Suppress("unused") event: Events.RefreshConversations) {
         initMessenger()
     }
 
     private fun checkWhatsNewDialog() {
-        arrayListOf<Release>().apply {
-            add(Release(420, R.string.release_420))
-            add(Release(421, R.string.release_421))
-            add(Release(423, R.string.release_423))
-            add(Release(500, R.string.release_500))
-            add(Release(501, R.string.release_501))
-            add(Release(510, R.string.release_510))
-            add(Release(511, R.string.release_511))
-            add(Release(512, R.string.release_512))
-            add(Release(513, R.string.release_513))
-            add(Release(514, R.string.release_514))
-            add(Release(515, R.string.release_515))
-            add(Release(520, R.string.release_520))
-            add(Release(521, R.string.release_521))
-            add(Release(610, R.string.release_610))
-            add(Release(611, R.string.release_611))
-            add(Release(620, R.string.release_620))
-            add(Release(630, R.string.release_630))
-            add(Release(631, R.string.release_631))
-            add(Release(632, R.string.release_632))
-            add(Release(633, R.string.release_633))
-            add(Release(700, R.string.release_700))
-            add(Release(701, R.string.release_701))
-            add(Release(702, R.string.release_702))
+        whatsNewList().apply {
             checkWhatsNew(this, BuildConfig.VERSION_CODE)
         }
     }

@@ -30,7 +30,7 @@ class DirectReplyReceiver : BroadcastReceiver() {
             val availableSIMs = context.subscriptionManagerCompat().activeSubscriptionInfoList
             if ((availableSIMs?.size ?: 0) > 1) {
                 val currentSIMCardIndex = context.config.getUseSIMIdAtNumber(address)
-                val wantedId = availableSIMs.getOrNull(currentSIMCardIndex)
+                val wantedId = availableSIMs?.getOrNull(currentSIMCardIndex)
                 if (wantedId != null) {
                     subscriptionId = wantedId.subscriptionId
                 }
@@ -42,7 +42,9 @@ class DirectReplyReceiver : BroadcastReceiver() {
                 var messageId = 0L
                 try {
                     context.sendMessageCompat(body, listOf(address), simToReplyFinal, emptyList())
-                    val message = context.getMessages(threadId, getImageResolutions = false, includeScheduledMessages = false, limit = 1).lastOrNull()
+                    val message = context.getMessages(
+                        threadId = threadId, includeScheduledMessages = false, limit = 1
+                    ).lastOrNull()
                     if (message != null) {
                         context.messagesDB.insertOrUpdate(message)
                         messageId = message.id
@@ -58,11 +60,11 @@ class DirectReplyReceiver : BroadcastReceiver() {
                 context.getContactFromAddress(address) { simpleContact ->
                     Handler(Looper.getMainLooper()).post {
                         context.notificationHelper.showMessageNotification(
-                            messageId,
-                            address,
-                            body,
-                            threadId,
-                            bitmap,
+                            messageId = messageId,
+                            address = address,
+                            body = body,
+                            threadId = threadId,
+                            bitmap = bitmap,
                             sender = null,
                             senderCache = sender,
                             alertOnlyOnce = true,

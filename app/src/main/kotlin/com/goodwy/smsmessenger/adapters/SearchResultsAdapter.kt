@@ -1,23 +1,20 @@
 package com.goodwy.smsmessenger.adapters
 
-import android.graphics.drawable.LayerDrawable
 import android.util.TypedValue
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.goodwy.commons.adapters.MyRecyclerViewAdapter
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.views.MyRecyclerView
-import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
 import com.goodwy.smsmessenger.databinding.ItemSearchResultBinding
 import com.goodwy.smsmessenger.extensions.config
 import com.goodwy.smsmessenger.models.SearchResult
 import java.util.*
-import kotlin.math.abs
 
 class SearchResultsAdapter(
     activity: SimpleActivity, var searchResults: ArrayList<SearchResult>, recyclerView: MyRecyclerView, highlightText: String, itemClick: (Any) -> Unit
@@ -50,6 +47,18 @@ class SearchResultsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        //Add a bottom margin for the last element so that it does not block the floating button
+        if (position == searchResults.lastIndex){
+            val params = holder.itemView.layoutParams as RecyclerView.LayoutParams
+            val margin = activity.resources.getDimension(com.goodwy.commons.R.dimen.shortcut_size).toInt()
+            params.bottomMargin = margin
+            holder.itemView.layoutParams = params
+        } else {
+            val params = holder.itemView.layoutParams as RecyclerView.LayoutParams
+            params.bottomMargin = 0
+            holder.itemView.layoutParams = params
+        }
+
         val searchResult = searchResults[position]
         holder.bindView(searchResult, allowSingleClick = true, allowLongClick = false) { itemView, _ ->
             setupView(itemView, searchResult)

@@ -120,13 +120,12 @@
                 app:layout_constraintTop_toBottomOf="@+id/conversationAddress"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/conversationImage"
-                tools:ignore="RtlSymmetry" />
+                tools:ignore="RtlSymmetry"/>
 
             <TextView
                 android:id="@+id/conversationBodyShort"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/tiny_margin"
                 android:layout_marginBottom="@dimen/medium_margin"
                 android:ellipsize="end"
                 android:maxLines="2"
@@ -134,7 +133,7 @@
                 android:textSize="@dimen/normal_text_size"
                 android:textDirection="locale"
                 android:textAlignment="viewStart"
-                app:layout_goneMarginStart="@dimen/larger_margin"
+                app:layout_goneMarginStart="@dimen/normal_margin"
                 app:layout_constraintTop_toBottomOf="@+id/conversationAddress"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/draftClear"
@@ -168,7 +167,7 @@
                 app:layout_constraintEnd_toEndOf="parent" />
 
             <TextView
-                android:id="@+id/unreadIndicatorEnd"
+                android:id="@+id/unreadCountBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="19dp"
