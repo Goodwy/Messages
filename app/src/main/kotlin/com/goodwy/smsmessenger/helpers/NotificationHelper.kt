@@ -53,152 +53,153 @@ class NotificationHelper(private val context: Context) {
         subscriptionId: Int? = null,
         contact: SimpleContact? = null
     ) {
-        val hasCustomNotifications =
-            context.config.customNotifications.contains(threadId.toString())
-        val notificationChannelId =
-            if (hasCustomNotifications) threadId.toString() else NOTIFICATION_CHANNEL
-        if (!hasCustomNotifications) {
-            createChannel(notificationChannelId, context.getString(R.string.channel_received_sms))
-        }
-
-        val notificationId = threadId.hashCode()
-        val contentIntent = Intent(context, ThreadActivity::class.java).apply {
-            putExtra(THREAD_ID, threadId)
-        }
-        val contentPendingIntent =
-            PendingIntent.getActivity(
-                context,
-                notificationId,
-                contentIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-            )
-
-        val markAsReadIntent = Intent(context, MarkAsReadReceiver::class.java).apply {
-            action = MARK_AS_READ
-            putExtra(THREAD_ID, threadId)
-        }
-        val markAsReadPendingIntent =
-            PendingIntent.getBroadcast(
-                context,
-                notificationId,
-                markAsReadIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-            )
-
-        val deleteSmsIntent = Intent(context, DeleteSmsReceiver::class.java).apply {
-            putExtra(THREAD_ID, threadId)
-            putExtra(MESSAGE_ID, messageId)
-        }
-        val deleteSmsPendingIntent =
-            PendingIntent.getBroadcast(
-                context,
-                notificationId,
-                deleteSmsIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-            )
-
-        var replyAction: NotificationCompat.Action? = null
-        val isNoReplySms = isShortCodeWithLetters(address)
-        if (!isNoReplySms) {
-            val replyLabel = context.getString(R.string.reply)
-            val remoteInput = RemoteInput.Builder(REPLY)
-                .setLabel(replyLabel)
-                .build()
-
-            val replyIntent = Intent(context, DirectReplyReceiver::class.java).apply {
-                putExtra(THREAD_ID, threadId)
-                putExtra(THREAD_NUMBER, address)
-                putExtra(SIM_TO_REPLY, subscriptionId)
-                putExtra(THREAD_TITLE, sender ?: senderCache)
+        try {
+            val hasCustomNotifications =
+                context.config.customNotifications.contains(threadId.toString())
+            val notificationChannelId =
+                if (hasCustomNotifications) threadId.toString() else NOTIFICATION_CHANNEL
+            if (!hasCustomNotifications) {
+                createChannel(notificationChannelId, context.getString(R.string.channel_received_sms))
             }
 
-            val replyPendingIntent =
-                PendingIntent.getBroadcast(
-                    context.applicationContext,
+            val notificationId = threadId.hashCode()
+            val contentIntent = Intent(context, ThreadActivity::class.java).apply {
+                putExtra(THREAD_ID, threadId)
+            }
+            val contentPendingIntent =
+                PendingIntent.getActivity(
+                    context,
                     notificationId,
-                    replyIntent,
+                    contentIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
                 )
-            replyAction = NotificationCompat.Action.Builder(
-                R.drawable.ic_send_vector,
-                replyLabel,
-                replyPendingIntent
-            )
-                .addRemoteInput(remoteInput)
-                .build()
-        }
 
-        val title = sender ?: senderCache
-        val largeIcon = bitmap ?: if (contact != null && title != null) {
-            if (contact.isABusinessContact() || isNoReplySms) {
-                SimpleContactsHelper(context).getColoredCompanyIcon(title).convertToBitmap()
-            } else {
-                SimpleContactsHelper(context).getContactLetterIcon(title)
-            }
-        } else if (title == address) {
-            SimpleContactsHelper(context).getColoredContactIcon(title).convertToBitmap()
-        } else if (sender != null) {
-            SimpleContactsHelper(context).getContactLetterIcon(sender)
-        } else {
-            null
-        }
-
-        val builder = NotificationCompat.Builder(context, notificationChannelId).apply {
-            when (context.config.lockScreenVisibilitySetting) {
-                LOCK_SCREEN_SENDER_MESSAGE -> {
-                    setLargeIcon(largeIcon)
-                    setStyle(getMessagesStyle(address, body, notificationId, sender))
-                }
-
-                LOCK_SCREEN_SENDER -> {
-                    setContentTitle(sender)
-                    setLargeIcon(largeIcon)
-                    val summaryText = context.getString(R.string.new_message)
-                    setStyle(
-                        NotificationCompat.BigTextStyle().setSummaryText(summaryText).bigText(body)
-                    )
-                }
-            }
-
-            color = context.getProperPrimaryColor()
-            setSmallIcon(R.drawable.ic_messages)
-            setContentIntent(contentPendingIntent)
-            priority = NotificationCompat.PRIORITY_MAX
-            setDefaults(Notification.DEFAULT_LIGHTS)
-            setCategory(Notification.CATEGORY_MESSAGE)
-            setAutoCancel(true)
-            setOnlyAlertOnce(alertOnlyOnce)
-            setSound(soundUri, AudioManager.STREAM_NOTIFICATION)
-        }
-
-        if (replyAction != null && context.config.lockScreenVisibilitySetting == LOCK_SCREEN_SENDER_MESSAGE) {
-            builder.addAction(replyAction)
-        }
-
-        builder.addAction(
-            com.goodwy.commons.R.drawable.ic_check_vector,
-            context.getString(R.string.mark_as_read),
-            markAsReadPendingIntent
-        )
-            .setChannelId(notificationChannelId)
-
-        val number = body.getOTPFromText()
-        if (number != null) {
-            val copyNumberAndDelete = context.config.copyNumberAndDelete
-            val copyNumberIntent = Intent(context, CopyNumberReceiver::class.java).apply {
-                action = if (copyNumberAndDelete) COPY_NUMBER_AND_DELETE else COPY_NUMBER
-                putExtra(THREAD_TEXT, number)
+            val markAsReadIntent = Intent(context, MarkAsReadReceiver::class.java).apply {
+                action = MARK_AS_READ
                 putExtra(THREAD_ID, threadId)
-                if (copyNumberAndDelete) {
-                    putExtra(MESSAGE_ID, messageId)
-                }
             }
-            val textCopyNumber = context.getString(com.goodwy.commons.R.string.copy) + " \"${number}\""
-            val copyNumber =
-                PendingIntent.getBroadcast(context, threadId.hashCode(), copyNumberIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
-            builder.addAction(com.goodwy.commons.R.drawable.ic_copy_vector, textCopyNumber, copyNumber)
+            val markAsReadPendingIntent =
+                PendingIntent.getBroadcast(
+                    context,
+                    notificationId,
+                    markAsReadIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                )
+
+            val deleteSmsIntent = Intent(context, DeleteSmsReceiver::class.java).apply {
+                putExtra(THREAD_ID, threadId)
+                putExtra(MESSAGE_ID, messageId)
+            }
+            val deleteSmsPendingIntent =
+                PendingIntent.getBroadcast(
+                    context,
+                    notificationId,
+                    deleteSmsIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                )
+
+            var replyAction: NotificationCompat.Action? = null
+            val isNoReplySms = isShortCodeWithLetters(address)
+            if (!isNoReplySms) {
+                val replyLabel = context.getString(R.string.reply)
+                val remoteInput = RemoteInput.Builder(REPLY)
+                    .setLabel(replyLabel)
+                    .build()
+
+                val replyIntent = Intent(context, DirectReplyReceiver::class.java).apply {
+                    putExtra(THREAD_ID, threadId)
+                    putExtra(THREAD_NUMBER, address)
+                    putExtra(SIM_TO_REPLY, subscriptionId)
+                    putExtra(THREAD_TITLE, sender ?: senderCache)
+                }
+
+                val replyPendingIntent =
+                    PendingIntent.getBroadcast(
+                        context.applicationContext,
+                        notificationId,
+                        replyIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                    )
+                replyAction = NotificationCompat.Action.Builder(
+                    R.drawable.ic_send_vector,
+                    replyLabel,
+                    replyPendingIntent
+                )
+                    .addRemoteInput(remoteInput)
+                    .build()
+            }
+
+            val title = sender ?: senderCache
+            val largeIcon = bitmap ?: if (contact != null && title != null) {
+                if (contact.isABusinessContact() || isNoReplySms) {
+                    SimpleContactsHelper(context).getColoredCompanyIcon(title).convertToBitmap()
+                } else {
+                    SimpleContactsHelper(context).getContactLetterIcon(title)
+                }
+            } else if (title == address) {
+                SimpleContactsHelper(context).getColoredContactIcon(title).convertToBitmap()
+            } else if (sender != null) {
+                SimpleContactsHelper(context).getContactLetterIcon(sender)
+            } else {
+                null
+            }
+
+            val builder = NotificationCompat.Builder(context, notificationChannelId).apply {
+                when (context.config.lockScreenVisibilitySetting) {
+                    LOCK_SCREEN_SENDER_MESSAGE -> {
+                        setLargeIcon(largeIcon)
+                        setStyle(getMessagesStyle(address, body, notificationId, sender))
+                    }
+
+                    LOCK_SCREEN_SENDER -> {
+                        setContentTitle(sender)
+                        setLargeIcon(largeIcon)
+                        val summaryText = context.getString(R.string.new_message)
+                        setStyle(
+                            NotificationCompat.BigTextStyle().setSummaryText(summaryText).bigText(body)
+                        )
+                    }
+                }
+
+                color = context.getProperPrimaryColor()
+                setSmallIcon(R.drawable.ic_messages)
+                setContentIntent(contentPendingIntent)
+                priority = NotificationCompat.PRIORITY_MAX
+                setDefaults(Notification.DEFAULT_LIGHTS)
+                setCategory(Notification.CATEGORY_MESSAGE)
+                setAutoCancel(true)
+                setOnlyAlertOnce(alertOnlyOnce)
+                setSound(soundUri, AudioManager.STREAM_NOTIFICATION)
+            }
+
+            if (replyAction != null && context.config.lockScreenVisibilitySetting == LOCK_SCREEN_SENDER_MESSAGE) {
+                builder.addAction(replyAction)
+            }
+
+            builder.addAction(
+                com.goodwy.commons.R.drawable.ic_check_vector,
+                context.getString(R.string.mark_as_read),
+                markAsReadPendingIntent
+            )
                 .setChannelId(notificationChannelId)
-        }
+
+            val number = body.getOTPFromText()
+            if (number != null) {
+                val copyNumberAndDelete = context.config.copyNumberAndDelete
+                val copyNumberIntent = Intent(context, CopyNumberReceiver::class.java).apply {
+                    action = if (copyNumberAndDelete) COPY_NUMBER_AND_DELETE else COPY_NUMBER
+                    putExtra(THREAD_TEXT, number)
+                    putExtra(THREAD_ID, threadId)
+                    if (copyNumberAndDelete) {
+                        putExtra(MESSAGE_ID, messageId)
+                    }
+                }
+                val textCopyNumber = context.getString(com.goodwy.commons.R.string.copy) + " \"${number}\""
+                val copyNumber =
+                    PendingIntent.getBroadcast(context, threadId.hashCode(), copyNumberIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+                builder.addAction(com.goodwy.commons.R.drawable.ic_copy_vector, textCopyNumber, copyNumber)
+                    .setChannelId(notificationChannelId)
+            }
 
 //        if (isNoReplySms) {
             builder.addAction(
@@ -208,22 +209,25 @@ class NotificationHelper(private val context: Context) {
             ).setChannelId(notificationChannelId)
 //        }
 
-        var shortcut = context.shortcutHelper.getShortcut(threadId)
-        if (shortcut == null) {
-            ensureBackgroundThread {
+            var shortcut = context.shortcutHelper.getShortcut(threadId)
+            if (shortcut == null) {
+                ensureBackgroundThread {
+                    notificationManager.notify(notificationId, builder.build())
+                    //The shortcut icon replaces notification icons if the shortcut was previously launched by notifications
+                    shortcut = context.shortcutHelper.createOrUpdateShortcut(threadId)
+                    builder.setShortcutInfo(shortcut)
+                    context.shortcutHelper.reportReceiveMessageUsage(threadId)
+                }
+            } else {
                 notificationManager.notify(notificationId, builder.build())
                 //The shortcut icon replaces notification icons if the shortcut was previously launched by notifications
-                shortcut = context.shortcutHelper.createOrUpdateShortcut(threadId)
                 builder.setShortcutInfo(shortcut)
-                context.shortcutHelper.reportReceiveMessageUsage(threadId)
+                ensureBackgroundThread {
+                    context.shortcutHelper.reportReceiveMessageUsage(threadId)
+                }
             }
-        } else {
-            notificationManager.notify(notificationId, builder.build())
-            //The shortcut icon replaces notification icons if the shortcut was previously launched by notifications
-            builder.setShortcutInfo(shortcut)
-            ensureBackgroundThread {
-                context.shortcutHelper.reportReceiveMessageUsage(threadId)
-            }
+        } catch (e: Exception) {
+            context.baseConfig.lastError = "NotificationHelper: $e"
         }
     }
 

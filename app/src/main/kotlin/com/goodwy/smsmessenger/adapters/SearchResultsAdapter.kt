@@ -4,7 +4,6 @@ import android.util.TypedValue
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.goodwy.commons.adapters.MyRecyclerViewAdapter
 import com.goodwy.commons.extensions.*
@@ -22,6 +21,10 @@ class SearchResultsAdapter(
 
     private var fontSize = activity.getTextSize()
     private var textToHighlight = highlightText
+
+    init {
+        addBottomPadding(64)
+    }
 
     override fun getActionMenuId() = 0
 
@@ -47,18 +50,6 @@ class SearchResultsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        //Add a bottom margin for the last element so that it does not block the floating button
-        if (position == searchResults.lastIndex){
-            val params = holder.itemView.layoutParams as RecyclerView.LayoutParams
-            val margin = activity.resources.getDimension(com.goodwy.commons.R.dimen.shortcut_size).toInt()
-            params.bottomMargin = margin
-            holder.itemView.layoutParams = params
-        } else {
-            val params = holder.itemView.layoutParams as RecyclerView.LayoutParams
-            params.bottomMargin = 0
-            holder.itemView.layoutParams = params
-        }
-
         val searchResult = searchResults[position]
         holder.bindView(searchResult, allowSingleClick = true, allowLongClick = false) { itemView, _ ->
             setupView(itemView, searchResult)

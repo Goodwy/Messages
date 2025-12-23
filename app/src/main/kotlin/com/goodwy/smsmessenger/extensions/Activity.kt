@@ -177,8 +177,9 @@ fun SimpleActivity.launchPurchase() {
     val subscriptionYearIdX2 = BuildConfig.SUBSCRIPTION_YEAR_ID_X2
     val subscriptionYearIdX3 = BuildConfig.SUBSCRIPTION_YEAR_ID_X3
 
+    val appName = if (packageName.startsWith("dev.goodwy")) R.string.app_name_n else R.string.app_name_g
     startPurchaseActivity(
-        R.string.app_name_g,
+        appName,
         productIdList = arrayListOf(productIdX1, productIdX2, productIdX3),
         productIdListRu = arrayListOf(productIdX1, productIdX2, productIdX3),
         subscriptionIdList = arrayListOf(subscriptionIdX1, subscriptionIdX2, subscriptionIdX3),
@@ -253,8 +254,9 @@ fun SimpleActivity.launchAbout() {
     val versionName = BuildConfig.VERSION_NAME
     val fullVersionText = "$versionName ($storeDisplayName)"
 
+    val appName = if (packageName.startsWith("dev.goodwy")) R.string.app_name_n else R.string.app_name_g
     startAboutActivity(
-        appNameId = R.string.app_name_g,
+        appNameId = appName,
         licenseMask = licenses,
         versionName = fullVersionText,
         flavorName = BuildConfig.FLAVOR,

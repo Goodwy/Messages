@@ -25,6 +25,7 @@ class ManageBlockedKeywordsActivity : SimpleActivity(), RefreshRecyclerViewListe
     private val binding by viewBinding(ActivityManageBlockedKeywordsBinding::inflate)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        useOverflowIcon = false
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         updateBlockedKeywords()

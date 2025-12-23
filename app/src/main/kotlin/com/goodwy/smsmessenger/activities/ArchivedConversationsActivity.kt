@@ -131,6 +131,8 @@ class ArchivedConversationsActivity : SimpleActivity() {
             if (areSystemAnimationsEnabled) {
                 binding.conversationsList.scheduleLayoutAnimation()
             }
+        } else {
+            (currAdapter as ArchivedConversationsAdapter).addBottomPadding(64)
         }
         return currAdapter as ArchivedConversationsAdapter
     }

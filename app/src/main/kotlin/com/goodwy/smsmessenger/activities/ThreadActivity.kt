@@ -1291,6 +1291,10 @@ class ThreadActivity : SimpleActivity() {
             subscriptionIdToSimId[subscriptionInfo.subscriptionId] = "${index + 1}"
         }
 
+        // Collecting the IDs of messages that need to be marked as read
+        // Fix: Exception java.util.ConcurrentModificationException
+        val messagesToMarkAsRead = mutableListOf<Long>()
+
         var prevDateTime = 0
         var prevSIMId = -2
         var hadUnreadItems = false
@@ -1318,8 +1322,9 @@ class ThreadActivity : SimpleActivity() {
 
             if (!message.read) {
                 hadUnreadItems = true
-                markMessageRead(message.id, message.isMMS)
-                conversationsDB.markRead(threadId)
+//                markMessageRead(message.id, message.isMMS)
+//                conversationsDB.markRead(threadId)
+                messagesToMarkAsRead.add(message.id)
             }
 
             if (i == cnt - 1 && (message.type == Telephony.Sms.MESSAGE_TYPE_SENT)) {
@@ -1331,6 +1336,15 @@ class ThreadActivity : SimpleActivity() {
                 )
             }
             prevSIMId = message.subscriptionId
+        }
+
+        if (messagesToMarkAsRead.isNotEmpty()) {
+            ensureBackgroundThread {
+                messagesToMarkAsRead.forEach { messageId ->
+                    markMessageRead(messageId, messages.firstOrNull { it.id == messageId }?.isMMS ?: false)
+                }
+                conversationsDB.markRead(threadId)
+            }
         }
 
         if (hadUnreadItems) {

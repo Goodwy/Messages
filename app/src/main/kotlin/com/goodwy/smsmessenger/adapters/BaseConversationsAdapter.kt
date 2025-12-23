@@ -81,6 +81,7 @@ abstract class BaseConversationsAdapter(
         setupDragListener(true)
         setHasStableIds(true)
         updateDrafts()
+        addBottomPadding(64)
 
         registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onChanged() = restoreRecyclerViewState()
@@ -142,18 +143,6 @@ abstract class BaseConversationsAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        //Add a bottom margin for the last element so that it does not block the floating button
-        if (position == currentList.lastIndex){
-            val params = holder.itemView.layoutParams as RecyclerView.LayoutParams
-            val margin = activity.resources.getDimension(com.goodwy.commons.R.dimen.shortcut_size).toInt()
-            params.bottomMargin = margin
-            holder.itemView.layoutParams = params
-        } else {
-            val params = holder.itemView.layoutParams as RecyclerView.LayoutParams
-            params.bottomMargin = 0
-            holder.itemView.layoutParams = params
-        }
-
         val conversation = getItem(position)
         holder.bindView(
             conversation,

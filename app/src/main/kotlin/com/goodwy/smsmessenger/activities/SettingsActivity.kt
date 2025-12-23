@@ -1226,7 +1226,7 @@ class SettingsActivity : SimpleActivity() {
     private fun setupTipJar() = binding.apply {
         settingsTipJarHolder.apply {
             beVisibleIf(isPro())
-            background.applyColorFilter(getColoredMaterialStatusBarColor())
+            background.applyColorFilter(getColoredMaterialStatusBarColor().lightenColor(4))
             setOnClickListener {
                 launchPurchase()
             }
@@ -1235,7 +1235,17 @@ class SettingsActivity : SimpleActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun setupAbout() = binding.apply {
-        settingsAboutVersion.text = "Version: " + BuildConfig.VERSION_NAME
+        val flavorName = BuildConfig.FLAVOR
+        val storeDisplayName = when (flavorName) {
+            "gplay" -> "Google Play"
+            "foss" -> "FOSS"
+            "rustore" -> "RuStore"
+            else -> ""
+        }
+        val versionName = BuildConfig.VERSION_NAME
+        val fullVersionText = "Version: $versionName ($storeDisplayName)"
+
+        settingsAboutVersion.text = fullVersionText
         settingsAboutHolder.setOnClickListener {
             launchAbout()
         }

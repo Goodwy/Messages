@@ -133,6 +133,8 @@ class RecycleBinConversationsActivity : SimpleActivity() {
             if (areSystemAnimationsEnabled) {
                 binding.conversationsList.scheduleLayoutAnimation()
             }
+        } else {
+            (currAdapter as RecycleBinConversationsAdapter).addBottomPadding(64)
         }
         return currAdapter as RecycleBinConversationsAdapter
     }

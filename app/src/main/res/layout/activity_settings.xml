@@ -449,10 +449,30 @@
                         android:id="@+id/settingsUseSwipeToActionHolder"
                         style="@style/SettingsHolderSwitchStyle">
 
+                        <com.goodwy.commons.views.MyTextView
+                            android:id="@+id/settingsUseSwipeToActionLabel"
+                            style="@style/SettingsTextLabelStyle"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="false"
+                            android:layout_toStartOf="@+id/settingsUseSwipeToAction"
+                            android:text="@string/use_swipe_gestures" />
+
+                        <com.goodwy.commons.views.MyTextView
+                            android:id="@+id/settingsUseSwipeToActionSummary"
+                            style="@style/SettingsTextSummaryStyle"
+                            android:layout_alignParentStart="true"
+                            android:layout_below="@+id/settingsUseSwipeToActionLabel"
+                            android:layout_toStartOf="@+id/settingsUseSwipeToAction"
+                            android:clickable="false"
+                            android:text="@string/use_swipe_gestures_summary"/>
+
                         <com.goodwy.commons.views.MyMaterialSwitch
                             android:id="@+id/settingsUseSwipeToAction"
                             style="@style/SettingsSwitchStyle"
-                            android:text="@string/use_swipe_gestures"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
                             app:switchPadding="@dimen/bigger_margin" />
                     </RelativeLayout>
 

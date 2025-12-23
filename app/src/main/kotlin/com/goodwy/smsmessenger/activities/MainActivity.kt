@@ -2,7 +2,9 @@ package com.goodwy.smsmessenger.activities
 
 import android.annotation.SuppressLint
 import android.app.role.RoleManager
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.Intent.ACTION_SEND
 import android.content.pm.ShortcutInfo
 import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
@@ -13,6 +15,7 @@ import android.speech.RecognizerIntent
 import android.text.TextUtils
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
+import com.goodwy.commons.dialogs.ConfirmationDialog
 import com.goodwy.commons.dialogs.PermissionRequiredDialog
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.*
@@ -134,6 +137,8 @@ class MainActivity : SimpleActivity() {
                 hideKeyboard()
             }
         })
+
+        checkErrorDialog()
     }
 
     override fun onPause() {
@@ -700,6 +705,40 @@ class MainActivity : SimpleActivity() {
     private fun checkWhatsNewDialog() {
         whatsNewList().apply {
             checkWhatsNew(this, BuildConfig.VERSION_CODE)
+        }
+    }
+
+    private fun checkErrorDialog() {
+        if (baseConfig.lastError != "") {
+            ConfirmationDialog(
+                this,
+                "An error occurred while the application was running. Please send us this error so we can fix it.",
+                positive = com.goodwy.commons.R.string.send_email
+            ) {
+                val body = "Dialer : LastError"
+                val address = getMyMailString()
+                val lastError = baseConfig.lastError
+
+                val emailIntent = Intent(ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf(address))
+                    putExtra(Intent.EXTRA_SUBJECT, body)
+                    putExtra(Intent.EXTRA_TEXT, lastError)
+
+                    // set the type for better compatibility
+                    type = "message/rfc822"
+                }
+
+                try {
+                    startActivity(Intent.createChooser(emailIntent, "Send email"))
+                } catch (_: ActivityNotFoundException) {
+                    toast(com.goodwy.commons.R.string.no_app_found)
+                } catch (e: Exception) {
+                    showErrorToast(e)
+                }
+
+                baseConfig.lastError = ""
+            }
         }
     }
 }
