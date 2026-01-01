@@ -10,4 +10,5 @@
     <string name="failed">Ha fallat</string>
     <string name="pending">Pendent</string>
     <string name="message_type">Tipus de missatge</string>
+    <string name="show_number_in_title">Mostra el número a la capçalera del xat</string>
 </resources>

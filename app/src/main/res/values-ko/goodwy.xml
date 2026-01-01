@@ -10,4 +10,5 @@
     <string name="failed">실패한</string>
     <string name="pending">보류 중</string>
     <string name="message_type">메시지 유형</string>
+    <string name="show_number_in_title">채팅 헤더에 숫자 표시</string>
 </resources>

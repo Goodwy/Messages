@@ -10,4 +10,5 @@
     <string name="pending">Na čekanju</string>
     <string name="message_type">Vrsta poruke</string>
     <string name="delete_after_copy">Izbrišite poruku nakon kopiranja broja iz obavijesti</string>
+    <string name="show_number_in_title">Prikaži broj u zaglavlju chata</string>
 </resources>

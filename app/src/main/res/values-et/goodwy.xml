@@ -10,4 +10,5 @@
     <string name="failed">Ebaõnnestunud</string>
     <string name="pending">Ootel</string>
     <string name="message_type">Sõnumi tüüp</string>
+    <string name="show_number_in_title">Näita numbrit vestluse päises</string>
 </resources>

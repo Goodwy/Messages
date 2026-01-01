@@ -10,4 +10,5 @@
     <string name="failed">असफल</string>
     <string name="pending">लंबित</string>
     <string name="message_type">संदेश का प्रकार</string>
+    <string name="show_number_in_title">चैट हेडर में नंबर दिखाएँ</string>
 </resources>

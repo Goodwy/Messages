@@ -10,4 +10,5 @@
     <string name="failed">പരാജയപ്പെട്ടു</string>
     <string name="pending">തീർപ്പാക്കാത്തത്</string>
     <string name="message_type">സന്ദേശ തരം</string>
+    <string name="show_number_in_title">ചാറ്റ് ഹെഡറിൽ നമ്പർ കാണിക്കുക</string>
 </resources>

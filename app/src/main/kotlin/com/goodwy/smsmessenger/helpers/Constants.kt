@@ -61,6 +61,7 @@ const val FONT_SIZE_MESSAGE = "font_size_message"
 const val SOUND_ON_OUT_GOING_MESSAGE = "sound_on_out_going_messages"
 const val NOTIFY_TURN_ON_SCREEN = "notify_turns_on_screen"
 const val INIT_CALL_BLOCKING_SETUP = "init_call_blocking_setup"
+const val SHOW_NUMBER_IN_TITLE = "show_number_in_title"
 
 private const val PATH = "com.goodwy.smsmessenger.action."
 const val MARK_AS_READ = PATH + "mark_as_read"
@@ -200,5 +201,7 @@ fun whatsNewList(): ArrayList<Release> {
         add(Release(700, R.string.release_700))
         add(Release(701, R.string.release_701))
         add(Release(800, R.string.release_800))
+        add(Release(810, R.string.release_810))
+        add(Release(811, R.string.release_811))
     }
 }

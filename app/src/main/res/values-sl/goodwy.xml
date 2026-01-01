@@ -10,4 +10,5 @@
     <string name="failed">Ni uspelo</string>
     <string name="pending">V teku</string>
     <string name="message_type">Vrsta sporočila</string>
+    <string name="show_number_in_title">Prikaži številko v glavi klepeta</string>
 </resources>

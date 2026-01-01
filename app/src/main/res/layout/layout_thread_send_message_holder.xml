@@ -159,8 +159,8 @@
 
             <ImageView
                 android:id="@+id/threadSelectSimIcon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:alpha="0.9"
                 android:background="@drawable/thread_background"
                 android:paddingStart="3dp"

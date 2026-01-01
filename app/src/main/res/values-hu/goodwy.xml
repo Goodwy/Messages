@@ -10,4 +10,5 @@
     <string name="failed">Sikertelen</string>
     <string name="pending">Függőben levő</string>
     <string name="message_type">Üzenet típusa</string>
+    <string name="show_number_in_title">Szám megjelenítése a csevegés fejlécében</string>
 </resources>

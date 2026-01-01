@@ -10,4 +10,5 @@
     <string name="failed">Misslyckades</string>
     <string name="pending">I avvaktan på</string>
     <string name="message_type">Meddelandetyp</string>
+    <string name="show_number_in_title">Visa nummer i chattrubriken</string>
 </resources>

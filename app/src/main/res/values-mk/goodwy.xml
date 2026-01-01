@@ -10,4 +10,5 @@
     <string name="pending">Во очекување</string>
     <string name="message_type">Тип на порака</string>
     <string name="delete_after_copy">Избришете ја пораката откако ќе го копирате бројот од известувањето</string>
+    <string name="show_number_in_title">Прикажи го бројот во заглавието на разговорот</string>
 </resources>

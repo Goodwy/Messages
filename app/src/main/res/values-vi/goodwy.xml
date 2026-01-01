@@ -10,4 +10,5 @@
     <string name="failed">Thất bại</string>
     <string name="pending">Chưa giải quyết</string>
     <string name="message_type">Loại tin nhắn</string>
+    <string name="show_number_in_title">Hiển thị số điện thoại trong tiêu đề cuộc trò chuyện</string>
 </resources>

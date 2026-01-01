@@ -10,4 +10,5 @@
     <string name="failed">Nepodarilo sa</string>
     <string name="pending">Čaká na spracovanie</string>
     <string name="message_type">Typ správy</string>
+    <string name="show_number_in_title">Zobraziť číslo v hlavičke chatu</string>
 </resources>

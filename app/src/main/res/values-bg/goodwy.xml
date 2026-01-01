@@ -10,4 +10,5 @@
     <string name="failed">Неуспешно</string>
     <string name="pending">В очакване</string>
     <string name="message_type">Тип съобщение</string>
+    <string name="show_number_in_title">Показване на номера в заглавката на чата</string>
 </resources>

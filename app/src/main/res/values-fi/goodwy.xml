@@ -10,4 +10,5 @@
     <string name="failed">Epäonnistui</string>
     <string name="pending">Odottaa</string>
     <string name="message_type">Viestin tyyppi</string>
+    <string name="show_number_in_title">Näytä numero keskustelun otsikossa</string>
 </resources>

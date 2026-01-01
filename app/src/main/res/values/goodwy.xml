@@ -11,4 +11,5 @@
     <string name="failed">Failed</string>
     <string name="pending">Pending</string>
     <string name="message_type">Message type</string>
+    <string name="show_number_in_title">Show number in title</string>
 </resources>

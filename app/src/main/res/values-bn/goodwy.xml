@@ -10,4 +10,5 @@
     <string name="pending">মুলতুবি</string>
     <string name="message_type">বার্তার ধরন</string>
     <string name="delete_after_copy">বিজ্ঞপ্তি থেকে নম্বর কপি করার পরে বার্তা মুছুন</string>
+    <string name="show_number_in_title">চ্যাট হেডারে নম্বর দেখান</string>
 </resources>

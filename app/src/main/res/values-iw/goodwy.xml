@@ -10,4 +10,5 @@
     <string name="failed">נִכשָׁל</string>
     <string name="pending">תָלוּי וְעוֹמֵד</string>
     <string name="message_type">סוג הודעה</string>
+    <string name="show_number_in_title">הצג את המספר בכותרת הצ\'אט</string>
 </resources>

@@ -10,4 +10,5 @@
     <string name="failed">ਅਸਫਲ ਰਿਹਾ</string>
     <string name="pending">ਬਕਾਇਆ</string>
     <string name="message_type">ਸੁਨੇਹਾ ਕਿਸਮ</string>
+    <string name="show_number_in_title">ਚੈਟ ਹੈੱਡਰ ਵਿੱਚ ਨੰਬਰ ਦਿਖਾਓ</string>
 </resources>

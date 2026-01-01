@@ -20,11 +20,11 @@ room = "2.8.3"
 mmslib = "1.0.0"
 indicatorFastScroll = "fe6ddbc316"
 #Goodwy
-right-commons = "2510299bdd"
+right-commons = "2ad91731bf"
 behavioRule = "1.0.1"
 rxAnimation = "2.1.1"
 rxJava3 = "3.1.5"
-swipeToActionLayout = "0f7632fc36"
+swipeToActionLayout = "94ab9268eb"
 googleServices = "21.0.1"
 #Gradle
 gradlePlugins-agp = "8.11.1"

@@ -10,4 +10,5 @@
     <string name="failed">ناکام</string>
     <string name="pending">زیر التواء</string>
     <string name="message_type">پیغام کی قسم</string>
+    <string name="show_number_in_title">چیٹ ہیڈر میں نمبر دکھائیں۔</string>
 </resources>

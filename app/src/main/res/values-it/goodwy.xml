@@ -10,4 +10,5 @@
     <string name="failed">Fallito</string>
     <string name="pending">In attesa di</string>
     <string name="message_type">Tipo di messaggio</string>
+    <string name="show_number_in_title">Mostra il numero nell\'intestazione della chat</string>
 </resources>

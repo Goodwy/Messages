@@ -10,4 +10,5 @@
     <string name="failed">Fehlgeschlagen</string>
     <string name="pending">Ausstehend</string>
     <string name="message_type">Nachrichtentyp</string>
+    <string name="show_number_in_title">Nummer im Chat-Header anzeigen</string>
 </resources>

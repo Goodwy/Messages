@@ -10,4 +10,5 @@
     <string name="failed">Mislykkedes</string>
     <string name="pending">Indtil</string>
     <string name="message_type">Meddelelsestype</string>
+    <string name="show_number_in_title">Vis nummer i chatheaderen</string>
 </resources>

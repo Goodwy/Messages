@@ -10,4 +10,5 @@
     <string name="failed">شکست خورد</string>
     <string name="pending">در انتظار</string>
     <string name="message_type">نوع پیام</string>
+    <string name="show_number_in_title">نمایش شماره در هدر چت</string>
 </resources>

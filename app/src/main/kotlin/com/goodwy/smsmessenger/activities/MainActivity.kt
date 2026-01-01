@@ -19,6 +19,7 @@ import com.goodwy.commons.dialogs.ConfirmationDialog
 import com.goodwy.commons.dialogs.PermissionRequiredDialog
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.*
+import com.google.android.material.appbar.AppBarLayout
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.adapters.ConversationsAdapter
@@ -62,6 +63,7 @@ class MainActivity : SimpleActivity() {
         refreshMenuItems()
 
         binding.mainMenu.updateTitle(getString(R.string.messages))
+        binding.mainMenu.searchBeVisibleIf(config.showSearchBar)
         setupEdgeToEdge(padBottomImeAndSystem = listOf(binding.conversationsList, binding.searchResultsList))
         if (config.changeColourTopBar) {
             val useSurfaceColor = isDynamicTheme() && !isSystemInDarkMode()
@@ -138,7 +140,16 @@ class MainActivity : SimpleActivity() {
             }
         })
 
+        // Top bar scroll
+        val params = binding.mainMenu.layoutParams as AppBarLayout.LayoutParams
+        params.scrollFlags = if (config.hideTopBarWhenScroll) {
+            AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
+                AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
+        } else 0
+        binding.mainMenu.layoutParams = params
+
         checkErrorDialog()
+        newAppRecommendation()
     }
 
     override fun onPause() {

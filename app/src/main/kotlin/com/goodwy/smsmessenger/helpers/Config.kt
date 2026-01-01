@@ -195,6 +195,10 @@ class Config(context: Context) : BaseConfig(context) {
         get() = prefs.getBoolean(INIT_CALL_BLOCKING_SETUP, true)
         set(initCallBlockingSetup) = prefs.edit { putBoolean(INIT_CALL_BLOCKING_SETUP, initCallBlockingSetup) }
 
+    var showNumberInTitle: Boolean
+        get() = prefs.getBoolean(SHOW_NUMBER_IN_TITLE, true)
+        set(showNumberInTitle) = prefs.edit { putBoolean(SHOW_NUMBER_IN_TITLE, showNumberInTitle) }
+
     //Swipe
     var swipeRightAction: Int
         get() = prefs.getInt(SWIPE_RIGHT_ACTION, SWIPE_ACTION_MARK_READ)

@@ -10,4 +10,5 @@
     <string name="failed">Mislukt</string>
     <string name="pending">In behandeling</string>
     <string name="message_type">Berichttype</string>
+    <string name="show_number_in_title">Toon het nummer in de chatheader</string>
 </resources>

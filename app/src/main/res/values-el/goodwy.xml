@@ -10,4 +10,5 @@
     <string name="failed">Αποτυχημένος</string>
     <string name="pending">Εκκρεμής</string>
     <string name="message_type">Τύπος μηνύματος</string>
+    <string name="show_number_in_title">Εμφάνιση αριθμού στην κεφαλίδα συνομιλίας</string>
 </resources>

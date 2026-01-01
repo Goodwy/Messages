@@ -386,6 +386,8 @@ fun Context.getConversations(
         Threads.DATE,
         Threads.READ,
         Threads.RECIPIENT_IDS,
+        Threads.ARCHIVED,
+        Threads.MESSAGE_COUNT
     )
 
     if (archiveAvailable) {
@@ -507,8 +509,10 @@ fun Context.getConversations(
         } else {
             showErrorToast(sqliteException)
         }
+        baseConfig.lastError = "Context.getConversations() SQLiteException: $sqliteException"
     } catch (e: Exception) {
         showErrorToast(e)
+        baseConfig.lastError = "Context.getConversations(): $e"
     }
 
     conversations.sortByDescending { it.date }
@@ -1116,6 +1120,9 @@ fun Context.markMessageRead(id: Long, isMMS: Boolean) {
 }
 
 fun Context.markThreadMessagesRead(threadId: Long) {
+    messagesDB.markThreadRead(threadId)
+    conversationsDB.markRead(threadId)
+
     val id = threadId.toString()
 
     val smsValues = ContentValues().apply {
@@ -1133,12 +1140,11 @@ fun Context.markThreadMessagesRead(threadId: Long) {
     val mmsSelection = "${Mms.THREAD_ID}=? AND ${Mms.MESSAGE_BOX}=?"
     val mmsArgs = arrayOf(id, Mms.MESSAGE_BOX_INBOX.toString())
     contentResolver.update(Mms.CONTENT_URI, mmsValues, mmsSelection, mmsArgs)
-
-    messagesDB.markThreadRead(threadId)
-    conversationsDB.markRead(threadId)
 }
 
 fun Context.markThreadMessagesUnread(threadId: Long) {
+    conversationsDB.markUnread(threadId)
+
     val id = threadId.toString()
 
     val smsValues = ContentValues().apply {
@@ -1156,12 +1162,12 @@ fun Context.markThreadMessagesUnread(threadId: Long) {
     val mmsSelection = "${Mms.THREAD_ID}=? AND ${Mms.MESSAGE_BOX}=?"
     val mmsArgs = arrayOf(id, Mms.MESSAGE_BOX_INBOX.toString())
     contentResolver.update(Mms.CONTENT_URI, mmsValues, mmsSelection, mmsArgs)
-
-    conversationsDB.markUnread(threadId)
 }
 
 //If you need to mark a conversation as unread, simply mark the last message as unread
 fun Context.markLastMessageUnread(threadId: Long) {
+    conversationsDB.markUnread(threadId)
+
     val id = threadId.toString()
 
     // First, we try to find the latest SMS.

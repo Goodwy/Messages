@@ -10,4 +10,5 @@
     <string name="failed">Nepavyko</string>
     <string name="pending">Laukiama</string>
     <string name="message_type">Pranešimo tipas</string>
+    <string name="show_number_in_title">Rodyti numerį pokalbio antraštėje</string>
 </resources>

@@ -10,4 +10,5 @@
     <string name="failed">Przegrany</string>
     <string name="pending">Aż do</string>
     <string name="message_type">Typ wiadomości</string>
+    <string name="show_number_in_title">Pokaż numer w nagłówku czatu</string>
 </resources>

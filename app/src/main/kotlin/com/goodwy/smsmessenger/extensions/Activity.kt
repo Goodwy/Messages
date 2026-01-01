@@ -270,3 +270,20 @@ fun SimpleActivity.launchAbout() {
         subscriptionYearIdListRu = arrayListOf(subscriptionYearIdX1, subscriptionYearIdX2, subscriptionYearIdX3),
     )
 }
+
+fun Activity.newAppRecommendation() {
+    if (packageName.startsWith("com.goodwy.", true)) {
+        if ((0..config.newAppRecommendationDialogCount).random() == 2) {
+            val packageName = "dev.goodwy.messages"
+            NewAppDialog(
+                activity = this,
+                packageName = packageName,
+                title = getString(com.goodwy.strings.R.string.notification_of_new_application),
+                text = "AlRight Messages",
+                drawable = AppCompatResources.getDrawable(this, R.drawable.ic_launcher_new),
+                showSubtitle = true
+            ) {
+            }
+        }
+    }
+}

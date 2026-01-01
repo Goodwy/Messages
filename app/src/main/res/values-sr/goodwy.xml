@@ -10,4 +10,5 @@
     <string name="failed">Није успело</string>
     <string name="pending">На чекању</string>
     <string name="message_type">Врста поруке</string>
+    <string name="show_number_in_title">Прикажи број у заглављу ћаскања</string>
 </resources>

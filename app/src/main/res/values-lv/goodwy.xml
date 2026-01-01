@@ -10,4 +10,5 @@
     <string name="failed">Neizdevās</string>
     <string name="pending">Gaida</string>
     <string name="message_type">Ziņojuma veids</string>
+    <string name="show_number_in_title">Rādīt numuru tērzēšanas galvenē</string>
 </resources>

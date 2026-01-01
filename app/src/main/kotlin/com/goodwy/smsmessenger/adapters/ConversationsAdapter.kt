@@ -310,7 +310,6 @@ class ConversationsAdapter(
             currentList.filter { selectedKeys.contains(it.hashCode()) } as ArrayList<Conversation>
         ensureBackgroundThread {
             conversationsMarkedAsRead.filter { conversation -> !conversation.read }.forEach {
-                activity.conversationsDB.markRead(it.threadId)
                 activity.markThreadMessagesRead(it.threadId)
             }
 
@@ -327,7 +326,6 @@ class ConversationsAdapter(
             currentList.filter { selectedKeys.contains(it.hashCode()) } as ArrayList<Conversation>
         ensureBackgroundThread {
             conversationsMarkedAsUnread.filter { conversation -> conversation.read }.forEach {
-                activity.conversationsDB.markUnread(it.threadId)
 //                activity.markThreadMessagesUnread(it.threadId)
                 activity.markLastMessageUnread(it.threadId)
             }
@@ -534,11 +532,9 @@ class ConversationsAdapter(
     private fun swipedMarkRead(conversation: Conversation) {
         ensureBackgroundThread {
             if (conversation.read) {
-                activity.conversationsDB.markUnread(conversation.threadId)
 //                activity.markThreadMessagesUnread(conversation.threadId)
                 activity.markLastMessageUnread(conversation.threadId)
             } else {
-                activity.conversationsDB.markRead(conversation.threadId)
                 activity.markThreadMessagesRead(conversation.threadId)
             }
 

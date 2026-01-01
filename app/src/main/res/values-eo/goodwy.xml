@@ -10,4 +10,5 @@
     <string name="failed">Malsukcesis</string>
     <string name="pending">Pritraktata</string>
     <string name="message_type">Mesaĝo-tipo</string>
+    <string name="show_number_in_title">Montri numeron en la babileja kaplinio</string>
 </resources>

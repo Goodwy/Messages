@@ -10,4 +10,5 @@
     <string name="failed">A eșuat</string>
     <string name="pending">În așteptare</string>
     <string name="message_type">Tipul mesajului</string>
+    <string name="show_number_in_title">Afișează numărul în antetul chatului</string>
 </resources>

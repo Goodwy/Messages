@@ -10,4 +10,5 @@
     <string name="failed">தோல்வியடைந்தது</string>
     <string name="pending">நிலுவையில் உள்ளது</string>
     <string name="message_type">செய்தி வகை</string>
+    <string name="show_number_in_title">அரட்டைத் தலைப்பில் எண்ணைக் காட்டு</string>
 </resources>

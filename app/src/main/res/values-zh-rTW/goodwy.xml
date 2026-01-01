@@ -10,4 +10,5 @@
     <string name="failed">失敗的</string>
     <string name="pending">待辦的</string>
     <string name="message_type">訊息類型</string>
+    <string name="show_number_in_title">在聊天標題中顯示號碼</string>
 </resources>

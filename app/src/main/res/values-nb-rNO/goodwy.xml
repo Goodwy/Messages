@@ -10,4 +10,5 @@
     <string name="failed">Mislyktes</string>
     <string name="pending">I påvente av</string>
     <string name="message_type">Meldingstype</string>
+    <string name="show_number_in_title">Vis nummeret i chat-overskriften</string>
 </resources>

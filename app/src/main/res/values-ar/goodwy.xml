@@ -10,4 +10,5 @@
     <string name="failed">فشل</string>
     <string name="pending">قيد الانتظار</string>
     <string name="message_type">نوع الرسالة</string>
+    <string name="show_number_in_title">إظهار الرقم في رأس المحادثة</string>
 </resources>

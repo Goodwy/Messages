@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#FF027BFE</color>
+    <color name="green_call">#FF35C759</color>
+    <color name="red_call">#FFEB5545</color>
+    <color name="swipe_purple">#FF5E5CE6</color>
+</resources>

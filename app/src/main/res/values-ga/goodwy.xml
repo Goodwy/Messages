@@ -10,4 +10,5 @@
     <string name="failed">Theip</string>
     <string name="pending">Ar feitheamh</string>
     <string name="message_type">Cineál teachtaireachta</string>
+    <string name="show_number_in_title">Taispeáin an uimhir i gceanntásc an chomhrá</string>
 </resources>

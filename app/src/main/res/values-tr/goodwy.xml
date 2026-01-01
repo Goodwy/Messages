@@ -10,4 +10,5 @@
     <string name="failed">Arızalı</string>
     <string name="pending">Askıda olması</string>
     <string name="message_type">Mesaj türü</string>
+    <string name="show_number_in_title">Sohbet başlığında numarayı göster</string>
 </resources>

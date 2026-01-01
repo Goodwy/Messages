@@ -138,6 +138,7 @@ class SettingsActivity : SimpleActivity() {
         setupNotifyTurnsOnScreen()
 
         setupThreadTopStyle()
+        setupShowNumberInTitle()
         setupMessageBubble()
         setupTextAlignmentMessage()
         setupFontSizeMessage()
@@ -153,6 +154,9 @@ class SettingsActivity : SimpleActivity() {
         setupGroupMessageAsMMS()
         setupMMSFileSizeLimit()
 
+        setupShowSearchBar()
+        setupHideTopBarWhenScroll()
+
         setupShowDividers()
         setupShowContactThumbnails()
         setupContactThumbnailsSize()
@@ -160,7 +164,6 @@ class SettingsActivity : SimpleActivity() {
         setupUnreadAtTop()
         setupLinesCount()
         setupUnreadIndicatorPosition()
-        setupHideTopBarWhenScroll()
         setupChangeColourTopBarWhenScroll()
 
         setupKeepConversationsArchived()
@@ -189,6 +192,7 @@ class SettingsActivity : SimpleActivity() {
                 settingsNotificationsLabel,
                 settingsMessagesLabel,
                 settingsOutgoingMessagesLabel,
+                settingsTopAppBarLabel,
                 settingsListViewLabel,
                 settingsSwipeGesturesLabel,
                 settingsArchivedMessagesLabel,
@@ -207,6 +211,7 @@ class SettingsActivity : SimpleActivity() {
                 settingsNotificationsHolder,
                 settingsMessagesHolder,
                 settingsOutgoingMessagesHolder,
+                settingsTopAppBarHolder,
                 settingsListViewHolder,
                 settingsSwipeGesturesHolder,
                 settingsRecycleBinHolder,
@@ -363,6 +368,14 @@ class SettingsActivity : SimpleActivity() {
                 config.threadTopStyle = it as Int
                 settingsThreadTopStyle.text = getThreadTopStyleText()
             }
+        }
+    }
+
+    private fun setupShowNumberInTitle() = binding.apply {
+        settingsShowNumberInTitle.isChecked = config.showNumberInTitle
+        settingsShowNumberInTitleHolder.setOnClickListener {
+            settingsShowNumberInTitle.toggle()
+            config.showNumberInTitle = settingsShowNumberInTitle.isChecked
         }
     }
 
@@ -1088,6 +1101,15 @@ class SettingsActivity : SimpleActivity() {
             else -> com.goodwy.strings.R.string.end
         }
     )
+
+    private fun setupShowSearchBar() = binding.apply {
+        settingsShowSearchBar.isChecked = config.showSearchBar
+        settingsShowSearchBarHolder.setOnClickListener {
+            settingsShowSearchBar.toggle()
+            config.showSearchBar = settingsShowSearchBar.isChecked
+            config.needRestart = true
+        }
+    }
 
     private fun setupHideTopBarWhenScroll() = binding.apply {
         settingsHideBarWhenScroll.isChecked = config.hideTopBarWhenScroll
