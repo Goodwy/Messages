@@ -13,7 +13,7 @@
     <string name="message_details_sim">SIM</string>
 
     <!-- Release notes -->
-    <string name="release_811">
+    <string name="release_812">
         Added ‘Show search bar’ option\n
         Added ‘Hide the top app bar when scrolling’ option\n
         Fixed bugs, improved stability

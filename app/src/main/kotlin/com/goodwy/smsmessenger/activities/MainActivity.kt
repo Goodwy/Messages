@@ -726,7 +726,7 @@ class MainActivity : SimpleActivity() {
                 "An error occurred while the application was running. Please send us this error so we can fix it.",
                 positive = com.goodwy.commons.R.string.send_email
             ) {
-                val body = "Dialer : LastError"
+                val body = "Messages : LastError"
                 val address = getMyMailString()
                 val lastError = baseConfig.lastError
 

@@ -386,8 +386,6 @@ fun Context.getConversations(
         Threads.DATE,
         Threads.READ,
         Threads.RECIPIENT_IDS,
-        Threads.ARCHIVED,
-        Threads.MESSAGE_COUNT
     )
 
     if (archiveAvailable) {
