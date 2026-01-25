@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Chat title style</string>
     <string name="unread_at_top_g">Unread always at the top</string>
     <string name="show_sim_selection_dialog">Show SIM card selection dialog when sending</string>
@@ -11,4 +10,61 @@
     <string name="pending">보류 중</string>
     <string name="message_type">메시지 유형</string>
     <string name="show_number_in_title">채팅 헤더에 숫자 표시</string>
+    <string name="warning_disclosure"><![CDATA[
+
+<h2>데이터 접근 공개</h2>
+
+<p><strong>이 앱은 정상적으로 작동하기 위해 SMS 메시지 및 전화 관련 정보에 대한 접근 권한이 필요합니다.</strong></p>
+
+<h3>🔍 접근하는 정보:</h3>
+<ul>
+
+<li><strong>SMS 메시지:</strong> SMS 메시지의 전체 내용입니다.</li>
+
+<li><strong>사용자의 전화번호:</strong> 기기의 SIM 카드와 연결된 전화번호입니다.</li>
+
+<li><strong>SMS에 포함된 전화번호:</strong> SMS 메시지에 포함된 전화번호입니다.</li>
+</ul>
+
+<h3>📱 이 정보의 사용 방법(기기에 로컬로 저장):</h3>
+<ul>
+
+<li><strong>사용자의 전화번호:</strong> 당사는 사용자의 기기 전화번호를 <strong>수집 및</strong> 용도로만 <strong>표시하기 위해</strong> 사용합니다. 앱 인터페이스에서 SIM 카드 선택 시 이 번호를 입력하세요. 이 번호는 로컬에서 처리되며 전송되지 않습니다.
+
+SMS에서 전화번호 추출: SMS 메시지에서 전화번호를 추출하여 쉽게 복사할 수 있도록 합니다. 이 추출 과정은 로컬에서 이루어집니다.
+
+OTP용 SMS 내용: SMS 텍스트를 분석하여 OTP 코드를 자동으로 감지하고 클립보드에 복사합니다. <em>이 분석은 로컬에서 이루어집니다.</em></li>
+</ul>
+
+<h3>🚫 저희가 귀하의 데이터를 어떻게 처리하지 않는지:</h3>
+<ul>
+
+<li><strong>저희는 귀하의 SMS 메시지, 전화번호 또는 메시지 내용을 어떤 서버에도 전송하거나 업로드하지 않습니다.</strong>
+</li>
+</li>
+</li> <li><strong>저희는 귀하의 SMS 데이터나 전화번호를 외부 서버에 저장하지 않습니다.</strong>
+</li>
+</li>
+</ul>
+<h3>✅ 핵심 보장:</h3>
+<p><strong>모든 데이터 처리는 귀하의 기기(온디바이스)에서만 이루어집니다.</strong> 귀하의 SMS 메시지와 전화번호는 절대 귀하의 기기를 벗어나지 않습니다.</p> 인터넷 접속은 MMS 전송 및 Google Play 구매 처리에만 사용됩니다.</p>
+
+<h3>🔑 필수 권한 설명:</h3>
+<ul>
+
+<li><strong>READ_SMS:</strong> OTP 복사 및 전화번호 추출을 위해 SMS에 접근합니다(로컬 처리만 해당).</li>
+<li><strong>READ_PHONE_STATE:</strong> SIM 카드 선택을 위해 기기의 전화번호를 수집하고 표시합니다(로컬 사용만 해당).</li>
+</ul>
+
+<p><em>계속 진행하면 다음 사항에 동의하는 것입니다.</em></p>
+<ol>
+
+<li>이 앱은 로컬 표시를 위해 기기의 전화번호를 수집합니다.</li>
+
+<li>이 앱은 로컬 OTP 및 전화번호 추출을 위해 SMS 메시지에 접근합니다.</li>
+
+<li>이 데이터는 기기에서 전송되지 않습니다.</li>
+</ol>
+
+]]></string>
 </resources>

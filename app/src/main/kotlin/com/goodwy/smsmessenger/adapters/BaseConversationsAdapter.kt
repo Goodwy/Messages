@@ -42,6 +42,7 @@ import com.goodwy.smsmessenger.databinding.ItemConversationBinding
 import com.goodwy.smsmessenger.extensions.config
 import com.goodwy.smsmessenger.extensions.deleteSmsDraft
 import com.goodwy.smsmessenger.extensions.getAllDrafts
+import com.goodwy.smsmessenger.extensions.setWidth
 import com.goodwy.smsmessenger.helpers.*
 import com.goodwy.smsmessenger.models.Conversation
 import me.thanel.swipeactionview.SwipeActionView
@@ -328,6 +329,13 @@ abstract class BaseConversationsAdapter(
                 } else {
                     if (swipeLeftAction == SWIPE_ACTION_NONE) swipeView.setDirectionEnabled(SwipeDirection.Left, false)
                     if (swipeRightAction == SWIPE_ACTION_NONE) swipeView.setDirectionEnabled(SwipeDirection.Right, false)
+                }
+
+                val halfScreenWidth = activity.resources.displayMetrics.widthPixels / activity.config.swipeToActionWidth
+                val swipeWidth = activity.resources.getDimension(com.goodwy.commons.R.dimen.swipe_width)
+                if (swipeWidth > halfScreenWidth) {
+                    swipeRightIconHolder.setWidth(halfScreenWidth)
+                    swipeLeftIconHolder.setWidth(halfScreenWidth)
                 }
 
                 if (activity.config.swipeRipple) {

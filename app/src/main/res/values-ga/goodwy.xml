@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Chat title style</string>
     <string name="unread_at_top_g">Unread always at the top</string>
     <string name="show_sim_selection_dialog">Show SIM card selection dialog when sending</string>
@@ -11,4 +10,46 @@
     <string name="pending">Ar feitheamh</string>
     <string name="message_type">Cineál teachtaireachta</string>
     <string name="show_number_in_title">Taispeáin an uimhir i gceanntásc an chomhrá</string>
+    <string name="warning_disclosure"><![CDATA[
+<h2>Nochtadh Rochtana Sonraí</h2>
+
+<p><strong>Éilíonn an aip seo rochtain ar theachtaireachtaí SMS agus ar fhaisnéis a bhaineann leis an bhfón chun go bhfeidhmeoidh sí i gceart.</strong></p>
+
+<h3>🔍 Cén Fhaisnéis a Rochtanaimid Air:</h3>
+<ul>
+<li><strong>TEACHTAIREACHTAÍ SMS:</strong> Ábhar iomlán do theachtaireachtaí SMS.</li>
+<li><strong>D\'UIMHIR(Í) GUTHÁIN:</strong> An uimhir(í) gutháin a bhaineann le cárta(í) SIM do ghléis.</li>
+<li><strong>UIMHIRÍ GUTHÁIN Ó SMS:</strong> Uimhreacha gutháin atá i do theachtaireachtaí SMS.</li>
+</ul>
+
+<h3>📱 Conas a Úsáidimid an Fhaisnéis seo (GO HÁITIÚIL AR AN NGHLÉIS):</h3>
+<ul>
+<li><strong>D\'UIMHIR GUTHÁIN:</strong> <strong>Bailímid agus úsáidimid</strong> uimhir gutháin do ghléis <strong>chun í a thaispeáint</strong> i gcomhéadan an aip le haghaidh Roghnú cárta SIM. <em>Próiseáiltear an uimhir seo go háitiúil agus ní tharchuirtear í.</em></li>
+<li><strong>UIMHREACHA GUTHÁIN Ó SMS:</strong> <strong>Bainimid uimhreacha gutháin</strong> as teachtaireachtaí SMS chun go mbeidh tú in ann iad a chóipeáil go héasca. <em>Tarlaíonn an eastóscadh seo go háitiúil.</em></li>
+<li><strong>ÁBHAR SMS DO OTP:</strong> <strong>Déanaimid anailís ar théacs SMS</strong> chun cóid OTP a bhrath agus a chóipeáil go huathoibríoch chuig do ghearrthaisce. <em>Déanann an anailís seo go háitiúil.</em></li>
+</ul>
+
+<h3>🚫 Cad NACH nDéanaimid le do Shonraí:</h3>
+<ul>
+<li><strong>NÍ THARCHUIDIMID ná NÍ UASLÓDÁLAIMID</strong> do theachtaireachtaí SMS, d\'uimhreacha gutháin, ná aon ábhar teachtaireachta chuig aon fhreastalaí.</li>
+<li><strong>NÍ STÓRÁLAIMID</strong> do shonraí SMS ná d\'uimhreacha gutháin ar fhreastalaithe seachtracha.</li>
+<li><strong>NÍ ROINNIMID</strong> do shonraí pearsanta le tríú páirtithe.</li>
+</ul>
+
+<h3>✅ Ráthaíocht Eochair:</h3>
+<p><strong>Déanann gach próiseáil sonraí go heisiach ar do ghléas (ar an ngléas).</strong> Ní fhágann do theachtaireachtaí SMS agus d\'uimhreacha gutháin do ghléas riamh. Ní úsáidtear rochtain idirlín ach chun MMS a sheoladh agus ceannacháin Google Play a phróiseáil.</p>
+
+<h3>🔑 Míniú ar na Ceadanna Riachtanacha:</h3>
+<ul>
+<li><strong>READ_SMS:</strong> Chun rochtain a fháil ar SMS le haghaidh cóipeáil OTP agus eastóscadh uimhreacha gutháin (próiseáil áitiúil amháin).</li>
+<li><strong>READ_PHONE_STATE:</strong> Chun uimhir theileafóin do ghléis a bhailiú agus a thaispeáint le haghaidh roghnú SIM (le húsáid áitiúil amháin).</li>
+</ul>
+
+<p><em>Trí leanúint ar aghaidh, aithníonn tú:</em></p>
+<ol>
+<li>Bailíonn an aip seo uimhir theileafóin do ghléis le haghaidh taispeántais áitiúil</li>
+<li>Rochtainíonn an aip seo teachtaireachtaí SMS le haghaidh eastóscadh OTP agus uimhreacha gutháin áitiúil</li>
+<li>Ní tharchuirtear aon cheann de na sonraí seo ó do ghléas</li>
+</ol>
+]]></string>
 </resources>

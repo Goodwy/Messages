@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Tittelstil for chat</string>
     <string name="unread_at_top_g">Ulest alltid øverst</string>
     <string name="show_sim_selection_dialog">Vis dialogboks for valg av SIM-kort når du sender</string>
@@ -11,4 +10,46 @@
     <string name="pending">I påvente av</string>
     <string name="message_type">Meldingstype</string>
     <string name="show_number_in_title">Vis nummeret i chat-overskriften</string>
+    <string name="warning_disclosure"><![CDATA[
+<h2>Datatilgangsinformasjon</h2>
+
+<p><strong>Denne appen krever tilgang til SMS-meldinger og telefonrelatert informasjon for å fungere ordentlig.</strong></p>
+
+<h3>🔍 Hvilken informasjon vi har tilgang til:</h3>
+<ul>
+<li><strong>SMS-MELDINGER:</strong> Hele innholdet i SMS-meldingene dine.</li>
+<li><strong>TELEFONNUMMER(E):</strong> Telefonnummeret(ene) som er knyttet til enhetens SIM-kort(er).</li>
+<li><strong>TELEFONNUMMER FRA SMS:</strong> Telefonnumre som finnes i SMS-meldingene dine.</li>
+</ul>
+
+<h3>📱 Hvordan vi bruker denne informasjonen (LOKALT PÅ ENHETEN):</h3>
+<ul>
+<li><strong>TELEFONNUMMER(E):</strong> Vi <strong>samler inn og bruker</strong> enhetens telefonnummer <strong>bare for å vise det</strong> i appgrensesnittet for Valg av SIM-kort. <em>Dette nummeret behandles lokalt og overføres ikke.</em></li>
+<li><strong>TELEFONNUMMER FRA SMS:</strong> Vi <strong>henter telefonnumre</strong> fra SMS-meldinger slik at du enkelt kan kopiere dem. <em>Denne hentingen skjer lokalt.</em></li>
+<li><strong>SMS-INNHOLD FOR OTP:</strong> Vi <strong>analyserer SMS-tekst</strong> for automatisk å oppdage og kopiere OTP-koder til utklippstavlen. <em>Denne analysen skjer lokalt.</em></li>
+</ul>
+
+<h3>🚫 Hva vi IKKE gjør med dataene dine:</h3>
+<ul>
+<li><strong>Vi OVERFØRER eller LASTER IKKE OPP</strong> SMS-meldingene, telefonnumrene eller noe meldingsinnhold til noen server.</li>
+<li><strong>Vi LAGRE IKKE</strong> SMS-dataene eller telefonnumrene dine på eksterne servere.</li>
+<li><strong>Vi DELER IKKE</strong> dine personopplysninger med tredjeparter.</li>
+</ul>
+
+<h3>✅ Nøkkelgaranti:</h3>
+<p><strong>All databehandling skjer utelukkende på enheten din (på enheten).</strong> SMS-meldingene og telefonnumrene dine forlater aldri enheten din. Internett-tilgang brukes kun til å sende MMS og behandle Google Play-kjøp.</p>
+
+<h3>🔑 Forklaring av nødvendige tillatelser:</h3>
+<ul>
+<li><strong>READ_SMS:</strong> For å få tilgang til SMS for kopiering av engangskode og uttrekking av telefonnummer (kun lokal behandling).</li>
+<li><strong>READ_PHONE_STATE:</strong> For å samle inn og vise enhetens telefonnummer for valg av SIM-kort (kun lokal bruk).</li>
+</ul>
+
+<p><em>Ved å fortsette, godtar du at:</em></p>
+<ol>
+<li>Denne appen samler inn enhetens telefonnummer for lokal visning</li>
+<li>Denne appen får tilgang til SMS-meldinger for lokal engangskode og uttrekking av telefonnummer</li>
+<li>Ingen av disse dataene overføres fra enheten din</li>
+</ol>
+]]></string>
 </resources>

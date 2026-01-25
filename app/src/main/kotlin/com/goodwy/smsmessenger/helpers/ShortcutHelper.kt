@@ -46,6 +46,10 @@ class ShortcutHelper(private val context: Context) {
         val participants = context.getThreadParticipants(conv.threadId, contactsMap)
         val persons: Array<Person> = participants.map { it.toPerson(context) }.toTypedArray()
         val isContact = if (participants.isNotEmpty()) participants[0].contactId != 0 else false
+        val shortLabel = conv.title.ifEmpty {
+            conv.phoneNumber.ifEmpty { "Unknown" }
+        }
+
         val intent = Intent(context, ThreadActivity::class.java).apply {
             action = Intent.ACTION_VIEW
             putExtra(THREAD_ID, conv.threadId)
@@ -58,8 +62,8 @@ class ShortcutHelper(private val context: Context) {
         }
 
         val shortcut = ShortcutInfoCompat.Builder(context, conv.threadId.toString()).apply {
-            setShortLabel(conv.title)
-            setLongLabel(conv.title)
+            setShortLabel(shortLabel)
+            setLongLabel(shortLabel)
             setIsConversation()
             setLongLived(true)
             setPersons(persons)
@@ -70,14 +74,11 @@ class ShortcutHelper(private val context: Context) {
             } else {
                 val icon = if (conv.isGroupConversation) {
                     IconCompat.createWithBitmap(
-                        contactsHelper.getColoredGroupIcon(conv.title).toBitmap()
+                        contactsHelper.getColoredGroupIcon(shortLabel).toBitmap()
                     )
                 } else {
-//                    IconCompat.createWithBitmap(
-//                        contactsHelper.getContactLetterIcon(conv.title)
-//                    )
                     IconCompat.createWithBitmap(
-                        SimpleContactsHelper(context).getColoredContactIcon(conv.title).toBitmap()
+                        SimpleContactsHelper(context).getColoredContactIcon(shortLabel).toBitmap()
                     )
                 }
                 setIcon(icon)

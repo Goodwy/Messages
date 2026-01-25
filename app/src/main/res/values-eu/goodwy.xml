@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Chat title style</string>
     <string name="unread_at_top_g">Unread always at the top</string>
     <string name="show_sim_selection_dialog">Show SIM card selection dialog when sending</string>
@@ -11,4 +10,46 @@
     <string name="pending">Zain</string>
     <string name="message_type">Mezu mota</string>
     <string name="show_number_in_title">Erakutsi zenbakia txataren goiburuan</string>
+    <string name="warning_disclosure"><![CDATA[
+<h2>Datuen Sarbidearen Dibulgazioa</h2>
+
+<p><strong>Aplikazio honek SMS mezuetarako eta telefonoarekin lotutako informaziorako sarbidea behar du behar bezala funtzionatzeko.</strong></p>
+
+<h3>🔍 Zer informazio eskuratzen dugun:</h3>
+<ul>
+<li><strong>SMS MEZUAK:</strong> Zure SMS mezuen eduki osoa.</li>
+<li><strong>ZURE TELEFONO ZENBAKIA(K):</strong> Zure gailuaren SIM txartelarekin lotutako telefono zenbakia(k).</li>
+<li><strong>SMSETAKO TELEFONO ZENBAKIAK:</strong> Zure SMS mezuetan dauden telefono zenbakiak.</li>
+</ul>
+
+<h3>📱 Nola erabiltzen dugun informazio hau (GAILUAN TOKIKOAN):</h3>
+<ul>
+<li><strong>ZURE TELEFONO ZENBAKIA:</strong> Zure gailuaren telefono zenbakia <strong>biltzen eta erabiltzen</strong> dugu aplikazioaren interfazean <strong>bistaratzeko</strong> soilik SIM txartelaren hautaketa. <em>Zenbaki hau tokian bertan prozesatzen da eta ez da transmititzen.</em></li>
+<li><strong>SMS mezuetako TELEFONO ZENBAKIAK:</strong> SMS mezuetatik <strong>telefono zenbakiak ateratzen ditugu</strong> erraz kopiatu ahal izateko. <em>Ateratze hau tokian bertan gertatzen da.</em></li>
+<li><strong>OTPrako SMS EDUKIA:</strong> SMS testua <strong>aztertzen dugu</strong> OTP kodeak automatikoki detektatu eta arbelean kopiatzeko. <em>Analisi hau tokian bertan egiten da.</em></li>
+</ul>
+
+<h3>🚫 Zer EZ dugu egiten zure datuekin:</h3>
+<ul>
+<li><strong>EZ ditugu zure SMS mezuak, telefono zenbakiak edo mezuen edukia zerbitzari batera transmititzen edo igotzen.</li>
+<li><strong>EZ ditugu zure SMS datuak edo telefono zenbakiak kanpoko zerbitzarietan GORDE.</li>
+<li><strong>EZ ditugu zure datu pertsonalak hirugarrenekin PARTEKATZEN.</li>
+</ul>
+
+<h3>✅ Berme nagusia:</h3>
+<p><strong>Datu-prozesamendu guztia zure gailuan (gailuaren barruan) soilik egiten da.</strong> Zure SMS mezuak eta telefono zenbakiak ez dira inoiz zure gailutik irteten. Interneterako sarbidea MMSak bidaltzeko eta Google Play-ko erosketak prozesatzeko soilik erabiltzen da.</p>
+
+<h3>🔑 Beharrezko baimenak azalduta:</h3>
+<ul>
+<li><strong>READ_SMS:</strong> SMSetara sartzeko OTP kopiatzeko eta telefono zenbakia ateratzeko (tokiko prozesamendua soilik).</li>
+<li><strong>READ_PHONE_STATE:</strong> Zure gailuaren telefono zenbakia biltzeko eta bistaratzeko SIM txartela hautatzeko (tokiko erabilera soilik).</li>
+</ul>
+
+<p><em>Jarraituz gero, honako hau onartzen duzu:</em></p>
+<ol>
+<li>Aplikazio honek zure gailuaren telefono zenbakia biltzen du tokiko bistaratzeko</li>
+<li>Aplikazio honek SMS mezuetara sartzen da tokiko OTP eta telefono zenbakia ateratzeko</li>
+<li>Datu hauetatik bat ere ez da zure gailutik transmititzen</li>
+</ol>
+]]></string>
 </resources>

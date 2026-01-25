@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Estilo de título do bate-papo</string>
     <string name="unread_at_top_g">Não lidos sempre no topo</string>
     <string name="show_sim_selection_dialog">Mostrar a caixa de diálogo de seleção do cartão SIM durante o envio</string>
@@ -11,4 +10,57 @@
     <string name="pending">Pendente</string>
     <string name="message_type">Tipo de mensagem</string>
     <string name="show_number_in_title">Exibir número no cabeçalho do chat</string>
+    <string name="warning_disclosure"><![CDATA[
+
+<h2>Divulgação de Acesso a Dados</h2>
+
+<p><strong>Este aplicativo requer acesso a mensagens SMS e informações relacionadas ao telefone para funcionar corretamente.</strong></p>
+
+<h3>🔍 Quais informações acessamos:</h3>
+<ul>
+
+<li><strong>MENSAGENS SMS:</strong> Conteúdo completo de suas mensagens SMS.</li>
+
+<li><strong>SEU(S) NÚMERO(S) DE TELEFONE:</strong> O(s) número(s) de telefone associado(s) ao(s) cartão(ões) SIM do seu dispositivo.</li>
+
+<li><strong>NÚMEROS DE TELEFONE DE SMS:</strong> Números de telefone contidos em suas mensagens SMS.</li>
+</ul>
+
+<h3>📱 Como usamos essas informações (LOCALMENTE NO DISPOSITIVO):</h3>
+<ul>
+
+<li><strong>SEU NÚMERO DE TELEFONE:</strong> Nós <strong>coletamos e usamos</strong> o número de telefone do seu dispositivo <strong>apenas para exibir <em>Este número é processado localmente e não transmitido.</em></li>
+<li><strong>NÚMEROS DE TELEFONE DE SMS:</strong> Nós <strong>extraímos números de telefone</strong> de mensagens SMS para permitir que você os copie facilmente. <em>Essa extração ocorre localmente.</em></li>
+<li><strong>CONTEÚDO DE SMS PARA OTP:</strong> Nós <strong>analisamos o texto SMS</strong> para detectar e copiar automaticamente os códigos OTP para a sua área de transferência. <em>Esta análise ocorre localmente.</em></li>
+</ul>
+
+<h3>🚫 O que NÃO fazemos com seus dados:</h3>
+<ul>
+<li><strong>NÃO TRANSMITIMOS nem ENVIAMOS</strong> suas mensagens SMS, números de telefone ou qualquer conteúdo de mensagem para nenhum servidor.</li>
+<li><strong>NÃO ARMAZENAMOS</strong> seus dados SMS ou números de telefone em servidores externos.</li>
+<li><strong>NÃO COMPARTILHAMOS</strong> seus dados pessoais com terceiros.</li>
+</ul>
+
+<h3>✅ Garantia Principal:</h3>
+<p><strong>Todo o processamento de dados ocorre exclusivamente no seu dispositivo (no dispositivo).</strong> Suas mensagens SMS e números de telefone nunca saem do seu dispositivo. O acesso à internet é usado apenas para o envio de MMS e o processamento de compras do Google Play.</p>
+
+<h3>🔑 Explicação das permissões necessárias:</h3>
+<ul>
+
+<li><strong>READ_SMS:</strong> Para acessar SMS para copiar o código OTP e extrair o número de telefone (somente processamento local).</li>
+
+<li><strong>READ_PHONE_STATE:</strong> Para coletar e exibir o número de telefone do seu dispositivo para seleção do SIM (somente uso local).</li>
+</ul>
+
+<p><em>Ao continuar, você reconhece que:</em></p>
+<ol>
+
+<li>Este aplicativo coleta o número de telefone do seu dispositivo para exibição local</li>
+
+<li>Este aplicativo acessa mensagens SMS para extrair o código OTP e o número de telefone localmente</li>
+
+<li>Nenhum desses dados é transmitido do seu dispositivo</li>
+</ol>
+
+]]></string>
 </resources>

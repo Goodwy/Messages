@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Slog naslova klepeta</string>
     <string name="unread_at_top_g">Neprebrano vedno na vrhu</string>
     <string name="show_sim_selection_dialog">Pokaži pogovorno okno za izbiro kartice SIM pri pošiljanju</string>
@@ -11,4 +10,46 @@
     <string name="pending">V teku</string>
     <string name="message_type">Vrsta sporočila</string>
     <string name="show_number_in_title">Prikaži številko v glavi klepeta</string>
+    <string name="warning_disclosure"><![CDATA[
+<h2>Razkritje dostopa do podatkov</h2>
+
+<p><strong>Ta aplikacija za pravilno delovanje potrebuje dostop do SMS sporočil in informacij, povezanih s telefonom.</strong></p>
+
+<h3>🔍 Do katerih informacij dostopamo:</h3>
+<ul>
+<li><strong>SMS SPOROČILA:</strong> Celotna vsebina vaših SMS sporočil.</li>
+<li><strong>VAŠA(-E) TELEFONSKA(-E) ŠTEVILKA(-E):</strong> Telefonska(-e) številka(-e), povezana(-e) s SIM kartico(-ami) vaše naprave.</li>
+<li><strong>TELEFONSKE ŠTEVILKE IZ SMS-SPOROČIL:</strong> Telefonske številke, ki so vsebovane v vaših SMS sporočilih.</li>
+</ul>
+
+<h3>📱 Kako uporabljamo te informacije (LOKALNO NA NAPRAVI):</h3>
+<ul>
+<li><strong>VAŠA TELEFONSKA ŠTEVILKA:</strong> Telefonsko številko vaše naprave <strong>zbiramo in uporabljamo</strong> <strong>samo za njen prikaz</strong> v vmesniku aplikacije za izbiro kartice SIM. <em>Ta številka se obdeluje lokalno in se ne prenaša.</em></li>
+<li><strong>TELEFONSKE ŠTEVILKE IZ SMS-ov:</strong> <strong>Telefonske številke</strong> <em>izvlečemo</strong> iz SMS-sporočil, da jih lahko preprosto kopirate. <em>To izvlečenje se zgodi lokalno.</em></li>
+<li><strong>VSEBINA SMS-ov ZA ENKRATNO geslo:</strong> <strong>Analiziramo besedilo SMS-ov</strong>, da samodejno zaznamo in kopiramo kode enkratnih gesel v vaše odložišče. <em>Ta analiza se izvaja lokalno.</em></li>
+</ul>
+
+<h3>🚫 Česa NE počnemo z vašimi podatki:</h3>
+<ul>
+<li><strong>Vaših SMS sporočil, telefonskih številk ali vsebine sporočil NE PRENAŠAMO ali NALAGAMO</strong> na noben strežnik.</li>
+<li><strong>Vaših SMS podatkov ali telefonskih številk NE SHRANJUJEMO</strong> na zunanjih strežnikih.</li>
+<li><strong>Vaših osebnih podatkov NE DELIMO</strong> s tretjimi osebami.</li>
+</ul>
+
+<h3>✅ Ključno jamstvo:</h3>
+<p><strong>Vsa obdelava podatkov se izvaja izključno v vaši napravi (na napravi).</strong> Vaša SMS sporočila in telefonske številke nikoli ne zapustijo vaše naprave. Dostop do interneta se uporablja samo za pošiljanje MMS-ov in obdelavo nakupov v trgovini Google Play.</p>
+
+<h3>🔑 Pojasnilo potrebnih dovoljenj:</h3>
+<ul>
+<li><strong>READ_SMS:</strong> Za dostop do SMS-ov za kopiranje enkratnih gesel in pridobivanje telefonske številke (samo lokalna obdelava).</li>
+<li><strong>READ_PHONE_STATE:</strong> Za zbiranje in prikaz telefonske številke vaše naprave za izbiro kartice SIM (samo lokalna uporaba).</li>
+</ul>
+
+<p><em>Z nadaljevanjem potrjujete, da:</em></p>
+<ol>
+<li>Ta aplikacija zbira telefonsko številko vaše naprave za lokalni prikaz</li>
+<li>Ta aplikacija dostopa do SMS-sporočil za lokalno enkratno geslo in pridobivanje telefonske številke</li>
+<li>Noben od teh podatkov se ne prenaša iz vaše naprave</li>
+</ol>
+]]></string>
 </resources>

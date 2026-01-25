@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">نمط عنوان الدردشة</string>
     <string name="unread_at_top_g">غير مقروء دائما في الأعلى</string>
     <string name="show_sim_selection_dialog">إظهار مربع حوار تحديد بطاقة SIM عند الإرسال</string>

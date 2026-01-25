@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
-    <string name="app_name_n" translatable="false">AlRight Messages</string>
     <string name="chat_title_style_g">Chat title style</string>
     <string name="unread_at_top_g">Unread always at the top</string>
     <string name="show_sim_selection_dialog">Show SIM card selection dialog when sending</string>
@@ -12,4 +10,48 @@
     <string name="pending">Pending</string>
     <string name="message_type">Message type</string>
     <string name="show_number_in_title">Show number in title</string>
+    <string name="warning_disclosure">
+        <![CDATA[
+        <h2>Data Access Disclosure</h2>
+
+<p><strong>This app requires access to SMS messages and phone-related information to function properly.</strong></p>
+
+<h3>🔍 What Information We Access:</h3>
+<ul>
+    <li><strong>SMS MESSAGES:</strong> Full content of your SMS messages.</li>
+    <li><strong>YOUR PHONE NUMBER(S):</strong> The phone number(s) associated with your device\'s SIM card(s).</li>
+    <li><strong>PHONE NUMBERS FROM SMS:</strong> Phone numbers contained within your SMS messages.</li>
+</ul>
+
+<h3>📱 How We Use This Information (LOCALLY ON DEVICE):</h3>
+<ul>
+    <li><strong>YOUR PHONE NUMBER:</strong> We <strong>collect and use</strong> your device\'s phone number <strong>only to display it</strong> in the app interface for SIM card selection. <em>This number is processed locally and not transmitted.</em></li>
+    <li><strong>PHONE NUMBERS FROM SMS:</strong> We <strong>extract phone numbers</strong> from SMS messages to allow you to copy them easily. <em>This extraction happens locally.</em></li>
+    <li><strong>SMS CONTENT FOR OTP:</strong> We <strong>analyze SMS text</strong> to automatically detect and copy OTP codes to your clipboard. <em>This analysis happens locally.</em></li>
+</ul>
+
+<h3>🚫 What We DO NOT Do With Your Data:</h3>
+<ul>
+    <li><strong>We do NOT TRANSMIT or UPLOAD</strong> your SMS messages, phone numbers, or any message content to any server.</li>
+    <li><strong>We do NOT STORE</strong> your SMS data or phone numbers on external servers.</li>
+    <li><strong>We do NOT SHARE</strong> your personal data with third parties.</li>
+</ul>
+
+<h3>✅ Key Guarantee:</h3>
+<p><strong>All data processing occurs exclusively on your device (on-device).</strong> Your SMS messages and phone numbers never leave your device. Internet access is used only for sending MMS and processing Google Play purchases.</p>
+
+<h3>🔑 Required Permissions Explained:</h3>
+<ul>
+    <li><strong>READ_SMS:</strong> To access SMS for OTP copying and phone number extraction (local processing only).</li>
+    <li><strong>READ_PHONE_STATE:</strong> To collect and display your device\'s phone number for SIM selection (local use only).</li>
+</ul>
+
+<p><em>By continuing, you acknowledge that:</em></p>
+<ol>
+    <li>This app collects your device\'s phone number for local display</li>
+    <li>This app accesses SMS messages for local OTP and phone number extraction</li>
+    <li>None of this data is transmitted from your device</li>
+</ol>
+        ]]>
+    </string>
 </resources>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">チャットのタイトルスタイル</string>
     <string name="unread_at_top_g">未読は常に一番上に表示されます</string>
     <string name="show_sim_selection_dialog">送信時にSIMカード選択ダイアログを表示する</string>
@@ -11,4 +10,46 @@
     <string name="pending">保留中</string>
     <string name="message_type">メッセージの種類</string>
     <string name="show_number_in_title">チャットヘッダーに番号を表示する</string>
+    <string name="warning_disclosure"><![CDATA[
+<h2>データアクセスに関する開示</h2>
+
+<p><strong>このアプリは、正常に動作するためにSMSメッセージおよび電話関連情報へのアクセスを必要とします。</strong></p>
+
+<h3>🔍 アクセスする情報: </h3>
+<ul>
+<li><strong>SMSメッセージ: </strong> SMSメッセージの全内容。</li>
+<li><strong>電話番号: </strong> デバイスのSIMカードに関連付けられた電話番号。</li>
+<li><strong>SMSから取得した電話番号: </strong> SMSメッセージに含まれる電話番号。</li>
+</ul>
+
+<h3>📱 この情報の使用方法（デバイス上でローカルに記録）: </h3>
+<ul>
+<li><strong>電話番号: </strong> デバイスの電話番号を<strong>収集および使用</strong>します。 SIMカード選択用のアプリインターフェースに<strong>表示のみ</strong>します。<em>この番号はローカルで処理され、送信されることはありません。</em></li>
+<li><strong>SMSからの電話番号：</strong> SMSメッセージから<strong>電話番号を抽出</strong>し、簡単にコピーできるようにします。<em>この抽出はローカルで行われます。</em></li>
+<li><strong>OTP用SMSコンテンツ：</strong> SMSテキストを<strong>分析</strong>し、OTPコードを自動的に検出してクリップボードにコピーします。 <em>この分析はローカルで行われます。</em></li>
+</ul>
+
+<h3>🚫 お客様のデータに関して行わないこと：</h3>
+<ul>
+<li><strong>お客様のSMSメッセージ、電話番号、またはメッセージの内容をいかなるサーバーにも送信またはアップロードしません</strong>。</li>
+<li><strong>お客様のSMSデータまたは電話番号を外部サーバーに保存しません</strong>。</li>
+<li><strong>お客様の個人データを第三者と共有しません</strong>。</li>
+</ul>
+
+<h3>✅ 重要な保証：</h3>
+<p><strong>すべてのデータ処理は、お客様のデバイス内（デバイス上）でのみ行われます。</strong>お客様のSMSメッセージと電話番号は、お客様のデバイスから外部に送信されることはありません。インターネットアクセスは、MMS の送信と Google Play での購入処理にのみ使用されます。</p>
+
+<h3>🔑 必要な権限の説明:</h3>
+<ul>
+<li><strong>READ_SMS:</strong> OTP のコピーと電話番号の抽出のために SMS にアクセスします（ローカル処理のみ）。</li>
+<li><strong>READ_PHONE_STATE:</strong> SIM 選択のためにデバイスの電話番号を収集して表示します（ローカル使用のみ）。</li>
+</ul>
+
+<p><em>続行すると、以下の内容に同意したことになります:</em></p>
+<ol>
+<li>このアプリは、ローカル表示のた​​めにデバイスの電話番号を収集します。</li>
+<li>このアプリは、ローカル OTP と電話番号の抽出のために SMS メッセージにアクセスします。</li>
+<li>これらのデータはデバイスから送信されることはありません。</li>
+</ol>
+]]></string>
 </resources>

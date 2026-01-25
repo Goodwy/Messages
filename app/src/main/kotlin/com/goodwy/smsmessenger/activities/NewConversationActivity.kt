@@ -295,6 +295,8 @@ class NewConversationActivity : SimpleActivity() {
             val all = allNotEmpty.map { it.name.substring(0, 1) }
             val unique: Set<String> = HashSet(all)
             val sizeUnique = unique.size
+            binding.contactsLetterFastscroller.beGoneIf(sizeUnique < 8)
+
             if (isHighScreenSize()) {
                 if (sizeUnique > 48) binding.contactsLetterFastscroller.textAppearanceRes = R.style.LetterFastscrollerStyleTooTiny
                 else if (sizeUnique > 37) binding.contactsLetterFastscroller.textAppearanceRes = R.style.LetterFastscrollerStyleTiny

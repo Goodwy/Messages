@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Sohbet başlığı stili</string>
     <string name="unread_at_top_g">Okunmamış, her zaman en üstte</string>
     <string name="show_sim_selection_dialog">Gönderirken SIM kart seçimi iletişim kutusunu göster</string>
@@ -11,4 +10,63 @@
     <string name="pending">Askıda olması</string>
     <string name="message_type">Mesaj türü</string>
     <string name="show_number_in_title">Sohbet başlığında numarayı göster</string>
+    <string name="warning_disclosure"><![CDATA[
+
+<h2>Veri Erişimi Açıklaması</h2>
+
+<p><strong>Bu uygulama düzgün çalışması için SMS mesajlarına ve telefonla ilgili bilgilere erişim gerektirir.</strong></p>
+
+<h3>🔍 Hangi Bilgilere Erişiyoruz:</h3>
+<ul>
+
+<li><strong>SMS MESAJLARI:</strong> SMS mesajlarınızın tam içeriği.</li>
+
+<li><strong>TELEFON NUMARANIZ(LAR):</strong> Cihazınızın SIM kartıyla ilişkili telefon numarası(ları).</li>
+
+<li><strong>SMS\'TEN GELEN TELEFON NUMARALARI:</strong> SMS mesajlarınızın içinde yer alan telefon numaraları.</li>
+</ul>
+
+<h3>📱 Bu Bilgileri Nasıl Kullanıyoruz (YEREL OLARAK CİHAZDA):</h3>
+<ul>
+
+<li><strong>TELEFON NUMARANIZ:</strong> Cihazınızın telefon numarasını yalnızca görüntülemek için topluyor ve kullanıyoruz.</strong> SIM kart seçimi için uygulama arayüzünde bu numarayı girin. Bu numara yerel olarak işlenir ve iletilmez.
+
+SMS\'LERDEN TELEFON NUMARALARI: Telefon numaralarını SMS mesajlarından çıkarıyoruz ve kolayca kopyalamanıza olanak sağlıyoruz. Bu çıkarma işlemi yerel olarak gerçekleşir.
+
+OTP İÇİN SMS İÇERİĞİ: OTP kodlarını otomatik olarak algılayıp panonuza kopyalamak için SMS metnini analiz ediyoruz. <em>Bu analiz yerel olarak gerçekleşir.</em></li>
+</ul>
+
+<h3>🚫 Verilerinizle Neler YAPMIYORUZ:</h3>
+<ul>
+
+<li><strong>SMS mesajlarınızı, telefon numaralarınızı veya herhangi bir mesaj içeriğini hiçbir sunucuya İLETMİYORUZ veya YÜKLEMİYORUZ.</strong>
+
+<li><strong>SMS verilerinizi veya telefon numaralarınızı harici sunucularda SAKLAMIYORUZ.</strong>
+
+<li><strong>Kişisel verilerinizi üçüncü taraflarla PAYLAŞMIYORUZ.</strong>
+
+</ul>
+
+<h3>✅ Temel Garanti:</h3>
+<p><strong>Tüm veri işleme yalnızca cihazınızda (cihaz üzerinde) gerçekleşir.</strong> SMS mesajlarınız ve telefon numaralarınız asla cihazınızdan ayrılmaz. İnternet erişimi yalnızca MMS göndermek ve Google Play satın alımlarını işlemek için kullanılır.</p>
+
+<h3>🔑 Gerekli İzinler Açıklaması:</h3>
+<ul>
+
+<li><strong>SMS OKUMA:</strong> OTP kopyalama ve telefon numarası çıkarma için SMS\'lere erişim (yalnızca yerel işlem).</li>
+
+<li><strong>TELEFON DURUMUNU OKUMA:</strong> SIM seçimi için cihazınızın telefon numarasını toplamak ve görüntülemek (yalnızca yerel kullanım).</li>
+</ul>
+
+<p><em>Devam ederek şunları kabul ediyorsunuz:</em></p>
+<ol>
+
+<li>Bu uygulama, cihazınızın telefon numarasını yerel görüntüleme için toplar.</li>
+
+<li>Bu uygulama, yerel OTP ve telefon numarası çıkarma için SMS mesajlarına erişir.</li>
+
+<li>Bu verilerin hiçbiri cihazınızdan iletilmez.</li>
+</ol>
+
+]]></string>
 </resources>

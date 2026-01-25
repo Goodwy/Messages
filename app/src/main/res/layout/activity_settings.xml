@@ -477,6 +477,26 @@
                     </RelativeLayout>
 
                     <RelativeLayout
+                        android:id="@+id/settings_swipe_width_holder"
+                        style="@style/SettingsHolderStyle">
+
+                        <com.goodwy.commons.views.MyTextView
+                            android:id="@+id/settings_swipe_width_label"
+                            style="@style/SettingsTextLabelStyle"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@+id/settings_swipe_width"
+                            android:text="@string/swipe_width" />
+
+                        <com.goodwy.commons.views.MyTextView
+                            android:id="@+id/settings_swipe_width"
+                            style="@style/SettingsTextValueStyle"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="@dimen/settings_margin"
+                            tools:text="1/2" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
                         android:id="@+id/settingsSwipeVibrationHolder"
                         style="@style/SettingsHolderSwitchStyle">
 

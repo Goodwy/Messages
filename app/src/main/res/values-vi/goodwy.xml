@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Chat title style</string>
     <string name="unread_at_top_g">Chưa đọc luôn ở trên cùng</string>
     <string name="show_sim_selection_dialog">Hiển thị hộp thoại chọn thẻ SIM khi gửi</string>
@@ -11,4 +10,67 @@
     <string name="pending">Chưa giải quyết</string>
     <string name="message_type">Loại tin nhắn</string>
     <string name="show_number_in_title">Hiển thị số điện thoại trong tiêu đề cuộc trò chuyện</string>
+    <string name="warning_disclosure"><![CDATA[
+
+<h2>Thông báo về quyền truy cập dữ liệu</h2>
+
+<p><strong>Ứng dụng này yêu cầu quyền truy cập vào tin nhắn SMS và thông tin liên quan đến điện thoại để hoạt động bình thường.</strong></p>
+
+<h3>🔍 Thông tin chúng tôi truy cập:</h3>
+<ul>
+
+<li><strong>TIN NHẮN SMS:</strong> Toàn bộ nội dung tin nhắn SMS của bạn.</li>
+
+<li><strong>SỐ ĐIỆN THOẠI CỦA BẠN:</strong> Số điện thoại được liên kết với thẻ SIM của thiết bị.</li>
+
+<li><strong>SỐ ĐIỆN THOẠI TỪ TIN NHẮN SMS:</strong> Số điện thoại có trong tin nhắn SMS của bạn.</li>
+
+</ul>
+
+<h3>📱 Cách chúng tôi sử dụng thông tin này (TRÊN THIẾT BỊ):</h3>
+
+<ul>
+
+<li><strong>SỐ ĐIỆN THOẠI CỦA BẠN:</strong> Chúng tôi <strong>thu thập và sử dụng</strong> số điện thoại của thiết bị của bạn <strong>chỉ để hiển thị <strong>Số này</strong> hiển thị trong giao diện ứng dụng để chọn thẻ SIM. <em>Số này được xử lý cục bộ và không được truyền đi.</em></li>
+<li><strong>SỐ ĐIỆN THOẠI TỪ TIN NHẮN SMS:</strong> Chúng tôi <strong>trích xuất số điện thoại</strong> từ tin nhắn SMS để bạn có thể sao chép dễ dàng. <em>Quá trình trích xuất này diễn ra cục bộ.</em></li>
+<li><strong>NỘI DUNG TIN NHẮN SMS CHO MÃ OTP:</strong> Chúng tôi <strong>phân tích văn bản SMS</strong> để tự động phát hiện và sao chép mã OTP vào khay nhớ tạm của bạn. <em>Việc phân tích này diễn ra cục bộ.</em></li>
+
+</ul>
+
+<h3>🚫 Những điều chúng tôi KHÔNG làm với dữ liệu của bạn:</h3>
+<ul>
+
+<li><strong>Chúng tôi KHÔNG TRUYỀN hoặc TẢI LÊN</strong> tin nhắn SMS, số điện thoại hoặc bất kỳ nội dung tin nhắn nào của bạn lên bất kỳ máy chủ nào.</li>
+
+<li><strong>Chúng tôi KHÔNG LƯU TRỮ</strong> dữ liệu SMS hoặc số điện thoại của bạn trên các máy chủ bên ngoài.</li>
+
+<li><strong>Chúng tôi KHÔNG CHIA SẺ</strong> dữ liệu cá nhân của bạn với bên thứ ba.</li>
+
+</ul>
+
+<h3>✅ Đảm bảo quan trọng:</h3>
+<p><strong>Tất cả quá trình xử lý dữ liệu chỉ diễn ra trên thiết bị của bạn (trên thiết bị).</strong> Tin nhắn SMS và số điện thoại của bạn không bao giờ rời khỏi thiết bị của bạn. Truy cập Internet chỉ được sử dụng để gửi MMS và xử lý các giao dịch mua trên Google Play.</p>
+
+<h3>🔑 Giải thích các quyền cần thiết:</h3>
+<ul>
+
+<li><strong>READ_SMS:</strong> Để truy cập tin nhắn SMS để sao chép mã OTP và trích xuất số điện thoại (chỉ xử lý cục bộ).</li>
+
+<li><strong>READ_PHONE_STATE:</strong> Để thu thập và hiển thị số điện thoại của thiết bị để chọn SIM (chỉ sử dụng cục bộ).</li>
+
+</ul>
+
+<p><em>Bằng cách tiếp tục, bạn xác nhận rằng:</em></p>
+
+<ol>
+
+<li>Ứng dụng này thu thập số điện thoại của thiết bị để hiển thị cục bộ</li>
+
+<li>Ứng dụng này truy cập tin nhắn SMS để trích xuất mã OTP và số điện thoại cục bộ</li>
+
+<li>Không có dữ liệu nào được truyền từ thiết bị của bạn</li>
+
+</ol>
+
+]]></string>
 </resources>

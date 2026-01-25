@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">聊天標題樣式</string>
     <string name="unread_at_top_g">未读始终位于顶部</string>
     <string name="show_sim_selection_dialog">发送时显示 SIM 卡选择对话框</string>
@@ -11,4 +10,73 @@
     <string name="pending">待办的</string>
     <string name="message_type">消息类型</string>
     <string name="show_number_in_title">在聊天标题中显示号码</string>
+    <string name="warning_disclosure"><![CDATA[
+
+<h2>数据访问披露</h2>
+
+<p><strong>此应用需要访问短信和手机相关信息才能正常运行。</strong></p>
+
+<h3>🔍 我们访问哪些信息：</h3>
+
+<ul>
+
+<li><strong>短信：</strong> 您的短信完整内容。</li>
+
+<li><strong>您的手机号码：</strong> 与您设备 SIM 卡关联的手机号码。</li>
+
+<li><strong>短信中的电话号码：</strong> 您的短信中包含的电话号码。</li>
+
+</ul>
+
+<h3>📱 我们如何使用这些信息（本地存储于设备）：</h3>
+
+<ul>
+
+<li><strong>您的手机号码：</strong> 我们<strong>收集并使用</strong>您设备的手机号码<strong>仅用于显示在应用界面中，您可以选择 SIM 卡。此号码在本地处理，不会传输。
+
+从短信中提取电话号码：我们会从短信中提取电话号码，方便您轻松复制。此提取过程在本地进行。
+
+从短信中提取验证码：我们会分析短信内容，自动检测并复制验证码到您的剪贴板。 <em>此分析在本地进行。</em></li>
+
+</ul>
+
+<h3>🚫 我们不会如何处理您的数据：</h3>
+
+<ul>
+
+<li><strong>我们不会将您的短信、电话号码或任何消息内容传输或上传到任何服务器。</strong>
+
+<li><strong>我们不会将您的短信数据或电话号码存储在外部服务器上。</strong>
+
+<li><strong>我们不会与第三方共享您的个人数据。</strong>
+
+</ul>
+
+<h3>✅ 关键保障：</h3>
+
+<p><strong>所有数据处理均在您的设备上进行（设备内）。</strong> 您的短信和电话号码绝不会离开您的设备。</p>仅用于发送彩信和处理 Google Play 购买。</p>
+
+<h3>🔑 所需权限说明：</h3>
+
+<ul>
+
+<li><strong>READ_SMS：</strong> 用于访问短信以复制验证码和提取电话号码（仅限本地处理）。</li>
+
+<li><strong>READ_PHONE_STATE：</strong> 用于收集并显示您设备的电话号码以进行 SIM 卡选择（仅限本地使用）。</li>
+
+</ul>
+
+<p><em>继续操作即表示您确认：</em></p>
+
+<ol>
+
+<li>此应用会收集您设备的电话号码以在本地显示</li>
+
+<li>此应用会访问短信以在本地提取验证码和电话号码</li>
+
+<li>所有这些数据都不会从您的设备传输</li>
+
+</ol>
+
+]]></string>
 </resources>

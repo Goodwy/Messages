@@ -20,6 +20,7 @@ import com.goodwy.smsmessenger.extensions.createTemporaryThread
 import com.goodwy.smsmessenger.extensions.deleteConversation
 import com.goodwy.smsmessenger.extensions.deleteMessage
 import com.goodwy.smsmessenger.extensions.deleteScheduledMessage
+import com.goodwy.smsmessenger.extensions.getUnreadMMSCountFromSystem
 import com.goodwy.smsmessenger.extensions.launchConversationDetails
 import com.goodwy.smsmessenger.extensions.markLastMessageUnread
 import com.goodwy.smsmessenger.extensions.markThreadMessagesRead
@@ -495,6 +496,17 @@ class ConversationsAdapter(
         toRecycleBin: Boolean,
     ) {
         val threadId = conversation.threadId
+
+        // FIRST, check the system database for unread MMS messages.
+        val unreadMMSCount = activity.getUnreadMMSCountFromSystem(threadId)
+        if (unreadMMSCount > 0) {
+            // Forcibly mark as read in the system database
+            activity.markThreadMessagesRead(threadId)
+            // Allow time for synchronisation
+            Thread.sleep(500)
+        }
+
+        // NOW we receive messages for deletion
         val messagesToRemove = try {
             if (activity.config.useRecycleBin) {
                 activity.messagesDB.getNonRecycledThreadMessages(threadId)

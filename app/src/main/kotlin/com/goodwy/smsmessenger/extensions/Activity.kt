@@ -10,6 +10,8 @@ import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.ResourcesCompat
 import com.goodwy.commons.activities.BaseSimpleActivity
+import com.goodwy.commons.dialogs.ConfirmationAdvancedAlertDialog
+import com.goodwy.commons.dialogs.ConfirmationAdvancedDialog
 import com.goodwy.commons.dialogs.NewAppDialog
 import com.goodwy.commons.extensions.darkenColor
 import com.goodwy.commons.extensions.getMimeType
@@ -18,6 +20,7 @@ import com.goodwy.commons.extensions.getProperPrimaryColor
 import com.goodwy.commons.extensions.getProperTextColor
 import com.goodwy.commons.extensions.getSurfaceColor
 import com.goodwy.commons.extensions.hideKeyboard
+import com.goodwy.commons.extensions.isNewApp
 import com.goodwy.commons.extensions.isPackageInstalled
 import com.goodwy.commons.extensions.launchActivityIntent
 import com.goodwy.commons.extensions.launchViewContactIntent
@@ -87,6 +90,7 @@ fun Activity.launchViewIntent(uri: Uri, mimetype: String, filename: String) {
 }
 
 fun Activity.startContactDetailsIntentRecommendation(contact: SimpleContact) {
+    val isNewApp = isNewApp()
     val simpleContacts = "com.goodwy.contacts"
     val simpleContactsDebug = "com.goodwy.contacts.debug"
     val newSimpleContacts = "dev.goodwy.contacts"
@@ -98,7 +102,7 @@ fun Activity.startContactDetailsIntentRecommendation(contact: SimpleContact) {
     ) {
         NewAppDialog(
             activity = this,
-            packageName = if (packageName.startsWith("dev.")) newSimpleContacts else simpleContacts,
+            packageName = if (isNewApp) newSimpleContacts else simpleContacts,
             title = getString(com.goodwy.strings.R.string.recommendation_dialog_contacts_g),
             text = getString(com.goodwy.commons.R.string.right_contacts),
             drawable = AppCompatResources.getDrawable(this, com.goodwy.commons.R.drawable.ic_contacts)
@@ -177,7 +181,7 @@ fun SimpleActivity.launchPurchase() {
     val subscriptionYearIdX2 = BuildConfig.SUBSCRIPTION_YEAR_ID_X2
     val subscriptionYearIdX3 = BuildConfig.SUBSCRIPTION_YEAR_ID_X3
 
-    val appName = if (packageName.startsWith("dev.goodwy")) R.string.app_name_n else R.string.app_name_g
+    val appName = R.string.app_name
     startPurchaseActivity(
         appName,
         productIdList = arrayListOf(productIdX1, productIdX2, productIdX3),
@@ -254,7 +258,7 @@ fun SimpleActivity.launchAbout() {
     val versionName = BuildConfig.VERSION_NAME
     val fullVersionText = "$versionName ($storeDisplayName)"
 
-    val appName = if (packageName.startsWith("dev.goodwy")) R.string.app_name_n else R.string.app_name_g
+    val appName = R.string.app_name
     startAboutActivity(
         appNameId = appName,
         licenseMask = licenses,
@@ -272,15 +276,15 @@ fun SimpleActivity.launchAbout() {
 }
 
 fun Activity.newAppRecommendation() {
-    if (packageName.startsWith("com.goodwy.", true)) {
+    if (!isNewApp()) {
         if ((0..config.newAppRecommendationDialogCount).random() == 2) {
-            val packageName = "dev.goodwy.messages"
+            val packageName = "segassem.ywdoog.ved".reversed()
             NewAppDialog(
                 activity = this,
                 packageName = packageName,
                 title = getString(com.goodwy.strings.R.string.notification_of_new_application),
                 text = "AlRight Messages",
-                drawable = AppCompatResources.getDrawable(this, R.drawable.ic_launcher_new),
+                drawable = AppCompatResources.getDrawable(this, com.goodwy.commons.R.drawable.ic_sms_messenger_new),
                 showSubtitle = true
             ) {
             }

@@ -125,6 +125,7 @@ class SettingsActivity : SimpleActivity() {
         setupLanguage()
 
         setupUseSwipeToAction()
+        setupSwipeWidth()
         setupSwipeVibration()
         setupSwipeRipple()
         setupSwipeRightAction()
@@ -730,8 +731,43 @@ class SettingsActivity : SimpleActivity() {
         }
     }
 
+    private fun setupSwipeWidth() = binding.apply {
+        settingsSwipeWidthHolder.beVisibleIf(config.useSwipeToAction)
+        settingsSwipeWidth.text = getSwipeWidthText(config.swipeToActionWidth)
+        settingsSwipeWidthHolder.setOnClickListener {
+            val items = arrayListOf(
+                RadioItem(2, "1/2"),
+                RadioItem(3, "1/3"),
+                RadioItem(4, "1/4"),
+                RadioItem(5, "1/5"),
+            )
+
+            RadioGroupIconDialog(
+                this@SettingsActivity,
+                items,
+                config.swipeToActionWidth,
+                com.goodwy.strings.R.string.swipe_width,
+                defaultItemId = 2
+            ) {
+                config.swipeToActionWidth = it as Int
+                config.needRestart = true
+                settingsSwipeWidth.text = getSwipeWidthText(config.swipeToActionWidth)
+            }
+        }
+    }
+
+    private fun getSwipeWidthText(swipeWidth: Int): String {
+        return when (swipeWidth) {
+            3 -> "1/3"
+            4 -> "1/4"
+            5 -> "1/5"
+            else -> "1/2"
+        }
+    }
+
     private fun updateSwipeToActionVisible() {
         binding.apply {
+            settingsSwipeWidthHolder.beVisibleIf(config.useSwipeToAction)
             settingsSwipeVibrationHolder.beVisibleIf(config.useSwipeToAction)
             settingsSwipeRippleHolder.beVisibleIf(config.useSwipeToAction)
             settingsSwipeRightActionHolder.beVisibleIf(config.useSwipeToAction)

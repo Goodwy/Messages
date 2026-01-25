@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Chat title style</string>
     <string name="unread_at_top_g">Unread always at the top</string>
     <string name="show_sim_selection_dialog">Show SIM card selection dialog when sending</string>
@@ -11,4 +10,46 @@
     <string name="pending">Arfaeth</string>
     <string name="message_type">Math o neges</string>
     <string name="show_number_in_title">Dangos rhif ym mhennawd y sgwrs</string>
+    <string name="warning_disclosure"><![CDATA[
+<h2>Datgeliad Mynediad i Ddata</h2>
+
+<p><strong>Mae angen mynediad i negeseuon SMS a gwybodaeth sy\'n gysylltiedig â\'r ffôn ar yr ap hwn i weithredu\'n iawn.</strong></p>
+
+<h3>🔍 Pa Wybodaeth Rydyn Ni\'n ei Mynediad:</h3>
+<ul>
+<li><strong>NEGESEUON SMS:</strong> Cynnwys llawn eich negeseuon SMS.</li>
+<li><strong>EICH RHIF(AU) FFÔN:</strong> Y rhif(au) ffôn sy\'n gysylltiedig â cherdyn(nau) SIM eich dyfais.</li>
+<li><strong>RHIFAU FFÔN O SMS:</strong> Rhifau ffôn sydd wedi\'u cynnwys yn eich negeseuon SMS.</li>
+</ul>
+
+<h3>📱 Sut Rydyn Ni\'n Defnyddio\'r Wybodaeth Hon (YN LLEOL AR Y DYFAIS):</h3>
+<ul>
+<li><strong>EICH RHIF FFÔN:</strong> Rydyn ni\'n <strong>casglu a defnyddio</strong> rhif ffôn eich dyfais <strong>dim ond i\'w arddangos</strong> yn rhyngwyneb yr ap ar gyfer Dewis cerdyn SIM. <em>Mae\'r rhif hwn yn cael ei brosesu\'n lleol ac nid yw\'n cael ei drosglwyddo.</em></li>
+<li><strong>RHIFAU FFÔN O SMS:</strong> Rydym yn <strong>echdynnu rhifau ffôn</strong> o negeseuon SMS i ganiatáu i chi eu copïo\'n hawdd. <em>Mae\'r echdynnu hwn yn digwydd yn lleol.</em></li>
+<li><strong>CYNNWYS SMS AR GYFER OTP:</strong> Rydym yn <strong>dadansoddi testun SMS</strong> i ganfod a chopïo codau OTP yn awtomatig i\'ch clipfwrdd. <em>Mae\'r dadansoddiad hwn yn digwydd yn lleol.</em></li>
+</ul>
+
+<h3>🚫 Yr Hyn NAD Ydyn Ni\'n Ei Wneud Gyda\'ch Data:</h3>
+<ul>
+<li><strong>NID Ydyn Ni\'n Trosglwyddo nac yn Uwchlwytho</strong> eich negeseuon SMS, rhifau ffôn, nac unrhyw gynnwys negeseuon i unrhyw weinydd.</li>
+<li><strong>NID Ydyn Ni\'n Storio</strong> eich data SMS na\'ch rhifau ffôn ar weinyddion allanol.</li>
+<li><strong>NID Ydyn Ni\'n Rhannu</strong> eich data personol gyda thrydydd partïon.</li>
+</ul>
+
+<h3>✅ Gwarant Allweddol:</h3>
+<p><strong>Mae\'r holl brosesu data yn digwydd ar eich dyfais yn unig (ar y ddyfais).</strong> Nid yw eich negeseuon SMS a\'ch rhifau ffôn byth yn gadael eich dyfais. Dim ond ar gyfer anfon MMS a phrosesu pryniannau Google Play y defnyddir mynediad i\'r rhyngrwyd.</p>
+
+<h3>🔑 Eglurhad o\'r Caniatadau Angenrheidiol:</h3>
+<ul>
+<li><strong>READ_SMS:</strong> I gael mynediad at SMS ar gyfer copïo OTP ac echdynnu rhif ffôn (prosesu lleol yn unig).</li>
+<li><strong>READ_PHONE_STATE:</strong> I gasglu ac arddangos rhif ffôn eich dyfais ar gyfer dewis SIM (defnydd lleol yn unig).</li>
+</ul>
+
+<p><em>Drwy barhau, rydych chi\'n cydnabod:</em></p>
+<ol>
+<li>Mae\'r ap hwn yn casglu rhif ffôn eich dyfais i\'w arddangos yn lleol</li>
+<li>Mae\'r ap hwn yn cael mynediad at negeseuon SMS ar gyfer echdynnu OTP a rhif ffôn lleol</li>
+<li>Ni chaiff unrhyw un o\'r data hwn ei drosglwyddo o\'ch dyfais</li>
+</ol>
+]]></string>
 </resources>

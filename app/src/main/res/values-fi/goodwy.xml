@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Chatin otsikkotyyli</string>
     <string name="unread_at_top_g">Lukematon aina huipulla</string>
     <string name="show_sim_selection_dialog">Näytä SIM-kortin valintaikkuna lähetettäessä</string>
@@ -11,4 +10,46 @@
     <string name="pending">Odottaa</string>
     <string name="message_type">Viestin tyyppi</string>
     <string name="show_number_in_title">Näytä numero keskustelun otsikossa</string>
+    <string name="warning_disclosure"><![CDATA[
+<h2>Tietojen käyttöoikeuden luovutus</h2>
+
+<p><strong>Tämä sovellus tarvitsee toimiakseen oikein pääsyn tekstiviesteihin ja puhelimeen liittyviin tietoihin.</strong></p>
+
+<h3>🔍 Mitä tietoja käytämme:</h3>
+<ul>
+<li><strong>TEKSTIVIESTIT:</strong> Tekstiviestiesi koko sisältö.</li>
+<li><strong>PUHELINNUMEROSI:</strong> Laitteesi SIM-korttiin/-kortteihin liitetty(t) puhelinnumero(t).</li>
+<li><strong>PUHELINNUMEROT TEKSTIVIESTEISTÄ:</strong> Tekstiviesteissäsi olevat puhelinnumerot.</li>
+</ul>
+
+<h3>📱 Kuinka käytämme näitä tietoja (PAIKALLISESTI LAITTEESTA):</h3>
+<ul>
+<li><strong>PUHELINNUMEROSI:</strong> Keräämme ja käytämme laitteesi puhelinnumeroa <strong>vain näyttääksemme sen</strong> sovelluksen käyttöliittymässä SIM-kortin valintaa varten. <em>Tämä numero käsitellään paikallisesti eikä sitä lähetetä.</em></li>
+<li><strong>PUHELINNUMEROT TEKSTIVIESTEISTÄ:</strong> <strong>Poistamme puhelinnumeroita</strong> tekstiviesteistä, jotta voit kopioida ne helposti. <em>Tämä poiminta tapahtuu paikallisesti.</em></li>
+<li><strong>TEKSTIVIESTIEN SISÄLTÖÄ OTP:LLE:</strong> <strong>Analysoimme tekstiviestien tekstin</strong> tunnistaaksemme ja kopioidaksemme automaattisesti OTP-koodit leikepöydällesi. <em>Tämä analyysi tapahtuu paikallisesti.</em></li>
+</ul>
+
+<h3>🚫 Mitä emme tee tiedoillasi:</h3>
+<ul>
+<li><strong>Emme lähetä tai lataa</strong> tekstiviestejäsi, puhelinnumeroitasi tai mitään viestisisältöä millekään palvelimelle.</li>
+<li><strong>Emme säilytä</strong> tekstiviestitietojasi tai puhelinnumeroitasi ulkoisilla palvelimilla.</li>
+<li><strong>Emme jaa</strong> henkilötietojasi kolmansille osapuolille.</li>
+</ul>
+
+<h3>✅ Keskeinen takuu:</h3>
+<p><strong>Kaikki tietojenkäsittely tapahtuu yksinomaan laitteellasi (laitteella).</strong> Tekstiviestisi ja puhelinnumerosi eivät koskaan poistu laitteeltasi. Internet-yhteyttä käytetään vain multimediaviestien lähettämiseen ja Google Play -ostosten käsittelyyn.</p>
+
+<h3>🔑 Vaadittujen käyttöoikeuksien selitys:</h3>
+<ul>
+<li><strong>READ_SMS:</strong> Tekstiviestien käyttö OTP-kopiointia ja puhelinnumeron poimintaa varten (vain paikallinen käsittely).</li>
+<li><strong>READ_PHONE_STATE:</strong> Laitteesi puhelinnumeron kerääminen ja näyttäminen SIM-kortin valintaa varten (vain paikalliseen käyttöön).</li>
+</ul>
+
+<p><em>Jatkamalla hyväksyt, että:</em></p>
+<ol>
+<li>Tämä sovellus kerää laitteesi puhelinnumeron paikallista näyttöä varten</li>
+<li>Tämä sovellus käyttää tekstiviestejä paikallista OTP-koodia ja puhelinnumeron poimintaa varten</li>
+<li>Mitään näistä tiedoista ei lähetetä laitteeltasi</li>
+</ol>
+]]></string>
 </resources>

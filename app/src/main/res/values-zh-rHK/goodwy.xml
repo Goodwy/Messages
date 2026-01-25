@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Chat title style</string>
     <string name="unread_at_top_g">Unread always at the top</string>
     <string name="show_sim_selection_dialog">Show SIM card selection dialog when sending</string>
@@ -11,4 +10,73 @@
     <string name="pending">待辦的</string>
     <string name="message_type">訊息類型</string>
     <string name="show_number_in_title">在聊天標題中顯示號碼</string>
+    <string name="warning_disclosure"><![CDATA[
+
+<h2>資料存取揭露</h2>
+
+<p><strong>此應用程式需要存取簡訊和手機相關資訊才能正常運作。 </strong></p>
+
+<h3>🔍 我們存取哪些資訊：</h3>
+
+<ul>
+
+<li><strong>簡訊：</strong> 您的簡訊完整內容。 </li>
+
+<li><strong>您的手機號碼：</strong> 與您裝置 SIM 卡關聯的手機號碼。 </li>
+
+<li><strong>簡訊中的電話號碼：</strong> 您的簡訊中包含的電話號碼。 </li>
+
+</ul>
+
+<h3>📱 我們如何使用這些資訊（本地儲存於設備）：</h3>
+
+<ul>
+
+<li><strong>您的手機號碼：</strong> 我們<strong>收集並使用</strong>您裝置的手機號碼<strong>僅用於顯示在應用程式介面中，您可以選擇 SIM 卡。此號碼在本地處理，不會傳輸。
+
+從簡訊中提取電話號碼：我們會從簡訊中提取電話號碼，方便您輕鬆複製。此提取過程在本地進行。
+
+從簡訊中提取驗證碼：我們會分析簡訊內容，自動偵測並複製驗證碼到您的剪貼簿。 <em>此分析在本地進行。 </em></li>
+
+</ul>
+
+<h3>🚫 我們不會如何處理您的資料：</h3>
+
+<ul>
+
+<li><strong>我們不會將您的簡訊、電話號碼或任何訊息內容傳輸或上傳到任何伺服器。 </strong>
+
+<li><strong>我們不會將您的簡訊資料或電話號碼儲存在外部伺服器上。 </strong>
+
+<li><strong>我們不會與第三方分享您的個人資料。 </strong>
+
+</ul>
+
+<h3>✅ 關鍵保障：</h3>
+
+<p><strong>所有資料處理均在您的裝置上進行（設備內）。 </strong> 您的簡訊和電話號碼絕對不會離開您的裝置。 </p>僅用於發送彩信和處理 Google Play 購買。 </p>
+
+<h3>🔑 所需權限說明：</h3>
+
+<ul>
+
+<li><strong>READ_SMS：</strong> 用於存取簡訊以複製驗證碼和提取電話號碼（僅限本地處理）。 </li>
+
+<li><strong>READ_PHONE_STATE：</strong> 用於收集並顯示您裝置的電話號碼以進行 SIM 卡選擇（僅限本地使用）。 </li>
+
+</ul>
+
+<p><em>繼續操作即表示您確認：</em></p>
+
+<ol>
+
+<li>此應用程式會收集您裝置的電話號碼以在本機顯示</li>
+
+<li>此應用程式會存取簡訊以在本地提取驗證碼和電話號碼</li>
+
+<li>所有這些資料都不會從您的裝置傳輸</li>
+
+</ol>
+
+]]></string>
 </resources>

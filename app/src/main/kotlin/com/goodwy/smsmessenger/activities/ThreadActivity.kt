@@ -1284,7 +1284,8 @@ class ThreadActivity : SimpleActivity() {
             return items
         }
 
-        messages.sortBy { it.date }
+        val messagesCopy = ArrayList(messages)
+        messagesCopy.sortBy { it.date }
 
         val subscriptionIdToSimId = HashMap<Int, String>()
         subscriptionIdToSimId[-1] = "?"
@@ -1299,9 +1300,8 @@ class ThreadActivity : SimpleActivity() {
         var prevDateTime = 0
         var prevSIMId = -2
         var hadUnreadItems = false
-        val cnt = messages.size
-        for (i in 0 until cnt) {
-            val message = messages.getOrNull(i) ?: continue
+
+        for (message in messagesCopy) {
             // do not show the date/time above every message, only if the difference between the 2 messages is at least MIN_DATE_TIME_DIFF_SECS,
             // or if the message is sent from a different SIM
             val isSentFromDifferentKnownSIM =
@@ -1328,7 +1328,7 @@ class ThreadActivity : SimpleActivity() {
                 messagesToMarkAsRead.add(message.id)
             }
 
-            if (i == cnt - 1 && (message.type == Telephony.Sms.MESSAGE_TYPE_SENT)) {
+            if (message == messagesCopy.last() && (message.type == Telephony.Sms.MESSAGE_TYPE_SENT)) {
                 items.add(
                     ThreadSent(
                         messageId = message.id,

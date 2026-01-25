@@ -1117,6 +1117,23 @@ fun Context.markMessageRead(id: Long, isMMS: Boolean) {
     messagesDB.markRead(id)
 }
 
+fun Context.getUnreadMMSCountFromSystem(threadId: Long): Int {
+    return try {
+        val cursor = contentResolver.query(
+            Mms.CONTENT_URI,
+            arrayOf("COUNT(*)"),
+            "${Mms.THREAD_ID} = ? AND ${Mms.READ} = 0",
+            arrayOf(threadId.toString()),
+            null
+        )
+        cursor?.use {
+            if (it.moveToFirst()) it.getInt(0) else 0
+        } ?: 0
+    } catch (e: Exception) {
+        0
+    }
+}
+
 fun Context.markThreadMessagesRead(threadId: Long) {
     messagesDB.markThreadRead(threadId)
     conversationsDB.markRead(threadId)

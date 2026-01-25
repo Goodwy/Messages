@@ -78,3 +78,10 @@ fun View.setPaddingBubble(activity: Activity, bubbleStyle: Int, isReceived: Bool
     }
 }
 
+fun View.setWidth(size: Int) {
+    val lp = layoutParams
+    lp.width = size
+    layoutParams = lp
+}
+
+

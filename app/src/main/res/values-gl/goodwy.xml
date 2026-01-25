@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Estilo do título do chat</string>
     <string name="unread_at_top_g">Sen ler sempre na parte superior</string>
     <string name="show_sim_selection_dialog">Mostrar o diálogo de selección da tarxeta SIM ao enviar</string>
@@ -11,4 +10,46 @@
     <string name="pending">Pendente</string>
     <string name="message_type">Tipo de mensaxe</string>
     <string name="show_number_in_title">Mostrar o número na cabeceira do chat</string>
+    <string name="warning_disclosure"><![CDATA[
+<h2>Divulgación de acceso a datos</h2>
+
+<p><strong>Esta aplicación require acceso a mensaxes SMS e información relacionada co teléfono para funcionar correctamente.</strong></p>
+
+<h3>🔍 A que información accedemos:</h3>
+<ul>
+<li><strong>MENSAXES SMS:</strong> Contido completo das túas mensaxes SMS.</li>
+<li><strong>O TEU(S) NÚMERO(S) DE TELÉFONO:</strong> O(s) número(s) de teléfono asociado(s) á(s) tarxeta(s) SIM do teu dispositivo.</li>
+<li><strong>NÚMEROS DE TELÉFONO DOS SMS:</strong> Números de teléfono contidos nas túas mensaxes SMS.</li>
+</ul>
+
+<h3>📱 Como usamos esta información (LOCALMENTE NO DISPOSITIVO):</h3>
+<ul>
+<li><strong>O TEU NÚMERO DE TELÉFONO:</strong> <strong>Recollemos e usamos</strong> o número de teléfono do teu dispositivo <strong>só para mostralo</strong> na interface da aplicación para Selección da tarxeta SIM. <em>Este número procésase localmente e non se transmite.</em></li>
+<li><strong>NÚMEROS DE TELÉFONO DE SMS:</strong> <strong>Extraemos números de teléfono</strong> das mensaxes SMS para que poidas copialos facilmente. <em>Esta extracción realízase localmente.</em></li>
+<li><strong>CONTIDO DE SMS PARA OTP:</strong> <strong>Analizamos o texto de SMS</strong> para detectar e copiar automaticamente os códigos OTP no teu portapapeis. <em>Esta análise realízase localmente.</em></li>
+</ul>
+
+<h3>🚫 O que NON facemos cos teus datos:</h3>
+<ul>
+<li><strong>NON TRANSMITIMOS nin CARGAMOS</strong> as túas mensaxes SMS, números de teléfono nin ningún contido de mensaxes a ningún servidor.</li>
+<li><strong>NON ALMACENAMOS</strong> os teus datos SMS nin números de teléfono en servidores externos.</li>
+<li><strong>NON COMPARTIMOS</strong> os teus datos persoais con terceiros.</li>
+</ul>
+
+<h3>✅ Garantía clave:</h3>
+<p><strong>Todo o procesamento de datos realízase exclusivamente no teu dispositivo (no dispositivo).</strong> As túas mensaxes SMS e números de teléfono nunca saen do teu dispositivo. O acceso a Internet só se usa para enviar MMS e procesar compras de Google Play.</p>
+
+<h3>🔑 Explicación dos permisos necesarios:</h3>
+<ul>
+<li><strong>READ_SMS:</strong> Para acceder a SMS para copiar OTP e extraer o número de teléfono (só procesamento local).</li>
+<li><strong>READ_PHONE_STATE:</strong> Para recompilar e mostrar o número de teléfono do teu dispositivo para a selección da SIM (só para uso local).</li>
+</ul>
+
+<p><em>Ao continuar, recoñeces que:</em></p>
+<ol>
+<li>Esta aplicación recompila o número de teléfono do teu dispositivo para a súa visualización local</li>
+<li>Esta aplicación accede ás mensaxes SMS para o OTP local e a extracción do número de teléfono</li>
+<li>Ningún destes datos se transmite desde o teu dispositivo</li>
+</ol>
+]]></string>
 </resources>

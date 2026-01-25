@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Vestluse pealkirja stiil</string>
     <string name="unread_at_top_g">Lugemata alati ülaosas</string>
     <string name="show_sim_selection_dialog">Kuva saatmisel SIM-kaardi valimise dialoog</string>
@@ -11,4 +10,46 @@
     <string name="pending">Ootel</string>
     <string name="message_type">Sõnumi tüüp</string>
     <string name="show_number_in_title">Näita numbrit vestluse päises</string>
+    <string name="warning_disclosure"><![CDATA[
+<h2>Andmetele juurdepääsu avalikustamine</h2>
+
+<p><strong>See rakendus vajab nõuetekohaseks toimimiseks juurdepääsu SMS-sõnumitele ja telefoniga seotud teabele.</strong></p>
+
+<h3>🔍 Millisele teabele me juurde pääseme:</h3>
+<ul>
+<li><strong>SMS-SÕNUMID:</strong> Teie SMS-sõnumite täielik sisu.</li>
+<li><strong>TEIE TELEFONINUMBER(ID):</strong> Teie seadme SIM-kaardiga (-kaartidega) seotud telefoninumber(-numbrid).</li>
+<li><strong>SMS-IST SAADUD TELEFONINUMBRID:</strong> Teie SMS-sõnumites sisalduvad telefoninumbrid.</li>
+</ul>
+
+<h3>📱 Kuidas me seda teavet kasutame (SEADMES KOHALIKULT):</h3>
+<ul>
+<li><strong>TEIE TELEFONINUMBER:</strong> Me <strong>kogume ja kasutame</strong> teie seadme telefoninumbrit <strong>ainult selleks, et seda</strong> rakenduse liideses kuvada SIM-kaardi valimiseks. <em>Seda numbrit töödeldakse lokaalselt ja seda ei edastata.</em></li>
+<li><strong>TELEFONINUMBRID SMS-IST:</strong> Me <strong>eraldame telefoninumbreid</strong> SMS-sõnumitest, et saaksite neid hõlpsalt kopeerida. <em>See eraldamine toimub lokaalselt.</em></li>
+<li><strong>ÜHEKORDSE PAROOLI (OTP) SMS-SISU:</strong> Me <strong>analüüsime SMS-teksti</strong>, et automaatselt tuvastada ja kopeerida OTP-koodid teie lõikelauale. <em>See analüüs toimub lokaalselt.</em></li>
+</ul>
+
+<h3>🚫 Mida me teie andmetega EI tee:</h3>
+<ul>
+<li><strong>Me EI EDASTA ega LAADI ÜLE</strong> teie SMS-sõnumeid, telefoninumbreid ega sõnumi sisu ühelegi serverile.</li>
+<li><strong>Me EI SALVESTA</strong> teie SMS-andmeid ega telefoninumbreid välistel serveritel.</li>
+<li><strong>Me EI JAGA</strong> teie isikuandmeid kolmandate osapooltega.</li>
+</ul>
+
+<h3>✅ Peamine garantii:</h3>
+<p><strong>Kogu andmetöötlus toimub ainult teie seadmes (seadmesiseselt).</strong> Teie SMS-sõnumid ja telefoninumbrid ei lahku kunagi teie seadmest. Internetiühendust kasutatakse ainult MMS-ide saatmiseks ja Google Play ostude töötlemiseks.</p>
+
+<h3>🔑 Nõutavate lubade selgitus:</h3>
+<ul>
+<li><strong>READ_SMS:</strong> SMS-idele juurdepääs OTP kopeerimiseks ja telefoninumbri ekstraheerimiseks (ainult kohalik töötlemine).</li>
+<li><strong>READ_PHONE_STATE:</strong> Teie seadme telefoninumbri kogumiseks ja kuvamiseks SIM-kaardi valimiseks (ainult kohalik kasutamine).</li>
+</ul>
+
+<p><em>Jätkates kinnitate, et:</em></p>
+<ol>
+<li>See rakendus kogub teie seadme telefoninumbrit kohalikuks kuvamiseks</li>
+<li>See rakendus pääseb SMS-sõnumitele juurde kohaliku OTP ja telefoninumbri ekstraheerimiseks</li>
+<li>Neid andmeid ei edastata teie seadmest</li>
+</ol>
+]]></string>
 </resources>

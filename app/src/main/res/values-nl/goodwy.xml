@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Chattitels stijl</string>
     <string name="unread_at_top_g">Ongelezen altijd bovenaan</string>
     <string name="show_sim_selection_dialog">Dialoogvenster voor SIM-kaartselectie weergeven tijdens verzending</string>
@@ -11,4 +10,58 @@
     <string name="pending">In behandeling</string>
     <string name="message_type">Berichttype</string>
     <string name="show_number_in_title">Toon het nummer in de chatheader</string>
+    <string name="warning_disclosure"><![CDATA[
+
+<h2>Toegangsverklaring gegevens</h2>
+
+<p><strong>Deze app heeft toegang nodig tot sms-berichten en telefoongerelateerde informatie om correct te functioneren.</strong></p>
+
+<h3>🔍 Welke informatie we opvragen:</h3>
+<ul>
+
+<li><strong>SMS-BERICHTEN:</strong> De volledige inhoud van uw sms-berichten.</li>
+
+<li><strong>UW TELEFOONNUMMER(S):</strong> Het telefoonnummer(s) dat is gekoppeld aan de simkaart(en) van uw apparaat.</li>
+
+<li><strong>TELEFOONNUMMERS UIT SMS:</strong> Telefoonnummers in uw sms-berichten.</li>
+</ul>
+
+<h3>📱 Hoe we deze informatie gebruiken (LOKAAL OP HET APPARAAT):</h3>
+<ul>
+
+<li><strong>UW TELEFOONNUMMER:</strong> We <strong>verzamelen en gebruiken</strong> het telefoonnummer van uw apparaat <strong>alleen om weer te geven Het wordt weergegeven in de app-interface voor de selectie van de simkaart. <em>Dit nummer wordt lokaal verwerkt en niet verzonden.</em></li>
+
+<li><strong>TELEFOONNUMMERS UIT SMS:</strong> We <strong>halen telefoonnummers</strong> uit sms-berichten zodat u ze gemakkelijk kunt kopiëren. <em>Deze extractie vindt lokaal plaats.</em></li>
+<li><strong>SMS-INHOUD VOOR OTP:</strong> We <strong>analyseren sms-tekst</strong> om automatisch OTP-codes te detecteren en naar uw klembord te kopiëren. <em>Deze analyse vindt lokaal plaats.</em></li>
+</ul>
+
+<h3>🚫 Wat we NIET doen met uw gegevens:</h3>
+<ul>
+
+<li><strong>We VERZENDEN of UPLOADEN</strong> uw sms-berichten, telefoonnummers of berichtinhoud NIET naar een server.</li>
+<li><strong>We SLAAN</strong> uw sms-gegevens of telefoonnummers NIET OP op externe servers.</li>
+
+<li><strong>We DELEN</strong> uw persoonlijke gegevens NIET met derden.</li>
+</ul>
+
+<h3>✅ Belangrijkste garantie:</h3>
+<p><strong>Alle gegevensverwerking vindt uitsluitend plaats op uw apparaat (on-device).</strong> Uw sms-berichten en telefoonnummers verlaten uw apparaat nooit. Internettoegang wordt alleen gebruikt voor het verzenden van MMS-berichten en het verwerken van aankopen in Google Play.</p>
+
+<h3>🔑 Vereiste machtigingen uitgelegd:</h3>
+<ul>
+
+<li><strong>LEZEN_SMS:</strong> Om toegang te krijgen tot sms-berichten voor het kopiëren van OTP\'s en het extraheren van telefoonnummers (alleen lokale verwerking).</li>
+<li><strong>LEZEN_TELEFOONSTATUS:</strong> Om het telefoonnummer van uw apparaat te verzamelen en weer te geven voor simkaartselectie (alleen lokaal gebruik).</li>
+</ul>
+
+<p><em>Door verder te gaan, erkent u dat:</em></p>
+<ol>
+
+<li>Deze app verzamelt het telefoonnummer van uw apparaat voor lokale weergave</li>
+<li>Deze app heeft toegang tot sms-berichten voor lokale OTP en het extraheren van telefoonnummers</li>
+
+<li>Geen van deze gegevens wordt vanaf uw apparaat verzonden</li>
+</ol>
+
+]]></string>
 </resources>

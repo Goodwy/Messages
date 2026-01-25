@@ -15,6 +15,7 @@ import android.speech.RecognizerIntent
 import android.text.TextUtils
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
+import com.goodwy.commons.dialogs.ConfirmationAdvancedDialog
 import com.goodwy.commons.dialogs.ConfirmationDialog
 import com.goodwy.commons.dialogs.PermissionRequiredDialog
 import com.goodwy.commons.extensions.*
@@ -73,7 +74,8 @@ class MainActivity : SimpleActivity() {
                 surfaceColor = useSurfaceColor
             )
         }
-        checkWhatsNewDialog()
+
+        if (config.wasReminderWarningShown) checkWhatsNewDialog()
         storeStateVariables()
 
         checkAndDeleteOldRecycleBinMessages()
@@ -148,8 +150,10 @@ class MainActivity : SimpleActivity() {
         } else 0
         binding.mainMenu.layoutParams = params
 
-        checkErrorDialog()
-        newAppRecommendation()
+        if (config.wasReminderWarningShown) {
+            checkErrorDialog()
+            newAppRecommendation()
+        }
     }
 
     override fun onPause() {
@@ -278,26 +282,65 @@ class MainActivity : SimpleActivity() {
     }
 
     private fun loadMessages() {
-        if (isQPlus()) {
-            val roleManager = getSystemService(RoleManager::class.java)
-            if (roleManager!!.isRoleAvailable(RoleManager.ROLE_SMS)) {
-                if (roleManager.isRoleHeld(RoleManager.ROLE_SMS)) {
-                    askPermissions()
+        if (!config.wasReminderWarningShown) {
+            ConfirmationAdvancedDialog(
+                activity = this,
+                messageId = R.string.warning_disclosure,
+                fromHtml = true,
+                positive = com.goodwy.strings.R.string.agree,
+                negative = com.goodwy.strings.R.string.disagree
+            ) {
+                if (it) {
+                    config.wasReminderWarningShown = true
+
+                    if (isQPlus()) {
+                        val roleManager = getSystemService(RoleManager::class.java)
+                        if (roleManager!!.isRoleAvailable(RoleManager.ROLE_SMS)) {
+                            if (roleManager.isRoleHeld(RoleManager.ROLE_SMS)) {
+                                askPermissions()
+                            } else {
+                                val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_SMS)
+                                startActivityForResult(intent, MAKE_DEFAULT_APP_REQUEST)
+                            }
+                        } else {
+                            toast(com.goodwy.commons.R.string.unknown_error_occurred)
+                            finish()
+                        }
+                    } else {
+                        if (Telephony.Sms.getDefaultSmsPackage(this) == packageName) {
+                            askPermissions()
+                        } else {
+                            val intent = Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT)
+                            intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, packageName)
+                            startActivityForResult(intent, MAKE_DEFAULT_APP_REQUEST)
+                        }
+                    }
                 } else {
-                    val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_SMS)
-                    startActivityForResult(intent, MAKE_DEFAULT_APP_REQUEST)
+                    finish()
                 }
-            } else {
-                toast(com.goodwy.commons.R.string.unknown_error_occurred)
-                finish()
             }
         } else {
-            if (Telephony.Sms.getDefaultSmsPackage(this) == packageName) {
-                askPermissions()
+            if (isQPlus()) {
+                val roleManager = getSystemService(RoleManager::class.java)
+                if (roleManager!!.isRoleAvailable(RoleManager.ROLE_SMS)) {
+                    if (roleManager.isRoleHeld(RoleManager.ROLE_SMS)) {
+                        askPermissions()
+                    } else {
+                        val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_SMS)
+                        startActivityForResult(intent, MAKE_DEFAULT_APP_REQUEST)
+                    }
+                } else {
+                    toast(com.goodwy.commons.R.string.unknown_error_occurred)
+                    finish()
+                }
             } else {
-                val intent = Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT)
-                intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, packageName)
-                startActivityForResult(intent, MAKE_DEFAULT_APP_REQUEST)
+                if (Telephony.Sms.getDefaultSmsPackage(this) == packageName) {
+                    askPermissions()
+                } else {
+                    val intent = Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT)
+                    intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, packageName)
+                    startActivityForResult(intent, MAKE_DEFAULT_APP_REQUEST)
+                }
             }
         }
     }

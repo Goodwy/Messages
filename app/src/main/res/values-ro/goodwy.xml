@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_g">Right Messages</string>
     <string name="chat_title_style_g">Stilul de titlu al chat-ului</string>
     <string name="unread_at_top_g">Necitit întotdeauna în partea de sus</string>
     <string name="show_sim_selection_dialog">Afișați dialogul de selectare a cartelei SIM la trimitere</string>
@@ -11,4 +10,46 @@
     <string name="pending">În așteptare</string>
     <string name="message_type">Tipul mesajului</string>
     <string name="show_number_in_title">Afișează numărul în antetul chatului</string>
+    <string name="warning_disclosure"><![CDATA[
+<h2>Dezvăluirea accesului la date</h2>
+
+<p><strong>Această aplicație necesită acces la mesaje SMS și informații legate de telefon pentru a funcționa corect.</strong></p>
+
+<h3>🔍 Ce informații accesăm:</h3>
+<ul>
+<li><strong>MESAJE SMS:</strong> Conținutul complet al mesajelor SMS.</li>
+<li><strong>NUMĂRUL(ELE) DVS. DE TELEFON:</strong> Numărul(ele) de telefon asociat(e) cu cartela(ele) SIM a dispozitivului dvs.</li>
+<li><strong>NUMERE DE TELEFON DIN SMS:</strong> Numerele de telefon conținute în mesajele SMS.</li>
+</ul>
+
+<h3>📱 Cum utilizăm aceste informații (LOCAL PE DISPOZITIV):</h3>
+<ul>
+<li><strong>NUMĂRUL(ELE) DVS. DE TELEFON:</strong> **Colectăm și utilizăm** numărul de telefon al dispozitivului dvs. **doar pentru a-l afișa** în interfața aplicației pentru Selectarea cartelei SIM. <em>Acest număr este procesat local și nu este transmis.</em></li>
+<li><strong>NUMERE DE TELEFON DIN SMS:</strong> <strong>Extragem numere de telefon</strong> din mesajele SMS pentru a vă permite să le copiați cu ușurință. <em>Această extragere se face local.</em></li>
+<li><strong>CONȚINUT SMS PENTRU OTP:</strong> <strong>Analizăm textul SMS</strong> pentru a detecta și copia automat codurile OTP în clipboard. <em>Această analiză are loc local.</em></li>
+</ul>
+
+<h3>🚫 Ce NU facem cu datele dvs.:</h3>
+<ul>
+<li><strong>NU TRANSMITEM sau ÎNCĂRCĂM</strong> mesajele SMS, numerele de telefon sau orice conținut al mesajelor dvs. pe niciun server.</li>
+<li><strong>NU STOCĂM</strong> datele SMS sau numerele de telefon pe servere externe.</li>
+<li><strong>NU PARTAJAJĂM</strong> datele dvs. personale cu terțe părți.</li>
+</ul>
+
+<h3>✅ Garanție cheie:</h3>
+<p><strong>Toată prelucrarea datelor are loc exclusiv pe dispozitivul dvs. (pe dispozitiv).</strong> Mesajele SMS și numerele de telefon nu părăsesc niciodată dispozitivul dvs. Accesul la internet este utilizat doar pentru trimiterea de MMS-uri și procesarea achizițiilor de pe Google Play.</p>
+
+<h3>🔑 Permisiuni necesare explicate:</h3>
+<ul>
+<li><strong>READ_SMS:</strong> Pentru a accesa SMS-urile pentru copierea OTP și extragerea numărului de telefon (doar procesare locală).</li>
+<li><strong>READ_PHONE_STATE:</strong> Pentru a colecta și afișa numărul de telefon al dispozitivului dvs. pentru selectarea cartelei SIM (doar pentru utilizare locală).</li>
+</ul>
+
+<p><em>Continuând, recunoașteți că:</em></p>
+<ol>
+<li>Această aplicație colectează numărul de telefon al dispozitivului dvs. pentru afișare locală</li>
+<li>Această aplicație accesează mesajele SMS pentru OTP local și extragerea numărului de telefon</li>
+<li>Niciunul dintre aceste date nu este transmis de pe dispozitivul dvs.</li>
+</ol>
+]]></string>
 </resources>
