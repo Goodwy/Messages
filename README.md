@@ -19,7 +19,7 @@ buying me a coffee! Your support helps me maintain and improve this project.
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/goodwy)
 
-*Every contribution, no matter how small, helps keep this project alive and growing! ❤️*<br><br>
+*Every contribution, no matter how small, helps keep this project alive and growing! ❤️*<br><br><br>
 
 
 *Based on [Simple SMS Messenger](https://github.com/SimpleMobileTools/Simple-SMS-Messenger), [Fossify Messages](https://github.com/FossifyOrg/Messages).*
