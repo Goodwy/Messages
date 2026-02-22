@@ -27,6 +27,7 @@ import com.goodwy.smsmessenger.extensions.markThreadMessagesRead
 import com.goodwy.smsmessenger.extensions.messagesDB
 import com.goodwy.smsmessenger.extensions.moveMessageToRecycleBin
 import com.goodwy.smsmessenger.extensions.renameConversation
+import com.goodwy.smsmessenger.extensions.shortcutHelper
 import com.goodwy.smsmessenger.extensions.updateConversationArchivedStatus
 import com.goodwy.smsmessenger.extensions.updateLastConversationMessage
 import com.goodwy.smsmessenger.extensions.updateScheduledMessagesThreadId
@@ -260,6 +261,9 @@ class ConversationsAdapter(
             conversationsToRemove.forEach {
                 deleteMessages(it, true)
                 activity.notificationManager.cancel(it.threadId.hashCode())
+                if (activity.shortcutHelper.getShortcut(it.threadId) != null) {
+                    activity.shortcutHelper.removeShortcutForThread(it.threadId)
+                }
             }
         } else {
             conversationsToRemove.forEach {
@@ -469,6 +473,9 @@ class ConversationsAdapter(
             conversationsToRemove.forEach {
                 deleteMessages(it, true)
                 activity.notificationManager.cancel(it.threadId.hashCode())
+                if (activity.shortcutHelper.getShortcut(it.threadId) != null) {
+                    activity.shortcutHelper.removeShortcutForThread(it.threadId)
+                }
             }
         } else {
             conversationsToRemove.forEach {

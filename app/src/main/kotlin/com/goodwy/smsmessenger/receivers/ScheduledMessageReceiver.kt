@@ -17,17 +17,30 @@ import com.goodwy.smsmessenger.helpers.THREAD_ID
 import com.goodwy.smsmessenger.helpers.refreshConversations
 import com.goodwy.smsmessenger.helpers.refreshMessages
 import com.goodwy.smsmessenger.messaging.sendMessageCompat
+import kotlin.time.Duration.Companion.minutes
 
 class ScheduledMessageReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        val wakelock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "goodwy.messages:scheduled.message.receiver")
-        wakelock.acquire(3000)
+        val wakelock = powerManager.newWakeLock(
+            PowerManager.PARTIAL_WAKE_LOCK,
+            "goodwy.messages:scheduled.message.receiver"
+        )
+        wakelock.acquire(1.minutes.inWholeMilliseconds)
 
-
+        val pendingResult = goAsync()
         ensureBackgroundThread {
-            handleIntent(context, intent)
+            try {
+                handleIntent(context, intent)
+            } finally {
+                try {
+                    if (wakelock.isHeld) wakelock.release()
+                } catch (_: Exception) {
+                }
+
+                pendingResult.finish()
+            }
         }
     }
 
@@ -57,7 +70,9 @@ class ScheduledMessageReceiver : BroadcastReceiver() {
         } catch (e: Exception) {
             context.showErrorToast(e)
         } catch (e: Error) {
-            context.showErrorToast(e.localizedMessage ?: context.getString(com.goodwy.commons.R.string.unknown_error_occurred))
+            context.showErrorToast(
+                e.localizedMessage ?: context.getString(com.goodwy.commons.R.string.unknown_error_occurred)
+            )
         }
     }
 }

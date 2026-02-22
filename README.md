@@ -4,8 +4,8 @@
 <img src="app/src/gplay/res/drawable/ic_launcher.png" width="120" alt="App icon"/>
 
 # Right Messages/AlRight Messages
-</div>
 <a href='https://play.google.com/store/apps/details?id=com.goodwy.smsmessenger'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' height=80/></a>  <a href='https://play.google.com/store/apps/details?id=dev.goodwy.messages'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' height=80/></a>
+</div>
 
 The ultimate SMS app that lets you personalize every aspect of your messaging experience. With Right Messages,
 you can easily customize the interface to suit your preferences and streamline your messaging experience.

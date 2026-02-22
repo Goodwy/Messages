@@ -9,6 +9,7 @@ import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.smsmessenger.extensions.conversationsDB
 import com.goodwy.smsmessenger.extensions.deleteMessage
 import com.goodwy.smsmessenger.extensions.markThreadMessagesRead
+import com.goodwy.smsmessenger.extensions.shortcutHelper
 import com.goodwy.smsmessenger.extensions.updateLastConversationMessage
 import com.goodwy.smsmessenger.helpers.COPY_NUMBER
 import com.goodwy.smsmessenger.helpers.COPY_NUMBER_AND_DELETE
@@ -46,6 +47,10 @@ class CopyNumberReceiver : BroadcastReceiver() {
                     context.updateLastConversationMessage(threadId)
                     refreshMessages()
                     refreshConversations()
+                }
+
+                if (context.shortcutHelper.getShortcut(threadId) != null) {
+                    context.shortcutHelper.removeShortcutForThread(threadId)
                 }
             }
         }

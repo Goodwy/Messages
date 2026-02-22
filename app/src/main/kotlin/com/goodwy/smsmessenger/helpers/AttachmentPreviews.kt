@@ -1,9 +1,8 @@
 package com.goodwy.smsmessenger.helpers
 
 import android.app.Activity
-import android.graphics.drawable.LayerDrawable
 import android.net.Uri
-import androidx.core.content.res.ResourcesCompat
+import android.view.View
 import androidx.core.graphics.drawable.toDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -19,9 +18,6 @@ import com.goodwy.smsmessenger.databinding.ItemAttachmentDocumentPreviewBinding
 import com.goodwy.smsmessenger.databinding.ItemAttachmentVcardBinding
 import com.goodwy.smsmessenger.databinding.ItemAttachmentVcardPreviewBinding
 import com.goodwy.smsmessenger.extensions.*
-import com.goodwy.smsmessenger.models.VCardPropertyWrapper
-import ezvcard.property.Organization
-import kotlin.math.abs
 
 fun ItemAttachmentDocumentPreviewBinding.setupDocumentPreview(
     uri: Uri,
@@ -62,7 +58,7 @@ fun ItemAttachmentDocumentBinding.setupDocumentPreview(
                 fileSize.beVisible()
                 fileSize.text = size.formatSize()
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             root.post {
                 fileSize.beGone()
             }
@@ -127,7 +123,7 @@ fun ItemAttachmentVcardBinding.setupVCardPreview(
     vcardTitle.setTextColor(textColor)
     vcardSubtitle.setTextColor(textColor)
 
-    arrayOf(vcardPhoto, vcardTitle, vcardSubtitle, viewContactDetails).forEach {
+    arrayOf<View>(vcardPhoto, vcardTitle, vcardSubtitle, viewContactDetails).forEach {
         it.beGone()
     }
 
@@ -163,7 +159,7 @@ fun ItemAttachmentVcardBinding.setupVCardPreview(
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(vcardPhoto)
 
-            arrayOf(vcardPhoto, vcardTitle).forEach {
+            arrayOf<View>(vcardPhoto, vcardTitle).forEach {
                 it.beVisible()
             }
 

@@ -8,6 +8,7 @@ import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.smsmessenger.extensions.conversationsDB
 import com.goodwy.smsmessenger.extensions.deleteMessage
 import com.goodwy.smsmessenger.extensions.markThreadMessagesRead
+import com.goodwy.smsmessenger.extensions.shortcutHelper
 import com.goodwy.smsmessenger.extensions.updateLastConversationMessage
 import com.goodwy.smsmessenger.helpers.IS_MMS
 import com.goodwy.smsmessenger.helpers.MESSAGE_ID
@@ -29,6 +30,10 @@ class DeleteSmsReceiver : BroadcastReceiver() {
             context.updateLastConversationMessage(threadId)
             refreshMessages()
             refreshConversations()
+        }
+
+        if (context.shortcutHelper.getShortcut(threadId) != null) {
+            context.shortcutHelper.removeShortcutForThread(threadId)
         }
     }
 }

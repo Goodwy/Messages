@@ -13,6 +13,11 @@
     <string name="message_details_sim">SIM</string>
 
     <!-- Release notes -->
+    <string name="release_820">
+        Added ‘Long Text Behavior’ option\n
+        Added ‘App font’ option\n
+        Fixed bugs, improved stability
+    </string>
     <string name="release_817">
         Added ‘Swipe width’ option\n
         Fixed bugs, improved stability

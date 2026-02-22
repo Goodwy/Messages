@@ -52,6 +52,7 @@ import com.goodwy.smsmessenger.messaging.MessagingUtils
 import com.goodwy.smsmessenger.messaging.MessagingUtils.Companion.ADDRESS_SEPARATOR
 import com.goodwy.smsmessenger.messaging.SmsSender
 import com.goodwy.smsmessenger.messaging.isShortCodeWithLetters
+import com.goodwy.smsmessenger.messaging.scheduleMessage
 import com.goodwy.smsmessenger.models.Attachment
 import com.goodwy.smsmessenger.models.Conversation
 import com.goodwy.smsmessenger.models.Draft
@@ -61,6 +62,7 @@ import com.goodwy.smsmessenger.models.NamePhoto
 import com.goodwy.smsmessenger.models.RecycleBinMessage
 import org.xmlpull.v1.XmlPullParserException
 import java.io.FileNotFoundException
+import kotlin.time.Duration.Companion.minutes
 
 val Context.config: Config
     get() = Config.newInstance(applicationContext)
@@ -375,6 +377,8 @@ fun Context.getMMSSender(msgId: Long): String {
 fun Context.getConversations(
     threadId: Long? = null,
     privateContacts: ArrayList<SimpleContact> = ArrayList(),
+    limit: Int = 50,
+    offset: Int = 0,
 ): ArrayList<Conversation> {
     val archiveAvailable = config.isArchiveAvailable
     val useRecycleBin = config.useRecycleBin
@@ -399,7 +403,8 @@ fun Context.getConversations(
         selectionArgs += threadId.toString()
     }
 
-    val sortOrder = "${Threads.DATE} DESC"
+//    val sortOrder = "${Threads.DATE} DESC"
+    val sortOrder = "${Threads.DATE} DESC LIMIT $limit OFFSET $offset"
 
     val conversations = ArrayList<Conversation>()
     val simpleContactHelper = SimpleContactsHelper(this)
@@ -536,12 +541,10 @@ private fun Context.queryCursorUnsafe(
 }
 
 fun Context.getConversationIds(): List<Long> {
-    val uri = "${Threads.CONTENT_URI}?simple=true".toUri()
     val projection = arrayOf(Threads._ID)
-    val selection = "${Threads.MESSAGE_COUNT} > 0"
     val sortOrder = "${Threads.DATE} ASC"
     val conversationIds = mutableListOf<Long>()
-    queryCursor(uri, projection, selection, null, sortOrder, true) { cursor ->
+    queryCursor(Threads.CONTENT_URI, projection, null, null, sortOrder, true) { cursor ->
         val id = cursor.getLongValue(Threads._ID)
         conversationIds.add(id)
     }
@@ -935,6 +938,7 @@ fun Context.insertNewSMS(
     subject: String,
     body: String,
     date: Long,
+    dateSent: Long,
     read: Int,
     threadId: Long,
     type: Int,
@@ -946,6 +950,7 @@ fun Context.insertNewSMS(
         put(Sms.SUBJECT, subject)
         put(Sms.BODY, body)
         put(Sms.DATE, date)
+        put(Sms.DATE_SENT, dateSent)
         put(Sms.READ, read)
         put(Sms.THREAD_ID, threadId)
         put(Sms.TYPE, type)
@@ -1028,6 +1033,10 @@ fun Context.emptyMessagesRecycleBin() {
     val messages = messagesDB.getAllRecycleBinMessages()
     for (message in messages) {
         deleteMessage(message.id, message.isMMS)
+
+        if (shortcutHelper.getShortcut(message.threadId) != null) {
+            shortcutHelper.removeShortcutForThread(message.threadId)
+        }
     }
 }
 
@@ -1035,6 +1044,10 @@ fun Context.emptyMessagesRecycleBinForConversation(threadId: Long) {
     val messages = messagesDB.getThreadMessagesFromRecycleBin(threadId)
     for (message in messages) {
         deleteMessage(message.id, message.isMMS)
+    }
+
+    if (shortcutHelper.getShortcut(threadId) != null) {
+        shortcutHelper.removeShortcutForThread(threadId)
     }
 }
 
@@ -1263,50 +1276,26 @@ fun Context.getThreadId(addresses: Set<String>): Long {
 }
 
 fun Context.showReceivedMessageNotification(
-        messageId: Long,
-        address: String,
-        body: String,
-        threadId: Long,
-        bitmap: Bitmap?,
-        subscriptionId: Int?,
-    ) {
+    messageId: Long,
+    address: String,
+    senderName: String,
+    body: String,
+    threadId: Long,
+    bitmap: Bitmap?,
+    subscriptionId: Int?,
+    contact: SimpleContact? = null
+) {
     Handler(Looper.getMainLooper()).post {
-    val privateCursor = getMyContactsCursor(favoritesOnly = false, withPhoneNumbersOnly = true)
-        try {
-            getContactFromAddress(address) { simpleContact ->
-                val senderName = getNameFromAddress(address, privateCursor)
-
-                Handler(Looper.getMainLooper()).post {
-                    notificationHelper.showMessageNotification(
-                        messageId = messageId,
-                        address = address,
-                        body = body,
-                        threadId = threadId,
-                        bitmap = bitmap,
-                        sender = senderName,
-                        subscriptionId = subscriptionId,
-                        contact = simpleContact
-                    )
-                }
-            }
-        } catch (_: Exception) {
-            ensureBackgroundThread {
-                val senderName = getNameFromAddress(address, privateCursor)
-
-                Handler(Looper.getMainLooper()).post {
-                    notificationHelper.showMessageNotification(
-                        messageId = messageId,
-                        address = address,
-                        body = body,
-                        threadId = threadId,
-                        bitmap = bitmap,
-                        sender = senderName,
-                        subscriptionId = subscriptionId
-                    )
-                }
-            }
-
-        }
+        notificationHelper.showMessageNotification(
+            messageId = messageId,
+            address = address,
+            body = body,
+            threadId = threadId,
+            bitmap = bitmap,
+            sender = senderName,
+            subscriptionId = subscriptionId,
+            contact = contact
+        )
     }
 }
 
@@ -1315,6 +1304,16 @@ fun Context.getNameFromAddress(address: String, privateCursor: Cursor?): String 
     if (address == sender) {
         val privateContacts = MyContactsContentProvider.getSimpleContacts(this, privateCursor)
         sender = privateContacts.firstOrNull { it.doesHavePhoneNumber(address) }?.name ?: address
+    }
+    return sender
+}
+
+fun Context.getNamePhotoFromAddress(address: String, privateCursor: Cursor?): NamePhoto {
+    var sender = getNameAndPhotoFromPhoneNumber(address)
+    if (address == sender.name) {
+        val privateContacts = MyContactsContentProvider.getSimpleContacts(this, privateCursor)
+        val contact = privateContacts.firstOrNull { it.doesHavePhoneNumber(address) }
+        sender = NamePhoto(contact?.name ?: address, contact?.photoUri, contact?.company ?: "", contact?.jobPosition ?: "")
     }
     return sender
 }
@@ -1580,13 +1579,13 @@ fun Context.updateScheduledMessagesThreadId(messages: List<Message>, newThreadId
 
 fun Context.clearExpiredScheduledMessages(threadId: Long, messagesToDelete: List<Message>? = null) {
     val messages = messagesToDelete ?: messagesDB.getScheduledThreadMessages(threadId)
-    val now = System.currentTimeMillis() + 500L
+    val cutoff = System.currentTimeMillis() - 1.minutes.inWholeMilliseconds
 
     try {
-        messages.filter { it.isScheduled && it.millis() < now }.forEach { msg ->
+        messages.filter { it.isScheduled && it.millis() < cutoff }.forEach { msg ->
             messagesDB.delete(msg.id)
         }
-        if (messages.filterNot { it.isScheduled && it.millis() < now }.isEmpty()) {
+        if (messages.filterNot { it.isScheduled && it.millis() < cutoff }.isEmpty()) {
             // delete empty temporary thread
             val conversation = conversationsDB.getConversationWithThreadId(threadId)
             if (conversation != null && conversation.isScheduled) {
@@ -1596,6 +1595,18 @@ fun Context.clearExpiredScheduledMessages(threadId: Long, messagesToDelete: List
     } catch (e: Exception) {
         e.printStackTrace()
         return
+    }
+}
+
+fun Context.rescheduleAllScheduledMessages() {
+    val scheduledMessages = try {
+        messagesDB.getAllScheduledMessages()
+    } catch (_: Exception) {
+        return
+    }
+
+    scheduledMessages.forEach { message ->
+        runCatching { scheduleMessage(message) }
     }
 }
 

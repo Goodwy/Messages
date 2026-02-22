@@ -49,6 +49,7 @@ class MainActivity : SimpleActivity() {
     private var storedTextColor = 0
     private var storedBackgroundColor = 0
     private var storedFontSize = 0
+    private var storedEllipsizeMode = ELLIPSIZE_MODE_END
     private var lastSearchedText = ""
     private var bus: EventBus? = null
     private var isSpeechToTextAvailable = false
@@ -112,6 +113,10 @@ class MainActivity : SimpleActivity() {
 
             if (storedFontSize != config.fontSize) {
                 updateFontSize()
+            }
+
+            if (storedEllipsizeMode != config.ellipsizeMode) {
+                updateEllipsizeMode()
             }
 
             updateDrafts()
@@ -271,6 +276,7 @@ class MainActivity : SimpleActivity() {
         storedTextColor = getProperTextColor()
         storedBackgroundColor = getProperBackgroundColor()
         storedFontSize = config.fontSize
+        storedEllipsizeMode = config.ellipsizeMode
         config.needRestart = false
     }
 
@@ -769,7 +775,9 @@ class MainActivity : SimpleActivity() {
                 "An error occurred while the application was running. Please send us this error so we can fix it.",
                 positive = com.goodwy.commons.R.string.send_email
             ) {
-                val body = "Messages : LastError"
+                val appName = getString(R.string.app_name)
+                val versionName = BuildConfig.VERSION_NAME
+                val body = "$appName($versionName) : LastError"
                 val address = getMyMailString()
                 val lastError = baseConfig.lastError
 

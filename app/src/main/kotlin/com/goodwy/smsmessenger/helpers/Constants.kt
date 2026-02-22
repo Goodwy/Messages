@@ -204,5 +204,6 @@ fun whatsNewList(): ArrayList<Release> {
         add(Release(810, R.string.release_810))
         add(Release(812, R.string.release_812))
         add(Release(817, R.string.release_817))
+        add(Release(820, R.string.release_820))
     }
 }

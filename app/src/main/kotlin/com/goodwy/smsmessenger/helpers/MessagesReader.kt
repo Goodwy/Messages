@@ -2,7 +2,6 @@ package com.goodwy.smsmessenger.helpers
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.net.Uri
 import android.provider.Telephony.Mms
 import android.provider.Telephony.Sms
 import android.util.Base64
@@ -21,6 +20,7 @@ import com.goodwy.smsmessenger.models.MmsPart
 import com.goodwy.smsmessenger.models.SmsBackup
 import java.io.IOException
 import java.io.InputStream
+import androidx.core.net.toUri
 
 class MessagesReader(private val context: Context) {
 
@@ -70,7 +70,7 @@ class MessagesReader(private val context: Context) {
                 val body = cursor.getStringValueOrNull(Sms.BODY)
                 val date = cursor.getLongValue(Sms.DATE)
                 val dateSent = cursor.getLongValue(Sms.DATE_SENT)
-                val locked = cursor.getIntValue(Sms.DATE_SENT)
+                val locked = cursor.getIntValue(Sms.LOCKED)
                 val protocol = cursor.getStringValueOrNull(Sms.PROTOCOL)
                 val read = cursor.getIntValue(Sms.READ)
                 val status = cursor.getIntValue(Sms.STATUS)
@@ -115,6 +115,7 @@ class MessagesReader(private val context: Context) {
             Mms.SEEN,
             Mms.TEXT_ONLY,
             Mms.STATUS,
+            Mms.SUBJECT,
             Mms.SUBJECT_CHARSET,
             Mms.SUBSCRIPTION_ID,
             Mms.TRANSACTION_ID
@@ -185,7 +186,7 @@ class MessagesReader(private val context: Context) {
     @SuppressLint("NewApi")
     private fun getParts(mmsId: Long): List<MmsPart> {
         val parts = mutableListOf<MmsPart>()
-        val uri = if (isQPlus()) Mms.Part.CONTENT_URI else Uri.parse("content://mms/part")
+        val uri = if (isQPlus()) Mms.Part.CONTENT_URI else "content://mms/part".toUri()
         val projection = arrayOf(
             Mms.Part._ID,
             Mms.Part.CONTENT_DISPOSITION,
@@ -254,7 +255,7 @@ class MessagesReader(private val context: Context) {
         val partUri = if (isQPlus()) {
             Mms.Part.CONTENT_URI.buildUpon().appendPath(partId.toString()).build()
         } else {
-            Uri.parse("content://mms/part/$partId")
+            "content://mms/part/$partId".toUri()
         }
 
         try {
@@ -262,7 +263,7 @@ class MessagesReader(private val context: Context) {
             stream.use {
                 return block(stream)
             }
-        } catch (e: IOException) {
+        } catch (_: IOException) {
             return ""
         }
     }
@@ -273,7 +274,7 @@ class MessagesReader(private val context: Context) {
         val uri = if (isRPlus()) {
             Mms.Addr.getAddrUriForMessage(messageId.toString())
         } else {
-            Uri.parse("content://mms/$messageId/addr")
+            "content://mms/$messageId/addr".toUri()
         }
 
         val projection = arrayOf(Mms.Addr.ADDRESS, Mms.Addr.TYPE, Mms.Addr.CHARSET)

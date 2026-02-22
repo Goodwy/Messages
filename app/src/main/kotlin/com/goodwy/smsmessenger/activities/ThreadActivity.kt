@@ -29,6 +29,7 @@ import android.text.format.DateUtils.FORMAT_SHOW_TIME
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.KeyEvent
+import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.view.animation.OvershootInterpolator
@@ -268,11 +269,11 @@ class ThreadActivity : SimpleActivity() {
             findItem(R.id.manage_people).isVisible = !isSpecialNumber() && !isRecycleBin
             findItem(R.id.mark_as_unread).isVisible = threadItems.isNotEmpty() && !isRecycleBin
 
-            // allow saving number in cases when we don't have it stored yet and it is a casual readable number
+            // allow saving number in cases when we don't have it stored yet
             findItem(R.id.add_number_to_contact).isVisible =
-                participants.size == 1 && participants.first().name == firstPhoneNumber && firstPhoneNumber.any {
-                    it.isDigit()
-                } && !isRecycleBin
+                participants.size == 1 && participants.first().name == firstPhoneNumber && !isRecycleBin
+            findItem(R.id.copy_number).isVisible =
+                participants.size == 1 && !firstPhoneNumber.isNullOrEmpty() && !isRecycleBin
             val unblockText = if (participants.size == 1) com.goodwy.strings.R.string.unblock_number else com.goodwy.strings.R.string.unblock_numbers
             val blockText = if (participants.size == 1) com.goodwy.commons.R.string.block_number else com.goodwy.commons.R.string.block_numbers
             findItem(R.id.block_number).title = if (isBlockNumbers()) getString(unblockText) else getString(blockText)
@@ -281,26 +282,28 @@ class ThreadActivity : SimpleActivity() {
 
     private fun setupOptionsMenu() {
         binding.threadToolbar.setOnMenuItemClickListener { menuItem ->
-            if (participants.isEmpty()) {
-                return@setOnMenuItemClickListener true
-            }
-
-            when (menuItem.itemId) {
-                R.id.block_number -> blockNumber()
-                R.id.delete -> askConfirmDelete()
-                R.id.restore -> askConfirmRestoreAll()
-                R.id.archive -> archiveConversation()
-                R.id.unarchive -> unarchiveConversation()
-                R.id.rename_conversation -> renameConversation()
-                R.id.conversation_details -> launchConversationDetails(threadId)
-                R.id.add_number_to_contact -> addNumberToContact()
-                R.id.dial_number -> dialNumber()
-                R.id.manage_people -> managePeople()
-                R.id.mark_as_unread -> markAsUnread()
-                else -> return@setOnMenuItemClickListener false
-            }
-            return@setOnMenuItemClickListener true
+            if (participants.isEmpty()) return@setOnMenuItemClickListener true
+            return@setOnMenuItemClickListener handleMenuItemAction(menuItem)
         }
+    }
+
+    private fun handleMenuItemAction(menuItem: MenuItem): Boolean {
+        when (menuItem.itemId) {
+            R.id.block_number -> blockNumber()
+            R.id.delete -> askConfirmDelete()
+            R.id.restore -> askConfirmRestoreAll()
+            R.id.archive -> archiveConversation()
+            R.id.unarchive -> unarchiveConversation()
+            R.id.rename_conversation -> renameConversation()
+            R.id.conversation_details -> launchConversationDetails(threadId)
+            R.id.add_number_to_contact -> addNumberToContact()
+            R.id.copy_number -> copyNumberToClipboard()
+            R.id.dial_number -> dialNumber()
+            R.id.manage_people -> managePeople()
+            R.id.mark_as_unread -> markAsUnread()
+            else -> return false
+        }
+        return true
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
@@ -592,9 +595,9 @@ class ThreadActivity : SimpleActivity() {
     }
 
     private fun handleItemClick(any: Any) {
-        when {
-            any is Message && any.isScheduled -> showScheduledMessageInfo(any)
-            any is ThreadError -> {
+        when (any) {
+            is Message if any.isScheduled -> showScheduledMessageInfo(any)
+            is ThreadError -> {
                 binding.messageHolder.threadTypeMessage.setText(any.messageText)
                 messageToResend = any.messageId
             }
@@ -646,6 +649,10 @@ class ThreadActivity : SimpleActivity() {
             createTemporaryThread(scheduledMessage, fakeThreadId, conversation)
             updateScheduledMessagesThreadId(messages, fakeThreadId)
             threadId = fakeThreadId
+        }
+
+        if (shortcutHelper.getShortcut(threadId) != null) {
+            shortcutHelper.removeShortcutForThread(threadId)
         }
     }
 
@@ -1189,6 +1196,13 @@ class ThreadActivity : SimpleActivity() {
     private fun dialNumber() {
         val phoneNumber = participants.first().phoneNumbers.first().normalizedNumber
         dialNumber(phoneNumber)
+    }
+
+    private fun copyNumberToClipboard() {
+        val phoneNumber = conversation?.phoneNumber
+            ?.ifEmpty { participants.firstOrNull()?.phoneNumbers?.firstOrNull()?.value }
+            ?: return
+        copyToClipboard(phoneNumber)
     }
 
     private fun managePeople() {

@@ -1058,6 +1058,26 @@
                     </RelativeLayout>
 
                     <RelativeLayout
+                        android:id="@+id/settingsEllipsizeModeHolder"
+                        style="@style/SettingsHolderStyle">
+
+                        <com.goodwy.commons.views.MyTextView
+                            android:id="@+id/settingsEllipsizeModeLabel"
+                            style="@style/SettingsTextLabelStyle"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_toStartOf="@+id/settingsEllipsizeMode"
+                            android:text="@string/long_text_behavior"/>
+
+                        <com.goodwy.commons.views.MyTextView
+                            android:id="@+id/settingsEllipsizeMode"
+                            style="@style/SettingsTextValueStyle"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="@dimen/settings_margin"
+                            tools:text="@string/cut_off"/>
+                    </RelativeLayout>
+
+                    <RelativeLayout
                         android:id="@+id/settings_relative_date_holder"
                         style="@style/SettingsHolderSwitchStyle">
 

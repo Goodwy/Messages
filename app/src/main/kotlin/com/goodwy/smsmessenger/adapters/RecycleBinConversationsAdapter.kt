@@ -8,14 +8,12 @@ import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.views.MyRecyclerView
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
-import com.goodwy.smsmessenger.extensions.config
 import com.goodwy.smsmessenger.extensions.createTemporaryThread
-import com.goodwy.smsmessenger.extensions.deleteConversation
 import com.goodwy.smsmessenger.extensions.deleteMessage
 import com.goodwy.smsmessenger.extensions.deleteScheduledMessage
 import com.goodwy.smsmessenger.extensions.messagesDB
 import com.goodwy.smsmessenger.extensions.restoreAllMessagesFromRecycleBinForConversation
-import com.goodwy.smsmessenger.extensions.updateLastConversationMessage
+import com.goodwy.smsmessenger.extensions.shortcutHelper
 import com.goodwy.smsmessenger.extensions.updateScheduledMessagesThreadId
 import com.goodwy.smsmessenger.helpers.SWIPE_ACTION_DELETE
 import com.goodwy.smsmessenger.helpers.SWIPE_ACTION_RESTORE
@@ -70,6 +68,10 @@ class RecycleBinConversationsAdapter(
             //activity.deleteConversation(it.threadId)
             deleteMessages(it)
             activity.notificationManager.cancel(it.threadId.hashCode())
+
+            if (activity.shortcutHelper.getShortcut(it.threadId) != null) {
+                activity.shortcutHelper.removeShortcutForThread(it.threadId)
+            }
         }
 
         removeConversationsFromList(conversationsToRemove)
@@ -160,8 +162,11 @@ class RecycleBinConversationsAdapter(
         val conversationsToRemove = ArrayList<Conversation>()
         conversationsToRemove.add(conversation)
         removeConversationsFromList(conversationsToRemove)
-    }
 
+        if (activity.shortcutHelper.getShortcut(conversation.threadId) != null) {
+            activity.shortcutHelper.removeShortcutForThread(conversation.threadId)
+        }
+    }
 
     private fun deleteMessages(
         conversation: Conversation,

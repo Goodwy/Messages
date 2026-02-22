@@ -3,6 +3,7 @@ package com.goodwy.smsmessenger.adapters
 import android.annotation.SuppressLint
 import android.graphics.Typeface
 import android.os.Parcelable
+import android.text.TextUtils
 import android.text.format.DateUtils
 import android.util.TypedValue
 import android.view.View
@@ -33,6 +34,8 @@ import com.goodwy.commons.extensions.slideLeft
 import com.goodwy.commons.extensions.slideLeftReturn
 import com.goodwy.commons.extensions.slideRight
 import com.goodwy.commons.extensions.slideRightReturn
+import com.goodwy.commons.helpers.ELLIPSIZE_MODE_END
+import com.goodwy.commons.helpers.FontHelper
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.views.MyRecyclerView
@@ -75,6 +78,7 @@ abstract class BaseConversationsAdapter(
     private var fontSize = activity.getTextSize()
     private var drafts = HashMap<Long, String>()
     private var showContactThumbnails = activity.config.showContactThumbnails
+    private var ellipsizeMode = activity.config.ellipsizeMode
 
     private var recyclerViewState: Parcelable? = null
 
@@ -97,6 +101,12 @@ abstract class BaseConversationsAdapter(
     @SuppressLint("NotifyDataSetChanged")
     fun updateFontSize() {
         fontSize = activity.getTextSize()
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateEllipsizeMode() {
+        ellipsizeMode = activity.config.ellipsizeMode
         notifyDataSetChanged()
     }
 
@@ -202,6 +212,10 @@ abstract class BaseConversationsAdapter(
             conversationAddress.apply {
                 text = title
                 setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize * 1.2f)
+                isSelected = true
+                val ellipsizeConfig =
+                    if (ellipsizeMode == ELLIPSIZE_MODE_END) TextUtils.TruncateAt.END else TextUtils.TruncateAt.MARQUEE
+                ellipsize = ellipsizeConfig
             }
 
             conversationBodyShort.apply {
@@ -223,9 +237,10 @@ abstract class BaseConversationsAdapter(
                 conversationBodyShort.alpha = 0.7f
                 if (conversation.isScheduled) Typeface.ITALIC else Typeface.NORMAL
             }
-            conversationAddress.setTypeface(null, style)
-            conversationBodyShort.setTypeface(null, style)
-            conversationDate.setTypeface(null, style)
+            val customTypeface = FontHelper.getTypeface(activity)
+            conversationAddress.setTypeface(customTypeface, style)
+            conversationBodyShort.setTypeface(customTypeface, style)
+            conversationDate.setTypeface(customTypeface, style)
 
 
             if (conversation.isBlocked) {

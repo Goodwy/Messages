@@ -6,9 +6,11 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.ContactsContract
 import com.goodwy.commons.RightApp
+import com.goodwy.commons.extensions.hasPermission
 import com.goodwy.commons.helpers.PERMISSION_READ_CONTACTS
 import com.goodwy.commons.helpers.PurchaseHelper
-import com.goodwy.commons.extensions.hasPermission
+import com.goodwy.commons.helpers.ensureBackgroundThread
+import com.goodwy.smsmessenger.extensions.rescheduleAllScheduledMessages
 import com.goodwy.smsmessenger.helpers.MessagingCache
 
 class App : RightApp() {
@@ -26,9 +28,13 @@ class App : RightApp() {
             ).forEach {
                 try {
                     contentResolver.registerContentObserver(it, true, contactsObserver)
-                } catch (_: Exception){
+                } catch (_: Exception) {
                 }
             }
+        }
+
+        ensureBackgroundThread {
+            rescheduleAllScheduledMessages()
         }
     }
 

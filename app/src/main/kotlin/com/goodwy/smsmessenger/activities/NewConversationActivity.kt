@@ -3,14 +3,12 @@ package com.goodwy.smsmessenger.activities
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
-import android.graphics.drawable.LayerDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.view.WindowManager
 import android.widget.Toast
 import android.widget.RelativeLayout
-import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.reddit.indicatorfastscroll.FastScrollItemIndicator

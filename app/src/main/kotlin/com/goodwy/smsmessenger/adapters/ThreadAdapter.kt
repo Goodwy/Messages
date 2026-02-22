@@ -15,7 +15,7 @@ import android.text.util.Linkify
 import android.util.TypedValue
 import android.view.*
 import android.widget.LinearLayout
-import android.widget.PopupMenu
+import androidx.appcompat.widget.PopupMenu
 import android.widget.RelativeLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintSet
@@ -55,6 +55,7 @@ import com.goodwy.commons.extensions.getProperPrimaryColor
 import com.goodwy.commons.extensions.getSurfaceColor
 import com.goodwy.commons.extensions.getTextSize
 import com.goodwy.commons.extensions.getTextSizeSmall
+import com.goodwy.commons.extensions.getTimeFormat
 import com.goodwy.commons.extensions.isDynamicTheme
 import com.goodwy.commons.extensions.isRTLLayout
 import com.goodwy.commons.extensions.isSystemInDarkMode
@@ -63,6 +64,7 @@ import com.goodwy.commons.extensions.launchSendSMSIntent
 import com.goodwy.commons.extensions.shareTextIntent
 import com.goodwy.commons.extensions.showErrorToast
 import com.goodwy.commons.extensions.usableScreenSize
+import com.goodwy.commons.helpers.FontHelper
 import com.goodwy.commons.helpers.TEXT_ALIGNMENT_ALONG_EDGES
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.views.MyRecyclerView
@@ -119,6 +121,7 @@ import com.goodwy.smsmessenger.models.ThreadItem.ThreadSending
 import com.goodwy.smsmessenger.models.ThreadItem.ThreadSent
 import java.util.Locale
 import kotlin.math.abs
+import org.joda.time.DateTime
 
 class ThreadAdapter(
     activity: SimpleActivity,
@@ -257,9 +260,18 @@ class ThreadAdapter(
 
     private fun copyToClipboard() {
         val selectedMessages = getSelectedItems().filterIsInstance<Message>()
-        val textToCopy = selectedMessages
-            .mapNotNull { message -> message.body.takeIf { it.isNotEmpty() } }
-            .joinToString("\n\n")
+        if (selectedMessages.isEmpty()) return
+
+        val textToCopy = if (selectedMessages.size == 1) {
+            selectedMessages.first().body
+        } else {
+            selectedMessages.filter { it.body.isNotEmpty() }.joinToString("\n\n") { message ->
+                val format = "${activity.config.dateFormat}, ${activity.getTimeFormat()}"
+                val dateTime = DateTime(message.millis()).toString(format)
+                val sender = if (message.isReceivedMessage()) message.senderName else activity.getString(R.string.me)
+                "[$dateTime] $sender: ${message.body}"
+            }
+        }
 
         if (textToCopy.isNotEmpty()) {
             activity.copyToClipboard(textToCopy)
@@ -400,7 +412,7 @@ class ThreadAdapter(
     private fun showLinkPopupMenu(context: Context, url: String, view: View) {
         val wrapper: Context = ContextThemeWrapper(activity, activity.getPopupMenuTheme())
         val popupMenu = PopupMenu(wrapper, view, Gravity.START)
-        val text = url.toUri().schemeSpecificPart
+        val text = url//.toUri().schemeSpecificPart //https://github.com/Goodwy/Messages/issues/91
         val (title, icon) = getActionTitleAndIcon(url)
 
         // Use only 24dp icons
@@ -811,7 +823,7 @@ class ThreadAdapter(
                 setLinkTextColor(contrastColorReceived)
 
                 if (message.isScheduled) {
-                    typeface = Typeface.create(Typeface.DEFAULT, Typeface.ITALIC)
+                    typeface = Typeface.create(FontHelper.getTypeface(activity), Typeface.ITALIC)
                     val scheduledDrawable = AppCompatResources.getDrawable(activity, com.goodwy.commons.R.drawable.ic_clock_vector)?.apply {
                         applyColorFilter(contrastColor)
                         val size = lineHeight
@@ -821,7 +833,7 @@ class ThreadAdapter(
 
                     setCompoundDrawables(null, null, scheduledDrawable, null)
                 } else {
-                    typeface = Typeface.DEFAULT
+                    typeface = FontHelper.getTypeface(activity)
                     setCompoundDrawables(null, null, null, null)
                 }
             }

@@ -86,13 +86,17 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 tools:src="@drawable/ic_sms_messenger" />
 
-            <TextView
+            <com.goodwy.commons.views.MyTextView
                 android:id="@+id/conversationAddress"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/medium_margin"
                 android:layout_marginStart="@dimen/normal_margin"
-                android:ellipsize="end"
+                android:ellipsize="marquee"
+                android:focusable="false"
+                android:marqueeRepeatLimit="3"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
                 android:maxLines="1"
                 android:paddingEnd="@dimen/medium_margin"
                 android:textSize="@dimen/big_text_size"
@@ -104,7 +108,7 @@
                 tools:text="John"
                 tools:ignore="RtlSymmetry" />
 
-            <TextView
+            <com.goodwy.commons.views.MyTextView
                 android:id="@+id/draftIndicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -122,7 +126,7 @@
                 app:layout_constraintStart_toEndOf="@+id/conversationImage"
                 tools:ignore="RtlSymmetry"/>
 
-            <TextView
+            <com.goodwy.commons.views.MyTextView
                 android:id="@+id/conversationBodyShort"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -181,7 +185,7 @@
                 android:textStyle="bold"
                 android:background="@drawable/tab_background"
                 android:visibility="gone"
-                android:includeFontPadding="false"
+                android:includeFontPadding="true"
                 app:layout_constraintTop_toTopOf="@+id/conversationBodyShort"
                 app:layout_constraintBottom_toBottomOf="@+id/conversationBodyShort"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -190,7 +194,7 @@
                 tools:text="8"
                 tools:ignore="SpUsage" />
 
-            <TextView
+            <com.goodwy.commons.views.MyTextView
                 android:id="@+id/conversationDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

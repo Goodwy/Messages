@@ -1,6 +1,11 @@
+@file:Suppress("MaxLineLength")
 package com.goodwy.smsmessenger.interfaces
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
 import com.goodwy.smsmessenger.models.Message
 import com.goodwy.smsmessenger.models.RecycleBinMessage
 
@@ -23,6 +28,9 @@ interface MessagesDao {
 
     @Query("SELECT messages.* FROM messages LEFT OUTER JOIN recycle_bin_messages ON messages.id = recycle_bin_messages.id WHERE recycle_bin_messages.id IS NOT NULL")
     fun getAllRecycleBinMessages(): List<Message>
+
+    @Query("SELECT messages.* FROM messages LEFT OUTER JOIN recycle_bin_messages ON messages.id = recycle_bin_messages.id WHERE recycle_bin_messages.id IS NULL AND is_scheduled = 1")
+    fun getAllScheduledMessages(): List<Message>
 
     @Query("SELECT messages.* FROM messages LEFT OUTER JOIN recycle_bin_messages ON messages.id = recycle_bin_messages.id WHERE recycle_bin_messages.id IS NOT NULL AND recycle_bin_messages.deleted_ts < :timestamp")
     fun getOldRecycleBinMessages(timestamp: Long): List<Message>
@@ -89,4 +97,6 @@ interface MessagesDao {
 
     @Query("SELECT COUNT(*) FROM messages WHERE thread_id = :threadId and read = 0")
     fun getThreadUnreadMessages(threadId: Long): Int
+
+
 }

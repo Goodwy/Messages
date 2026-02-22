@@ -136,6 +136,8 @@ class NotificationHelper(private val context: Context) {
                 } else {
                     SimpleContactsHelper(context).getContactLetterIcon(title)
                 }
+            } else if (isNoReplySms&& title != null) {
+                SimpleContactsHelper(context).getColoredCompanyIcon(title).convertToBitmap()
             } else if (title == address) {
                 SimpleContactsHelper(context).getColoredContactIcon(title).convertToBitmap()
             } else if (sender != null) {

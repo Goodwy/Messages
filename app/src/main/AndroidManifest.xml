@@ -11,6 +11,7 @@
     <uses-permission android:name="android.provider.Telephony.SMS_RECEIVED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
@@ -22,10 +23,12 @@
         tools:node="remove" />
 
     <queries>
-        <package android:name="com.goodwy.audiobook.debug" />
-        <package android:name="com.goodwy.audiobook" />
-        <package android:name="com.goodwy.files.debug" />
-        <package android:name="com.goodwy.files" />
+        <package android:name="dev.goodwy.phone.debug" />
+        <package android:name="dev.goodwy.phone" />
+        <package android:name="com.goodwy.smsmessenger.debug" />
+        <package android:name="com.goodwy.smsmessenger" />
+        <package android:name="dev.goodwy.contacts.debug" />
+        <package android:name="dev.goodwy.contacts" />
         <package android:name="com.goodwy.dialer.debug" />
         <package android:name="com.goodwy.dialer" />
         <package android:name="com.goodwy.contacts.debug" />
@@ -34,12 +37,13 @@
         <package android:name="com.goodwy.smsmessenger" />
         <package android:name="com.goodwy.voicerecorder.debug" />
         <package android:name="com.goodwy.voicerecorder" />
-        <package android:name="com.goodwy.voicerecorderfree.debug" />
-        <package android:name="com.goodwy.voicerecorderfree" />
-        <package android:name="com.goodwy.calendar" />
-        <package android:name="com.goodwy.calendar.debug" />
+        <package android:name="com.goodwy.gallery.debug" />
+        <package android:name="com.goodwy.gallery" />
+        <package android:name="com.goodwy.filemanager.debug" />
+        <package android:name="com.goodwy.filemanager" />
+        <package android:name="com.goodwy.audiobooklite" />
         <package android:name="com.goodwy.keyboard" />
-        <package android:name="com.goodwy.keyboard.debug" />
+        <package android:name="com.goodwy.calendar" />
     </queries>
 
     <uses-feature android:name="android.hardware.telephony" />
@@ -272,6 +276,18 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="com.goodwy.smsmessenger.action.copy_number" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".receivers.RescheduleAlarmsReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>
         </receiver>
 

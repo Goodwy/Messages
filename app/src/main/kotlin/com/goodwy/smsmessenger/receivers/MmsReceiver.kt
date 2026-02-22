@@ -2,18 +2,20 @@ package com.goodwy.smsmessenger.receivers
 
 import android.content.Context
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import android.os.PowerManager
 import com.bumptech.glide.Glide
+import com.goodwy.commons.extensions.baseConfig
+import com.goodwy.commons.extensions.getMyContactsCursor
+import com.goodwy.commons.extensions.isNumberBlocked
 import com.klinker.android.send_message.MmsReceivedReceiver
-import com.goodwy.commons.extensions.*
+import com.goodwy.commons.helpers.ContactLookupResult
 import com.goodwy.commons.helpers.SimpleContactsHelper
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.extensions.config
 import com.goodwy.smsmessenger.extensions.getConversations
 import com.goodwy.smsmessenger.extensions.getLatestMMS
+import com.goodwy.smsmessenger.extensions.getNameFromAddress
 import com.goodwy.smsmessenger.extensions.insertOrUpdateConversation
 import com.goodwy.smsmessenger.extensions.notificationHelper
 import com.goodwy.smsmessenger.extensions.shouldUnarchive
@@ -27,8 +29,14 @@ import com.goodwy.smsmessenger.models.Message
 class MmsReceiver : MmsReceivedReceiver() {
 
     override fun isAddressBlocked(context: Context, address: String): Boolean {
-        val normalizedAddress = address.normalizePhoneNumber()
-        return context.isNumberBlocked(normalizedAddress)
+        if (context.isNumberBlocked(address)) return true
+        if (context.baseConfig.blockUnknownNumbers) {
+            val privateCursor = context.getMyContactsCursor(favoritesOnly = false, withPhoneNumbersOnly = true)
+            val result = SimpleContactsHelper(context).existsSync(address, privateCursor)
+            return result == ContactLookupResult.NotFound
+        }
+
+        return false
     }
 
     override fun isContentBlocked(context: Context, content: String): Boolean {
@@ -37,21 +45,10 @@ class MmsReceiver : MmsReceivedReceiver() {
 
     override fun onMessageReceived(context: Context, messageUri: Uri) {
         val mms = context.getLatestMMS() ?: return
-        val address = mms.getSender()?.phoneNumbers?.first()?.normalizedNumber ?: ""
-
+        val address = mms.getSender()?.phoneNumbers?.firstOrNull()?.normalizedNumber ?: ""
         val size = context.resources.getDimension(R.dimen.notification_large_icon_size).toInt()
-        val privateCursor = context.getMyContactsCursor(favoritesOnly = false, withPhoneNumbersOnly = true)
         ensureBackgroundThread {
-            if (context.baseConfig.blockUnknownNumbers) {
-                val simpleContactsHelper = SimpleContactsHelper(context)
-                simpleContactsHelper.exists(address, privateCursor) { exists ->
-                    if (exists) {
-                        handleMmsMessage(context, mms, size, address)
-                    }
-                }
-            } else {
-                handleMmsMessage(context, mms, size, address)
-            }
+            handleMmsMessage(context, mms, size, address)
         }
 
         if (context.config.notifyTurnsOnScreen) {
@@ -87,25 +84,26 @@ class MmsReceiver : MmsReceivedReceiver() {
             null
         }
 
-        Handler(Looper.getMainLooper()).post {
-            context.showReceivedMessageNotification(
-                messageId = mms.id,
-                address = address,
-                body = mms.body,
-                threadId = mms.threadId,
-                bitmap = glideBitmap,
-                subscriptionId = mms.subscriptionId
-            )
-            ensureBackgroundThread {
-                val conversation = context.getConversations(mms.threadId).firstOrNull()
-                    ?: return@ensureBackgroundThread
-                context.insertOrUpdateConversation(conversation)
-                if (context.shouldUnarchive()) {
-                    context.updateConversationArchivedStatus(mms.threadId, false)
-                }
-                refreshMessages()
-                refreshConversations()
-            }
+        val senderName = context.getMyContactsCursor(favoritesOnly = false, withPhoneNumbersOnly = true).use {
+            context.getNameFromAddress(address, it)
         }
+
+        context.showReceivedMessageNotification(
+            messageId = mms.id,
+            address = address,
+            senderName = senderName,
+            body = mms.body,
+            threadId = mms.threadId,
+            bitmap = glideBitmap,
+            subscriptionId = mms.subscriptionId
+        )
+
+        val conversation = context.getConversations(mms.threadId).firstOrNull() ?: return
+        runCatching { context.insertOrUpdateConversation(conversation) }
+        if (context.shouldUnarchive()) {
+            context.updateConversationArchivedStatus(mms.threadId, false)
+        }
+        refreshMessages()
+        refreshConversations()
     }
 }

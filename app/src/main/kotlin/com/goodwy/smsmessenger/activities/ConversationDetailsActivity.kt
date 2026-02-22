@@ -66,12 +66,17 @@ class ConversationDetailsActivity : SimpleActivity() {
 
     private fun initButton() {
         val primaryColor = getProperPrimaryColor()
+        val typeface = FontHelper.getTypeface(this)
 
         var drawableSMS = AppCompatResources.getDrawable(this, com.goodwy.commons.R.drawable.ic_phone_vector)
         drawableSMS = DrawableCompat.wrap(drawableSMS!!)
         DrawableCompat.setTint(drawableSMS, primaryColor)
         DrawableCompat.setTintMode(drawableSMS, PorterDuff.Mode.SRC_IN)
-        binding.oneButton.setCompoundDrawablesWithIntrinsicBounds(null, drawableSMS, null, null)
+        binding.oneButton.apply {
+            setCompoundDrawablesWithIntrinsicBounds(null, drawableSMS, null, null)
+            setTypeface(typeface)
+            setTextColor(primaryColor)
+        }
 
 //        var drawableCall = AppCompatResources.getDrawable(this, com.goodwy.commons.R.drawable.ic_videocam_vector)
 //        drawableCall = DrawableCompat.wrap(drawableCall!!)
@@ -83,19 +88,23 @@ class ConversationDetailsActivity : SimpleActivity() {
         drawableVideoCall = DrawableCompat.wrap(drawableVideoCall!!)
         DrawableCompat.setTint(drawableVideoCall, primaryColor)
         DrawableCompat.setTintMode(drawableVideoCall, PorterDuff.Mode.SRC_IN)
-        binding.threeButton.setCompoundDrawablesWithIntrinsicBounds(null, drawableVideoCall, null, null)
+        binding.threeButton.apply {
+            setCompoundDrawablesWithIntrinsicBounds(null, drawableVideoCall, null, null)
+            setTypeface(typeface)
+            setTextColor(primaryColor)
+        }
 
         var drawableMail = AppCompatResources.getDrawable(this, com.goodwy.commons.R.drawable.ic_ios_share)
         drawableMail = DrawableCompat.wrap(drawableMail!!)
         DrawableCompat.setTint(drawableMail, primaryColor)
         DrawableCompat.setTintMode(drawableMail, PorterDuff.Mode.SRC_IN)
-        binding.fourButton.setCompoundDrawablesWithIntrinsicBounds(null, drawableMail, null, null)
+        binding.fourButton.apply {
+            setCompoundDrawablesWithIntrinsicBounds(null, drawableMail, null, null)
+            setTypeface(typeface)
+            setTextColor(primaryColor)
+        }
 
         arrayOf(
-            binding.oneButton,
-//            binding.twoButton,
-            binding.threeButton,
-            binding.fourButton,
             binding.conversationNumber,
             binding.conversationBirthdays
         ).forEach {
@@ -409,12 +418,15 @@ class ConversationDetailsActivity : SimpleActivity() {
         val red = resources.getColor(com.goodwy.commons.R.color.red_missed, theme)
         val isBlockNumbers = isBlockNumbers()
         val blockColor = if (isBlockNumbers) { primaryColor } else { red }
-        blockButton.setTextColor(blockColor)
-        val unblockText = if (participants.size == 1) com.goodwy.strings.R.string.unblock_number else com.goodwy.strings.R.string.unblock_numbers
-        val blockText = if (participants.size == 1) com.goodwy.commons.R.string.block_number else com.goodwy.commons.R.string.block_numbers
-        blockButton.text = if (isBlockNumbers) { resources.getString(unblockText) } else { resources.getString(blockText)}
-        blockButton.setOnClickListener {
-            blockNumber()
+        blockButton.apply {
+            setTypeface(FontHelper.getTypeface(this@ConversationDetailsActivity))
+            setTextColor(blockColor)
+            val unblockText = if (participants.size == 1) com.goodwy.strings.R.string.unblock_number else com.goodwy.strings.R.string.unblock_numbers
+            val blockText = if (participants.size == 1) com.goodwy.commons.R.string.block_number else com.goodwy.commons.R.string.block_numbers
+            blockButton.text = if (isBlockNumbers) { resources.getString(unblockText) } else { resources.getString(blockText)}
+            blockButton.setOnClickListener {
+                blockNumber()
+            }
         }
     }
 

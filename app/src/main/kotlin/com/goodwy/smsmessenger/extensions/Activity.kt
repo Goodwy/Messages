@@ -27,6 +27,7 @@ import com.goodwy.commons.extensions.launchViewContactIntent
 import com.goodwy.commons.extensions.lightenColor
 import com.goodwy.commons.extensions.performHapticFeedback
 import com.goodwy.commons.extensions.showErrorToast
+import com.goodwy.commons.extensions.showSupportSnackbar
 import com.goodwy.commons.extensions.toast
 import com.goodwy.commons.helpers.CONTACT_ID
 import com.goodwy.commons.helpers.IS_PRIVATE
@@ -90,22 +91,25 @@ fun Activity.launchViewIntent(uri: Uri, mimetype: String, filename: String) {
 }
 
 fun Activity.startContactDetailsIntentRecommendation(contact: SimpleContact) {
-    val isNewApp = isNewApp()
+    val isNewApp = true //isNewApp()
     val simpleContacts = "com.goodwy.contacts"
     val simpleContactsDebug = "com.goodwy.contacts.debug"
-    val newSimpleContacts = "dev.goodwy.contacts"
-    val newSimpleContactsDebug = "dev.goodwy.contacts.debug"
+    val newContacts = "dev.goodwy.contacts"
+    val newContactsDebug = "dev.goodwy.contacts.debug"
     if (
         (0..config.appRecommendationDialogCount).random() == 2 &&
         (!isPackageInstalled(simpleContacts) && !isPackageInstalled(simpleContactsDebug) &&
-            !isPackageInstalled(newSimpleContacts) && !isPackageInstalled(newSimpleContactsDebug))
+            !isPackageInstalled(newContacts) && !isPackageInstalled(newContactsDebug))
     ) {
         NewAppDialog(
             activity = this,
-            packageName = if (isNewApp) newSimpleContacts else simpleContacts,
+            packageName = if (isNewApp) newContacts else simpleContacts,
             title = getString(com.goodwy.strings.R.string.recommendation_dialog_contacts_g),
-            text = getString(com.goodwy.commons.R.string.right_contacts),
-            drawable = AppCompatResources.getDrawable(this, com.goodwy.commons.R.drawable.ic_contacts)
+            text = if (isNewApp) "AlRight Contacts" else getString(com.goodwy.commons.R.string.right_contacts),
+            drawable = AppCompatResources.getDrawable(
+                this,
+                if (isNewApp) com.goodwy.commons.R.drawable.ic_contacts_new else com.goodwy.commons.R.drawable.ic_contacts
+            )
         ) {
             startContactDetailsIntent(contact)
         }
@@ -194,21 +198,7 @@ fun SimpleActivity.launchPurchase() {
 }
 
 fun SimpleActivity.showSnackbar(view: View) {
-    view.performHapticFeedback()
-
-    val snackbar = Snackbar.make(view, com.goodwy.strings.R.string.support_project_to_unlock, Snackbar.LENGTH_SHORT)
-        .setAction(com.goodwy.commons.R.string.support) {
-            launchPurchase()
-        }
-
-    val bgDrawable = ResourcesCompat.getDrawable(view.resources, com.goodwy.commons.R.drawable.button_background_16dp, null)
-    snackbar.view.background = bgDrawable
-    val properBackgroundColor = getProperBackgroundColor()
-    val backgroundColor = if (properBackgroundColor == Color.BLACK) getSurfaceColor().lightenColor(6) else getSurfaceColor().darkenColor(6)
-    snackbar.setBackgroundTint(backgroundColor)
-    snackbar.setTextColor(getProperTextColor())
-    snackbar.setActionTextColor(getProperPrimaryColor())
-    snackbar.show()
+    showSupportSnackbar(view) { launchPurchase() }
 }
 
 fun SimpleActivity.launchAbout() {
@@ -276,17 +266,19 @@ fun SimpleActivity.launchAbout() {
 }
 
 fun Activity.newAppRecommendation() {
-    if (!isNewApp()) {
-        if ((0..config.newAppRecommendationDialogCount).random() == 2) {
-            val packageName = "segassem.ywdoog.ved".reversed()
-            NewAppDialog(
-                activity = this,
-                packageName = packageName,
-                title = getString(com.goodwy.strings.R.string.notification_of_new_application),
-                text = "AlRight Messages",
-                drawable = AppCompatResources.getDrawable(this, com.goodwy.commons.R.drawable.ic_sms_messenger_new),
-                showSubtitle = true
-            ) {
+    if (resources.getBoolean(com.goodwy.commons.R.bool.is_foss)) {
+        if (!isNewApp()) {
+            if ((0..config.newAppRecommendationDialogCount).random() == 2) {
+                val packageName = "segassem.ywdoog.ved".reversed()
+                NewAppDialog(
+                    activity = this,
+                    packageName = packageName,
+                    title = getString(com.goodwy.strings.R.string.notification_of_new_application),
+                    text = "AlRight Messages",
+                    drawable = AppCompatResources.getDrawable(this, com.goodwy.commons.R.drawable.ic_sms_messenger_new),
+                    showSubtitle = true
+                ) {
+                }
             }
         }
     }

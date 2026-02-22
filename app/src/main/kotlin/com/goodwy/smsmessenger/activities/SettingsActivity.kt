@@ -12,7 +12,6 @@ import com.goodwy.commons.dialogs.*
 import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.*
 import com.goodwy.commons.models.RadioItem
-import com.goodwy.commons.models.Release
 import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.databinding.ActivitySettingsBinding
@@ -161,6 +160,7 @@ class SettingsActivity : SimpleActivity() {
         setupShowDividers()
         setupShowContactThumbnails()
         setupContactThumbnailsSize()
+        setupEllipsizeMode()
         setupUseRelativeDate()
         setupUnreadAtTop()
         setupLinesCount()
@@ -1075,6 +1075,35 @@ class SettingsActivity : SimpleActivity() {
             CONTACT_THUMBNAILS_SIZE_MEDIUM -> com.goodwy.commons.R.string.medium
             CONTACT_THUMBNAILS_SIZE_LARGE -> com.goodwy.commons.R.string.large
             else -> com.goodwy.commons.R.string.extra_large
+        }
+    )
+
+    private fun setupEllipsizeMode() = binding.apply {
+        settingsEllipsizeMode.text = getEllipsizeModeText()
+        settingsEllipsizeModeHolder.setOnClickListener {
+            val items = arrayListOf(
+                RadioItem(ELLIPSIZE_MODE_END, getString(com.goodwy.strings.R.string.cut_off)),
+                RadioItem(ELLIPSIZE_MODE_MARQUEE, getString(com.goodwy.strings.R.string.auto_scroll)),
+            )
+
+            RadioGroupDialog(
+                this@SettingsActivity,
+                items,
+                config.ellipsizeMode,
+                com.goodwy.strings.R.string.long_text_behavior,
+                defaultItemId = ELLIPSIZE_MODE_END
+            ) {
+                config.ellipsizeMode = it as Int
+                settingsEllipsizeMode.text = getEllipsizeModeText()
+//                config.needRestart = true
+            }
+        }
+    }
+
+    private fun getEllipsizeModeText() = getString(
+        when (baseConfig.ellipsizeMode) {
+            ELLIPSIZE_MODE_END -> com.goodwy.strings.R.string.cut_off
+            else -> com.goodwy.strings.R.string.auto_scroll
         }
     )
 

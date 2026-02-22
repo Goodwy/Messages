@@ -1,33 +1,33 @@
 [versions]
 #jetbrains
-kotlin = "2.2.21"
-kotlinxSerializationJson = "1.9.0"
+kotlin = "2.3.10"
+kotlinxSerializationJson = "1.10.0"
 #KSP
-ksp = "2.3.0"
+ksp = "2.3.5"
 #Detekt
 detekt = "1.23.8"
-detektCompose = "0.4.27"
+detektCompose = "0.4.28"
 #AndroidX
 androidx-constraintlayout = "2.2.1"
-androidx-swiperefreshlayout = "1.1.0"
-androidx-lifecycleprocess = "2.9.4"
+androidx-swiperefreshlayout = "1.2.0"
+androidx-lifecycleprocess = "2.10.0"
 androidx-documentfile = "1.1.0"
 #Eventbus
 eventbus = "3.3.1"
 #Room
-room = "2.8.3"
+room = "2.8.4"
 #Simple Mobile Tools
 mmslib = "1.0.0"
 indicatorFastScroll = "fe6ddbc316"
 #Goodwy
-right-commons = "395c45c606"
+right-commons = "e00d817e3e"
 behavioRule = "1.0.1"
 rxAnimation = "2.1.1"
 rxJava3 = "3.1.5"
 swipeToActionLayout = "94ab9268eb"
 googleServices = "21.0.1"
 #Gradle
-gradlePlugins-agp = "8.11.1"
+gradlePlugins-agp = "9.0.1"
 #build
 app-build-compileSDKVersion = "36"
 app-build-targetSDK = "36"
@@ -35,7 +35,7 @@ app-build-minimumSDK = "26"
 app-build-javaVersion = "VERSION_17"
 app-build-kotlinJVMTarget = "17"
 #Helpers
-ez-vcard = "0.12.1"
+ez-vcard = "0.12.2"
 [libraries]
 #AndroidX
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "androidx-constraintlayout" }
@@ -80,7 +80,6 @@ lifecycle = [
 ]
 [plugins]
 android = { id = "com.android.application", version.ref = "gradlePlugins-agp" }
-kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

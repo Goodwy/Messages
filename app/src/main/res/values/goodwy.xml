@@ -54,4 +54,5 @@
 </ol>
         ]]>
     </string>
+    <string name="restricted_settings_guide">Android has restricted access to SMS features for this app. To continue:\n\n1. Tap \"OK\" to open App Settings.\n2. Tap the three dots (⋮) in the top right corner.\n3. Select \"Allow restricted settings\".\n4. Return to the app and try again.</string>
 </resources>
