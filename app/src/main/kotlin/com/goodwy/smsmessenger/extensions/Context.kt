@@ -540,16 +540,31 @@ private fun Context.queryCursorUnsafe(
     }
 }
 
+// Export not working
+//fun Context.getConversationIds(): List<Long> {
+//    val projection = arrayOf(Threads._ID)
+//    val sortOrder = "${Threads.DATE} ASC"
+//    val conversationIds = mutableListOf<Long>()
+//    queryCursor(Threads.CONTENT_URI, projection, null, null, sortOrder, true) { cursor ->
+//        val id = cursor.getLongValue(Threads._ID)
+//        conversationIds.add(id)
+//    }
+//    return conversationIds
+//}
+
 fun Context.getConversationIds(): List<Long> {
+    val uri = "${Threads.CONTENT_URI}?simple=true".toUri()
     val projection = arrayOf(Threads._ID)
+//    val selection = "${Threads.MESSAGE_COUNT} > 0"
     val sortOrder = "${Threads.DATE} ASC"
     val conversationIds = mutableListOf<Long>()
-    queryCursor(Threads.CONTENT_URI, projection, null, null, sortOrder, true) { cursor ->
+    queryCursor(uri, projection, null, null, sortOrder, true) { cursor ->
         val id = cursor.getLongValue(Threads._ID)
         conversationIds.add(id)
     }
     return conversationIds
 }
+
 
 // based on https://stackoverflow.com/a/6446831/1967672
 @SuppressLint("NewApi")

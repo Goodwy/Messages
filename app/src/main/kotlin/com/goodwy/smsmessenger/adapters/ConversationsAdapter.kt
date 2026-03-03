@@ -10,7 +10,6 @@ import com.goodwy.commons.extensions.*
 import com.goodwy.commons.helpers.KEY_PHONE
 import com.goodwy.commons.helpers.ensureBackgroundThread
 import com.goodwy.commons.views.MyRecyclerView
-import com.goodwy.smsmessenger.BuildConfig
 import com.goodwy.smsmessenger.R
 import com.goodwy.smsmessenger.activities.SimpleActivity
 import com.goodwy.smsmessenger.dialogs.RenameConversationDialog
@@ -20,6 +19,7 @@ import com.goodwy.smsmessenger.extensions.createTemporaryThread
 import com.goodwy.smsmessenger.extensions.deleteConversation
 import com.goodwy.smsmessenger.extensions.deleteMessage
 import com.goodwy.smsmessenger.extensions.deleteScheduledMessage
+import com.goodwy.smsmessenger.extensions.dialNumber
 import com.goodwy.smsmessenger.extensions.getUnreadMMSCountFromSystem
 import com.goodwy.smsmessenger.extensions.launchConversationDetails
 import com.goodwy.smsmessenger.extensions.markLastMessageUnread
@@ -177,7 +177,7 @@ class ConversationsAdapter(
 
     private fun dialNumber() {
         val conversation = getSelectedItems().firstOrNull() ?: return
-        activity.launchCallIntent(conversation.phoneNumber, key = BuildConfig.RIGHT_APP_KEY)
+        activity.dialNumber(conversation.phoneNumber)
         finishActMode()
     }
 
@@ -575,7 +575,7 @@ class ConversationsAdapter(
     private fun swipedCall(conversation: Conversation) {
         if (conversation.isGroupConversation || isShortCodeWithLetters(conversation.phoneNumber)) activity.toast(com.goodwy.commons.R.string.no_phone_number_found)
         else {
-            activity.launchCallIntent(conversation.phoneNumber, key = BuildConfig.RIGHT_APP_KEY)
+            activity.dialNumber(conversation.phoneNumber)
             finishActMode()
         }
     }

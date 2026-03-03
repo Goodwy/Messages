@@ -67,6 +67,7 @@ class MainActivity : SimpleActivity() {
         binding.mainMenu.updateTitle(getString(R.string.messages))
         binding.mainMenu.searchBeVisibleIf(config.showSearchBar)
         setupEdgeToEdge(padBottomImeAndSystem = listOf(binding.conversationsList, binding.searchResultsList))
+
         if (config.changeColourTopBar) {
             val useSurfaceColor = isDynamicTheme() && !isSystemInDarkMode()
             setupSearchMenuScrollListener(
