@@ -377,8 +377,8 @@ fun Context.getMMSSender(msgId: Long): String {
 fun Context.getConversations(
     threadId: Long? = null,
     privateContacts: ArrayList<SimpleContact> = ArrayList(),
-    limit: Int = 50,
-    offset: Int = 0,
+//    limit: Int = 50,
+//    offset: Int = 0,
 ): ArrayList<Conversation> {
     val archiveAvailable = config.isArchiveAvailable
     val useRecycleBin = config.useRecycleBin
@@ -403,8 +403,9 @@ fun Context.getConversations(
         selectionArgs += threadId.toString()
     }
 
-//    val sortOrder = "${Threads.DATE} DESC"
-    val sortOrder = "${Threads.DATE} DESC LIMIT $limit OFFSET $offset"
+    val sortOrder = "${Threads.DATE} DESC"
+    // On some devices, more than 50 conversations do not load
+//    val sortOrder = "${Threads.DATE} DESC LIMIT $limit OFFSET $offset"
 
     val conversations = ArrayList<Conversation>()
     val simpleContactHelper = SimpleContactsHelper(this)
