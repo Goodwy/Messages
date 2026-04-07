@@ -1935,6 +1935,24 @@ class ThreadActivity : SimpleActivity() {
         setupAdapter()
         runOnUiThread {
             setupSIMSelector()
+            scrollToBottomIfUserIsNearBottom()
+        }
+    }
+
+    private fun scrollToBottomIfUserIsNearBottom() {
+        val layoutManager = binding.threadMessagesList.layoutManager as LinearLayoutManager
+        val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
+        val itemCount = getOrCreateThreadAdapter().itemCount
+
+        // Scroll down if the user was at the bottom (the last 3 posts)
+        if (lastVisiblePosition >= itemCount - 3) {
+            binding.threadMessagesList.postDelayed({
+                scrollToBottom()
+            }, 100)
+        } else {
+            // If the user is above, display the button
+            val fab = binding.scrollToBottomFab
+            fab.show()
         }
     }
 

@@ -37,8 +37,8 @@
         <package android:name="com.goodwy.smsmessenger" />
         <package android:name="com.goodwy.voicerecorder.debug" />
         <package android:name="com.goodwy.voicerecorder" />
-        <package android:name="com.goodwy.gallery.debug" />
-        <package android:name="com.goodwy.gallery" />
+        <package android:name="dev.goodwy.gallery.debug" />
+        <package android:name="dev.goodwy.gallery" />
         <package android:name="com.goodwy.filemanager.debug" />
         <package android:name="com.goodwy.filemanager" />
         <package android:name="com.goodwy.audiobooklite" />

@@ -47,7 +47,8 @@ class ShortcutHelper(private val context: Context) {
         val persons: Array<Person> = participants.map { it.toPerson(context) }.toTypedArray()
         val isContact = if (participants.isNotEmpty()) participants[0].contactId != 0 else false
         val shortLabel = conv.title.ifEmpty {
-            conv.phoneNumber.ifEmpty { "Unknown" }
+            if (participants.isNotEmpty()) participants[0].name.ifEmpty { "Unknown" }
+            else conv.phoneNumber.ifEmpty { "Unknown" }
         }
 
         val intent = Intent(context, ThreadActivity::class.java).apply {
